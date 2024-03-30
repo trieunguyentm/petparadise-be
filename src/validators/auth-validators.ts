@@ -58,3 +58,7 @@ export const loginValidator = [
     .notEmpty()
     .withMessage("Password is required"),
 ];
+
+export const verifyValidator = [
+  body("cookieName").notEmpty().withMessage("Cookie name is required"),
+];

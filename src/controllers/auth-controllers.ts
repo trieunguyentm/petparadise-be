@@ -10,7 +10,54 @@ import {
 import { validationResult } from "express-validator";
 import { ERROR_CLIENT, ERROR_SESSION } from "../constants";
 import { ErrorResponse } from "../types/response";
+import { connectRedis } from "../db/redis";
 import * as jwtHelper from "../utils/jwt";
+
+export const handleAuth = async (req: Request, res: Response) => {
+  try {
+    const authCookie = req.cookies["refresh-token-id"];
+    if (!authCookie) {
+      return res.status(401).json({ auth: false });
+    } else {
+      const client = await connectRedis();
+      const dataSession = await client.get(authCookie);
+      if (!dataSession) {
+        return res.status(401).json({ auth: false });
+      } else {
+        return res.status(200).json({ auth: true });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(401).json({ auth: false });
+  }
+};
+
+export const handleVerify = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(403).json({
+      verify: false,
+      message: `${errors.array()[0].msg}`,
+    });
+  }
+  try {
+    const { cookieName } = req.body;
+    const client = await connectRedis();
+    const cookieValue = req.cookies[cookieName];
+    const cookieData = await client.get(cookieValue);
+    if (!cookieData) {
+      return res.status(403).json({ verify: false });
+    } else {
+      return res.status(200).json({ verify: true });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(403).json({
+      verify: false,
+    });
+  }
+};
 
 export const handleRegister = async (req: Request, res: Response) => {
   // Kiểm tra kết quả validation
@@ -98,7 +145,7 @@ export const handleRecoveryPassword = async (req: Request, res: Response) => {
     return res.status(result.statusCode).json(result);
   } else {
     /** Set Cookie */
-    res.cookie("recovery-password", result.data?.id, {
+    res.cookie("verify-otp-recovery", result.data?.id, {
       maxAge: 300 * 1000,
       httpOnly: true,
       secure: false,
@@ -122,8 +169,8 @@ export const handleVerifyOTPRecovery = async (req: Request, res: Response) => {
     return res.status(400).json(response);
   }
   const { otpCode } = req.body;
-  // Lấy cookie 'recovery-password'
-  const verifyOtpCookie = req.cookies["recovery-password"];
+  // Lấy cookie 'verify-otp-recovery'
+  const verifyOtpCookie = req.cookies["verify-otp-recovery"];
   if (!verifyOtpCookie) {
     let dataResponse: ErrorResponse = {
       success: false,
@@ -142,7 +189,7 @@ export const handleVerifyOTPRecovery = async (req: Request, res: Response) => {
     return res.status(result.statusCode).json(result);
   } else {
     // Xóa cookie "verify-otp" bằng cách set nó với maxAge là 0 hoặc set expire date là quá khứ
-    res.cookie("recovery-password", "", { maxAge: 0 });
+    res.cookie("verify-otp-recovery", "", { maxAge: 0 });
     // Thêm cookie "confirm-password"
     res.cookie("confirm-password", result.data?.id, {
       maxAge: 300 * 1000,
