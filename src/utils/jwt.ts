@@ -17,6 +17,8 @@ export const generateRefreshToken = ({
   /** Payload */
   const refreshTokenPayload = {
     id,
+    username,
+    email,
     tokenType: REFRESH_TOKEN,
   };
   /** Id cho Refresh Token */
@@ -104,7 +106,7 @@ export const getExpiryDurationToken = (token: string): number => {
     } else {
       const now = Math.floor(Date.now() / 1000); // Chuyển về dạng giây
       // Thời gian còn sống của token
-      const duration = (decoded.exp - now);
+      const duration = decoded.exp - now;
       return duration;
     }
   } catch (error) {

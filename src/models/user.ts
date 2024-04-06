@@ -5,6 +5,8 @@ export interface IUserDocument extends mongoose.Document {
   email: string;
   password: string;
   profileImage?: string;
+  address?: string;
+  dateOfBirth?: Date;
   posts: mongoose.Schema.Types.ObjectId[];
   savedPosts: mongoose.Schema.Types.ObjectId[];
   likedPosts: mongoose.Schema.Types.ObjectId[];
@@ -20,6 +22,8 @@ const userSchema = new mongoose.Schema<IUserDocument>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   profileImage: { type: String, default: "" },
+  address: { type: String, default: "" },
+  dateOfBirth: { type: Date },
   posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] }],
   savedPosts: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] },

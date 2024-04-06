@@ -13,6 +13,7 @@ import { ErrorResponse } from "../types/response";
 import { connectRedis } from "../db/redis";
 import * as jwtHelper from "../utils/jwt";
 
+/** Xử lý kiểm tra phiên của người dùng */
 export const handleAuth = async (req: Request, res: Response) => {
   try {
     const authCookie = req.cookies["refresh-token-id"];
@@ -33,6 +34,7 @@ export const handleAuth = async (req: Request, res: Response) => {
   }
 };
 
+/** Xử lý các trang verify như verify OTP */
 export const handleVerify = async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -265,9 +267,19 @@ export const handleLogin = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: false,
     });
-    /** Delete Key RefreshToken Before Return */
+    /** Set Cookie */
+    res.cookie("access-token", result.data.accessToken.value, {
+      maxAge:
+        jwtHelper.getExpiryDurationToken(result.data.accessToken.value) * 1000,
+      httpOnly: true,
+      secure: false,
+    });
+    /** Delete Key refreshToken and accessToken Before Return */
     if (result.data.refreshToken) {
       delete result.data.refreshToken;
+    }
+    if (result.data.accessToken) {
+      delete result.data.accessToken;
     }
     return res.status(result.statusCode).json(result);
   }
