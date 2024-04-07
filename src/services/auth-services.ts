@@ -27,7 +27,7 @@ export const handleRegisterService = async ({
   password: string;
 }) => {
   await connectMongoDB();
-  /** Check exist email and username */
+  // Check exist email and username
   const existingEmail = await User.findOne({ email });
   if (existingEmail) {
     let dataResponse: ErrorResponse = {
@@ -51,20 +51,20 @@ export const handleRegisterService = async ({
     return dataResponse;
   }
   try {
-    /** Tạo random code */
+    // Tạo random code
     const randomCode = Math.floor(100000 + Math.random() * 900000);
-    /** Tạo uuid chứa OTP và thông tin đăng ký */
+    // Tạo uuid chứa OTP và thông tin đăng ký
     const id = v4();
     const client = await connectRedis();
     client.set(id, JSON.stringify({ username, email, password, randomCode }), {
       EX: 300,
     });
-    /** Send HTML Content */
+    // Send HTML Content
     const emailBody = await generateRegisterMail(email, randomCode);
-    /** Send Email */
+    // Send Email
     const subject = "Verify OTP for register";
     await sendEmail(email, subject, emailBody);
-    /** Response */
+    // Response
     let dataResponse: SuccessResponse = {
       success: true,
       message: "Verify OTP for register",
@@ -163,7 +163,7 @@ export const handleRecoveryPasswordService = async ({
   email: string;
 }) => {
   await connectMongoDB();
-  /** Check exist email and username */
+  // Check exist email and username
   const existingEmail = await User.findOne({ email });
   if (!existingEmail) {
     let dataResponse: ErrorResponse = {
@@ -176,20 +176,20 @@ export const handleRecoveryPasswordService = async ({
     return dataResponse;
   }
   try {
-    /** Tạo random code */
+    // Tạo random code
     const randomCode = Math.floor(100000 + Math.random() * 900000);
-    /** Tạo uuid chứa OTP và thông tin đăng ký */
+    // Tạo uuid chứa OTP và thông tin đăng ký
     const id = v4();
     const client = await connectRedis();
     client.set(id, JSON.stringify({ email, randomCode }), {
       EX: 300,
     });
-    /** Send HTML Content */
+    // Send HTML Content
     const emailBody = await generateRecoveryPasswordMail(email, randomCode);
-    /** Send Email */
+    // Send Email
     const subject = "Recovery Password in Pet Paradise";
     await sendEmail(email, subject, emailBody);
-    /** Response */
+    // Response
     let dataResponse: SuccessResponse = {
       success: true,
       message: "Verify OTP for recovery password of account",
@@ -372,24 +372,24 @@ export const handleLoginService = async ({
     // Nếu mật khẩu khớp, trả về phản hồi thành công
     const { password, ...userWithoutPassword } = user.toObject();
     // Generate Token
-    const { accessToken, refreshToken } = jwtHelper.generateToken({
+    const { value: token, jti } = jwtHelper.generateToken({
       username: user.username,
       email: user.email,
       id: user._id,
     });
     // Connect Redis
     const client = await connectRedis();
-    // Lưu RefreshToken vào Redis
-    client.set(refreshToken.jti, refreshToken.value, {
-      EX: jwtHelper.getExpiryDurationToken(refreshToken.value),
+    // Lưu token vào Redis
+    client.set(jti, token, {
+      EX: jwtHelper.getExpiryDurationToken(token),
     });
     // Lưu thông tin RefreshToken vào danh sách phiên
-    client.sAdd(user._id.toString(), refreshToken.jti);
+    client.sAdd(user._id.toString(), jti);
     // Trả về thông tin
     let dataResponse: SuccessResponse = {
       success: true,
       message: "Login successful",
-      data: { user: userWithoutPassword, refreshToken, accessToken },
+      data: { user: userWithoutPassword, jti, token },
       statusCode: 200,
       type: SUCCESS,
     };

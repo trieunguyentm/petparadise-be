@@ -11,12 +11,13 @@ import { validationResult } from "express-validator";
 import { ERROR_CLIENT, ERROR_SESSION } from "../constants";
 import { ErrorResponse } from "../types/response";
 import { connectRedis } from "../db/redis";
+import jwt from "jsonwebtoken";
 import * as jwtHelper from "../utils/jwt";
 
 /** Xử lý kiểm tra phiên của người dùng */
 export const handleAuth = async (req: Request, res: Response) => {
   try {
-    const authCookie = req.cookies["refresh-token-id"];
+    const authCookie = req.cookies["t"];
     if (!authCookie) {
       return res.status(401).json({ auth: false });
     } else {
@@ -25,7 +26,8 @@ export const handleAuth = async (req: Request, res: Response) => {
       if (!dataSession) {
         return res.status(401).json({ auth: false });
       } else {
-        return res.status(200).json({ auth: true });
+        const payload = jwt.verify(dataSession, process.env.JWT_KEY as string);
+        if (payload) return res.status(200).json({ auth: true });
       }
     }
   } catch (error) {
@@ -80,7 +82,7 @@ export const handleRegister = async (req: Request, res: Response) => {
   if (!result.success) {
     return res.status(result.statusCode).json(result);
   } else {
-    /** Set Cookie */
+    // Set cookie
     res.cookie("verify-otp", result.data?.id, {
       maxAge: 300 * 1000,
       httpOnly: true,
@@ -146,7 +148,7 @@ export const handleRecoveryPassword = async (req: Request, res: Response) => {
   if (!result.success) {
     return res.status(result.statusCode).json(result);
   } else {
-    /** Set Cookie */
+    // Set cookie
     res.cookie("verify-otp-recovery", result.data?.id, {
       maxAge: 300 * 1000,
       httpOnly: true,
@@ -260,26 +262,15 @@ export const handleLogin = async (req: Request, res: Response) => {
   if (!result.success) {
     return res.status(result.statusCode).json(result);
   } else {
-    /** Set Cookie */
-    res.cookie("refresh-token-id", result.data.refreshToken.jti, {
-      maxAge:
-        jwtHelper.getExpiryDurationToken(result.data.refreshToken.value) * 1000,
+    // Set Cookie
+    res.cookie("t", result.data.jti, {
+      maxAge: jwtHelper.getExpiryDurationToken(result.data.token) * 1000,
       httpOnly: true,
       secure: false,
     });
-    /** Set Cookie */
-    res.cookie("access-token", result.data.accessToken.value, {
-      maxAge:
-        jwtHelper.getExpiryDurationToken(result.data.accessToken.value) * 1000,
-      httpOnly: true,
-      secure: false,
-    });
-    /** Delete Key refreshToken and accessToken Before Return */
-    if (result.data.refreshToken) {
-      delete result.data.refreshToken;
-    }
-    if (result.data.accessToken) {
-      delete result.data.accessToken;
+    // Delete Key refreshToken and accessToken Before Return
+    if (result.data.token) {
+      delete result.data.token;
     }
     return res.status(result.statusCode).json(result);
   }

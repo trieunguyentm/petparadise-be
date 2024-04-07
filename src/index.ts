@@ -13,7 +13,7 @@ const port = process.env.PORT || 9000;
 /** Cors */
 app.use(
   cors({
-    origin: "http://localhost:3001", // Thay đổi giá trị này để phù hợp với client của bạn
+    origin: "http://localhost:3001",
     credentials: true,
   })
 );
