@@ -13,7 +13,7 @@ import {
 } from "../utils/mailgenerate";
 import { sendEmail } from "../utils/mailer";
 import User from "../models/user";
-import { ErrorResponse, SuccessResponse } from "../types/response";
+import { ErrorResponse, SuccessResponse } from "../types";
 import bcrypt, { hash } from "bcryptjs";
 import * as jwtHelper from "../utils/jwt";
 
@@ -375,7 +375,7 @@ export const handleLoginService = async ({
     const { value: token, jti } = jwtHelper.generateToken({
       username: user.username,
       email: user.email,
-      id: user._id,
+      id: user._id.toString(),
     });
     // Connect Redis
     const client = await connectRedis();

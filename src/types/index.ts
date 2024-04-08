@@ -1,0 +1,32 @@
+import { Request } from "express";
+import { JwtPayload } from "jsonwebtoken";
+
+export type ErrorResponse = {
+  success: false;
+  message: string;
+  error: string;
+  statusCode: number;
+  type: string;
+};
+
+export type SuccessResponse = {
+  success: true;
+  message: string;
+  data?: any;
+  statusCode: number;
+  type: string;
+};
+
+export interface UserPayLoad extends JwtPayload {
+  username: string;
+  email: string;
+  id: string;
+}
+
+export interface RequestCustom extends Request {
+  user?: {
+    id: string;
+    username: string;
+    email: string;
+  };
+}

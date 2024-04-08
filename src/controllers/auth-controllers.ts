@@ -9,7 +9,7 @@ import {
 } from "../services/auth-services";
 import { validationResult } from "express-validator";
 import { ERROR_CLIENT, ERROR_SESSION } from "../constants";
-import { ErrorResponse } from "../types/response";
+import { ErrorResponse } from "../types";
 import { connectRedis } from "../db/redis";
 import jwt from "jsonwebtoken";
 import * as jwtHelper from "../utils/jwt";

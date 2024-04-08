@@ -1,123 +1,75 @@
-// import jwt from "jsonwebtoken";
-// import dotenv from "dotenv";
-// import { NextFunction, Request, Response, Router } from "express";
-// import { ErrorResponse } from "../types/response";
-// import { SESSION_EXPIRED } from "../constants";
-// import { connectRedis } from "../db/redis";
-// import { generateAccessToken, getExpiryDurationToken } from "../utils/jwt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import * as userControllers from "../controllers/user-controllers";
+import { NextFunction, Response, Router } from "express";
+import { ErrorResponse, RequestCustom, UserPayLoad } from "../types";
+import { SESSION_EXPIRED } from "../constants";
+import { connectRedis } from "../db/redis";
 
-// export interface RequestCustom extends Request {
-//   user?: {
-//     id: string;
-//     username: string;
-//     email: string;
-//   };
-// }
+dotenv.config();
+const userRoute = Router();
 
-// export interface AccessTokenPayload {
-//   id: string;
-//   username: string;
-//   email: string;
-//   tokenType?: string;
-//   refreshTokenId?: string;
-// }
+const authenticate = async (
+  req: RequestCustom,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const tokenId = req.cookies["t"];
+    if (!tokenId) {
+      let response: ErrorResponse = {
+        success: false,
+        message: "Not provided a token id",
+        error: "Not found token id",
+        statusCode: 403,
+        type: SESSION_EXPIRED,
+      };
+      res.status(403).json(response);
+      return;
+    }
+    const client = await connectRedis();
+    const token = await client.get(tokenId);
+    if (!token) {
+      let response: ErrorResponse = {
+        success: false,
+        message: "Not found token",
+        error: "Not exist token in DB",
+        statusCode: 403,
+        type: SESSION_EXPIRED,
+      };
+      res.status(403).json(response);
+      return;
+    }
+    const payload = jwt.verify(token, process.env.JWT_KEY as string);
+    if (payload) {
+      req.user = payload as UserPayLoad;
+      next();
+    } else {
+      let response: ErrorResponse = {
+        success: false,
+        message: "Error when verify authenticate",
+        error: "Error when verify authenticate",
+        statusCode: 403,
+        type: SESSION_EXPIRED,
+      };
+      res.status(403).json(response);
+      return;
+    }
+  } catch (error) {
+    let response: ErrorResponse = {
+      success: false,
+      message: "Error when verify authenticate",
+      error: "Error when verify authenticate",
+      statusCode: 403,
+      type: SESSION_EXPIRED,
+    };
+    res.status(403).json(response);
+    return;
+  }
+};
 
-// export interface RefreshTokenPayload {
-//   id: string;
-//   username: string;
-//   email: string;
-//   tokenType?: string;
-// }
+userRoute.use(authenticate);
 
-// dotenv.config();
-// const userRoute = Router();
+userRoute.get("/", userControllers.handleGetUser);
 
-// const authenticationToken = async (
-//   req: RequestCustom,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const accessToken = req.cookies["access-token"];
-//   const refreshTokenId = req.cookies["refresh-token-id"];
-//   if (!accessToken) {
-//     return await refreshAccessToken(req, res, next, refreshTokenId);
-//   }
-//   try {
-//     const payload = jwt.verify(
-//       accessToken,
-//       process.env.JWT_ACCESS_KEY as string
-//     ) as AccessTokenPayload;
-//     delete payload.tokenType;
-//     delete payload.refreshTokenId;
-//     req.user = payload;
-//     next();
-//   } catch (error) {
-//     return await refreshAccessToken(req, res, next, refreshTokenId);
-//   }
-// };
-
-// const refreshAccessToken = async (
-//   req: RequestCustom,
-//   res: Response,
-//   next: NextFunction,
-//   refreshTokenId: string
-// ) => {
-//   if (!refreshTokenId) {
-//     const response: ErrorResponse = {
-//       success: false,
-//       message: `Session expired, please login again`,
-//       error: "Session expired",
-//       statusCode: 403,
-//       type: SESSION_EXPIRED,
-//     };
-//     res.status(403).json(response);
-//   }
-//   try {
-//     const client = await connectRedis();
-//     const refreshToken = await client.get(refreshTokenId);
-//     if (!refreshToken) {
-//       const response: ErrorResponse = {
-//         success: false,
-//         message: `Session expired, please login again`,
-//         error: "Session expired",
-//         statusCode: 403,
-//         type: SESSION_EXPIRED,
-//       };
-//       res.status(403).json(response);
-//     } else {
-//       const payload = jwt.verify(
-//         refreshToken,
-//         process.env.JWT_REFRESH_KEY as string
-//       ) as RefreshTokenPayload;
-//       const newAccessToken = generateAccessToken({
-//         username: payload.username,
-//         email: payload.email,
-//         id: payload.id,
-//         refreshTokenId,
-//       });
-//       res.cookie("access-token", newAccessToken.value, {
-//         maxAge: getExpiryDurationToken(newAccessToken.value) * 1000,
-//         httpOnly: true,
-//         secure: false,
-//       });
-//       delete payload.tokenType;
-//       req.user = payload;
-//       next();
-//     }
-//   } catch (error) {
-//     const response: ErrorResponse = {
-//       success: false,
-//       message: `Session expired, please login again`,
-//       error: "Session expired",
-//       statusCode: 403,
-//       type: SESSION_EXPIRED,
-//     };
-//     res.status(403).json(response);
-//   }
-// };
-
-// userRoute.use(authenticationToken);
-
-// userRoute.get("/test", (req, res) => res.send("Ok"));
-
-// export default userRoute;
+export default userRoute;
