@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import multer from "multer";
 import * as userControllers from "../controllers/user-controllers";
 import * as validators from "../validators/user-validators";
 import { NextFunction, Response, Router } from "express";
@@ -10,6 +11,22 @@ import { connectRedis } from "../db/redis";
 dotenv.config();
 const userRoute = Router();
 
+// Cấu hình multer
+const storage = multer.memoryStorage();
+
+const upload = multer({
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    // Kiểm tra file có phải là ảnh
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|svg)$/)) {
+      return cb(null, false);
+    }
+    cb(null, true);
+  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // Giới hạn file size <= 5MB
+});
+
+// Cấu hình middleware authenticate
 const authenticate = async (
   req: RequestCustom,
   res: Response,
@@ -78,5 +95,7 @@ userRoute.post(
   validators.changePasswordValidator,
   userControllers.handleChangePassword
 );
+
+userRoute.post("/update", upload.single("photo"), userControllers.handleUpdate);
 
 export default userRoute;
