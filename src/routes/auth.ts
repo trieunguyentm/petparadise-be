@@ -5,6 +5,7 @@ import * as authControllers from "../controllers/auth-controllers";
 const authRoute = Router();
 
 authRoute.get("/", authControllers.handleAuth);
+
 authRoute.post(
   "/verify",
   validators.verifyValidator,
