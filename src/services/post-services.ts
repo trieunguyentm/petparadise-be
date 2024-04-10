@@ -4,6 +4,8 @@ import { Stream } from "stream";
 import { ERROR_SERVER, SUCCESS } from "../constants";
 import { ErrorResponse, SuccessResponse } from "../types";
 import { connectMongoDB } from "../db/mongodb";
+import User from "../models/user";
+import Comment from "../models/comment";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -67,6 +69,49 @@ export const handleCreatePostService = async ({
       success: false,
       message: "Failed to create post",
       error: "Failed to create post",
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetPostService = async ({
+  limit,
+  offset,
+}: {
+  limit: number;
+  offset: number;
+}) => {
+  try {
+    await connectMongoDB();
+    const posts = await Post.find()
+      .skip(offset)
+      .limit(limit)
+      .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo, mới nhất đầu tiên
+      .populate({
+        path: "poster likes saves",
+        model: User,
+      })
+      .populate({
+        path: "comments",
+        model: Comment,
+      })
+      .exec();
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get post successfully",
+      data: posts,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to create post",
+      error: "Failed to create post: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

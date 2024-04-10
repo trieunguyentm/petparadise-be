@@ -42,6 +42,12 @@ const userSchema = new mongoose.Schema<IUserDocument>({
   createdAt: { type: Date, default: Date.now },
 });
 
+userSchema.methods.toJSON = function () {
+  const user = this.toObject();
+  delete user.password;
+  return user;
+};
+
 const User: Model<IUserDocument> =
   mongoose.models?.User || mongoose.model("User", userSchema);
 

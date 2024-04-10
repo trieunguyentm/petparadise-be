@@ -1,7 +1,10 @@
 import { Response } from "express";
 import { ErrorResponse, RequestCustom } from "../types";
 import { ERROR_CLIENT } from "../constants";
-import { handleCreatePostService } from "../services/post-services";
+import {
+  handleCreatePostService,
+  handleGetPostService,
+} from "../services/post-services";
 import { validationResult } from "express-validator";
 
 export const handleCreatePost = async (req: RequestCustom, res: Response) => {
@@ -36,6 +39,22 @@ export const handleCreatePost = async (req: RequestCustom, res: Response) => {
   const result = await handleCreatePostService({ user, files, content, tags });
 
   // Kiểm tra kết quả và phản hồi tương ứng
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleGetPost = async (req: RequestCustom, res: Response) => {
+  // Parse the query parameters and provide default values if necessary
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = parseInt(req.query.offset as string) || 0;
+
+  // Now pass these variables to the service function
+  const result = await handleGetPostService({ limit, offset });
+
+  // Check the result and respond accordingly
   if (!result.success) {
     return res.status(result.statusCode).json(result);
   } else {
