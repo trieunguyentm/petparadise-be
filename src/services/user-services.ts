@@ -4,6 +4,8 @@ import { ErrorResponse, SuccessResponse } from "../types";
 import User, { IUserDocument } from "../models/user";
 import bcrypt from "bcryptjs";
 import cloudinary from "../utils/cloudinary-config";
+import Post, { IPostDocument } from "../models/post";
+import mongoose from "mongoose";
 
 export const handleGetUserService = async ({
   user,
@@ -162,6 +164,75 @@ export const handleUpdateService = async ({
       success: false,
       message: "Fail when to update user",
       error: "Fail when to update user",
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleLikePostService = async ({
+  user,
+  postID,
+}: {
+  user: { id: string; email: string; username: string };
+  postID: string;
+}) => {
+  try {
+    console.log(postID);
+    await connectMongoDB();
+    /** Lấy thông tin user và post */
+    const userInfo = await User.findById(user.id).populate({
+      path: "likedPosts",
+      model: Post,
+    });
+    const postInfo = await Post.findById(postID).populate({
+      path: "likes",
+      model: User,
+    });
+    console.log(userInfo);
+    console.log(postInfo);
+    /** Kiểm tra xem post tồn tại hay không */
+    if (!postInfo || !userInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Not found",
+        error: "Not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    /** Kiểm tra trạng thái like hay unlike */
+    const isLiked = userInfo?.likedPosts.find(
+      (post) => post._id.toString() === postID
+    );
+    if (isLiked) {
+      userInfo.likedPosts = userInfo.likedPosts.filter(
+        (item) => item._id.toString() !== postID
+      );
+      postInfo.likes = postInfo.likes.filter(
+        (item) => item._id.toString() !== user.id.toString()
+      );
+    } else {
+      userInfo.likedPosts.push(postInfo);
+      postInfo.likes.push(userInfo);
+    }
+    await userInfo.save();
+    await postInfo.save();
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Like success",
+      data: userInfo,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Fail when like post",
+      error: "Fail when like post: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

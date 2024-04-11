@@ -12,3 +12,7 @@ export const changePasswordValidator = [
     .notEmpty()
     .withMessage("New password is required"),
 ];
+
+export const likePostValidator = [
+  body("postID").notEmpty().withMessage("Post ID is required"),
+];

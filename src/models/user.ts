@@ -1,4 +1,5 @@
 import mongoose, { Model } from "mongoose";
+import { IPostDocument } from "./post";
 
 export interface IUserDocument extends mongoose.Document {
   username: string;
@@ -9,7 +10,7 @@ export interface IUserDocument extends mongoose.Document {
   dateOfBirth?: Date;
   posts: mongoose.Schema.Types.ObjectId[];
   savedPosts: mongoose.Schema.Types.ObjectId[];
-  likedPosts: mongoose.Schema.Types.ObjectId[];
+  likedPosts: IPostDocument[];
   followers: mongoose.Schema.Types.ObjectId[];
   following: mongoose.Schema.Types.ObjectId[];
   chats: mongoose.Schema.Types.ObjectId[];

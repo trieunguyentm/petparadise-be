@@ -17,4 +17,10 @@ userRoute.post(
 
 userRoute.post("/update", upload.single("photo"), userControllers.handleUpdate);
 
+userRoute.post(
+  "/like",
+  validators.likePostValidator,
+  userControllers.handleLikePost
+);
+
 export default userRoute;

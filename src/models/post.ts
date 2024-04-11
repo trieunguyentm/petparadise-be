@@ -1,9 +1,10 @@
 import mongoose, { Model } from "mongoose";
+import { IUserDocument } from "./user";
 
 export interface IPostDocument extends mongoose.Document {
   poster: mongoose.Schema.Types.ObjectId;
   createdAt: Date;
-  likes: mongoose.Schema.Types.ObjectId[];
+  likes: IUserDocument[];
   saves: mongoose.Schema.Types.ObjectId[];
   comments: mongoose.Schema.Types.ObjectId[];
   images: string[];
