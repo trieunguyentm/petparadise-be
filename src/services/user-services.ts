@@ -4,8 +4,7 @@ import { ErrorResponse, SuccessResponse } from "../types";
 import User, { IUserDocument } from "../models/user";
 import bcrypt from "bcryptjs";
 import cloudinary from "../utils/cloudinary-config";
-import Post, { IPostDocument } from "../models/post";
-import mongoose from "mongoose";
+import Post from "../models/post";
 
 export const handleGetUserService = async ({
   user,
@@ -14,7 +13,17 @@ export const handleGetUserService = async ({
 }) => {
   try {
     await connectMongoDB();
-    const userInfo: IUserDocument | null = await User.findById(user.id);
+    const userInfo: IUserDocument | null = await User.findById(
+      user.id
+    ).populate({
+      path: "likedPosts savedPosts",
+      model: Post,
+      populate: {
+        path: "poster",
+        model: User,
+        select: "-password", // Loại bỏ trường password từ kết quả
+      },
+    });
     if (!userInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
