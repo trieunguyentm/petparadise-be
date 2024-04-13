@@ -16,4 +16,10 @@ postRoute.post(
 
 postRoute.get("/", postControllers.handleGetPost);
 
+postRoute.get(
+  "/search",
+  validators.searchPostValidator,
+  postControllers.handleSearchPost
+);
+
 export default postRoute;

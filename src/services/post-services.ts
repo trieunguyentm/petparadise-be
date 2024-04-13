@@ -118,3 +118,36 @@ export const handleGetPostService = async ({
     return dataResponse;
   }
 };
+
+export const handleSearchPostService = async ({ query }: { query: string }) => {
+  try {
+    await connectMongoDB();
+    const regexPattern = new RegExp(query, "i");
+
+    const searchedPosts = await Post.find({
+      $or: [
+        { content: { $regex: regexPattern } },
+        { tags: { $elemMatch: { $regex: regexPattern } } },
+      ],
+    }).exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get post successfully",
+      data: searchedPosts,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get post",
+      error: "Failed to get post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
