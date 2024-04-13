@@ -23,4 +23,10 @@ userRoute.post(
   userControllers.handleLikePost
 );
 
+userRoute.post(
+  "/save",
+  validators.savePostValidator,
+  userControllers.handleSavePost
+);
+
 export default userRoute;

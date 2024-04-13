@@ -9,7 +9,7 @@ export interface IUserDocument extends mongoose.Document {
   address?: string;
   dateOfBirth?: Date;
   posts: mongoose.Schema.Types.ObjectId[];
-  savedPosts: mongoose.Schema.Types.ObjectId[];
+  savedPosts: IPostDocument[];
   likedPosts: IPostDocument[];
   followers: mongoose.Schema.Types.ObjectId[];
   following: mongoose.Schema.Types.ObjectId[];

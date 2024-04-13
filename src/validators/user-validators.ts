@@ -16,3 +16,7 @@ export const changePasswordValidator = [
 export const likePostValidator = [
   body("postID").notEmpty().withMessage("Post ID is required"),
 ];
+
+export const savePostValidator = [
+  body("postID").notEmpty().withMessage("Post ID is required"),
+];

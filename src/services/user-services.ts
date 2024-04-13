@@ -179,7 +179,6 @@ export const handleLikePostService = async ({
   postID: string;
 }) => {
   try {
-    console.log(postID);
     await connectMongoDB();
     /** Lấy thông tin user và post */
     const userInfo = await User.findById(user.id).populate({
@@ -190,8 +189,6 @@ export const handleLikePostService = async ({
       path: "likes",
       model: User,
     });
-    console.log(userInfo);
-    console.log(postInfo);
     /** Kiểm tra xem post tồn tại hay không */
     if (!postInfo || !userInfo) {
       let dataResponse: ErrorResponse = {
@@ -233,6 +230,72 @@ export const handleLikePostService = async ({
       success: false,
       message: "Fail when like post",
       error: "Fail when like post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleSavePostService = async ({
+  user,
+  postID,
+}: {
+  user: { id: string; email: string; username: string };
+  postID: string;
+}) => {
+  try {
+    await connectMongoDB();
+    /** Lấy thông tin user và post */
+    const userInfo = await User.findById(user.id).populate({
+      path: "savedPosts",
+      model: Post,
+    });
+    const postInfo = await Post.findById(postID).populate({
+      path: "saves",
+      model: User,
+    });
+    /** Kiểm tra xem post tồn tại hay không */
+    if (!postInfo || !userInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Not found",
+        error: "Not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    /** Kiểm tra trạng thái save hay unsave */
+    const isSaved = userInfo.savedPosts.find(
+      (post) => post._id.toString() === postID
+    );
+    if (isSaved) {
+      userInfo.savedPosts = userInfo.savedPosts.filter(
+        (item) => item._id.toString() !== postID
+      );
+      postInfo.saves = postInfo.saves.filter(
+        (item) => item._id.toString() !== user.id.toString()
+      );
+    } else {
+      userInfo.savedPosts.push(postInfo);
+      postInfo.saves.push(userInfo);
+    }
+    await userInfo.save();
+    await postInfo.save();
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Save success",
+      data: userInfo,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Fail when save post",
+      error: "Fail when save post: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

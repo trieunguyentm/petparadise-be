@@ -5,7 +5,7 @@ export interface IPostDocument extends mongoose.Document {
   poster: mongoose.Schema.Types.ObjectId;
   createdAt: Date;
   likes: IUserDocument[];
-  saves: mongoose.Schema.Types.ObjectId[];
+  saves: IUserDocument[];
   comments: mongoose.Schema.Types.ObjectId[];
   images: string[];
   content: string;
