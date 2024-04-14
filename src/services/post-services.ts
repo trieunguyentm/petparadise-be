@@ -55,6 +55,10 @@ export const handleCreatePostService = async ({
       // Các trường khác như likes, saves, comments sẽ mặc định hoặc trống
     });
 
+    const userInfo = await User.findById(user.id);
+    userInfo?.posts.push(newPost);
+    await userInfo?.save();
+
     const dataResponse: SuccessResponse = {
       success: true,
       message: "Post created successfully",
@@ -129,7 +133,16 @@ export const handleSearchPostService = async ({ query }: { query: string }) => {
         { content: { $regex: regexPattern } },
         { tags: { $elemMatch: { $regex: regexPattern } } },
       ],
-    }).exec();
+    })
+      .populate({
+        path: "poster likes saves",
+        model: User,
+      })
+      .populate({
+        path: "comments",
+        model: Comment,
+      })
+      .exec();
 
     const dataResponse: SuccessResponse = {
       success: true,

@@ -8,11 +8,11 @@ export interface IUserDocument extends mongoose.Document {
   profileImage?: string;
   address?: string;
   dateOfBirth?: Date;
-  posts: mongoose.Schema.Types.ObjectId[];
+  posts: IPostDocument[];
   savedPosts: IPostDocument[];
   likedPosts: IPostDocument[];
-  followers: mongoose.Schema.Types.ObjectId[];
-  following: mongoose.Schema.Types.ObjectId[];
+  followers: IUserDocument[];
+  following: IUserDocument[];
   chats: mongoose.Schema.Types.ObjectId[];
   role: "user" | "admin";
   createdAt: Date;
@@ -48,6 +48,12 @@ userSchema.methods.toJSON = function () {
   delete user.password;
   return user;
 };
+
+// Thêm chỉ mục cho trường username để tối ưu cho việc truy vấn
+userSchema.index({ username: 1 });
+
+// Cần sắp xếp theo ngày tạo nên thêm chỉ mục cho trường createdAt
+userSchema.index({ createdAt: -1 });
 
 const User: Model<IUserDocument> =
   mongoose.models?.User || mongoose.model("User", userSchema);

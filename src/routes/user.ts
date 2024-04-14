@@ -29,4 +29,12 @@ userRoute.post(
   userControllers.handleSavePost
 );
 
+userRoute.get("/other", userControllers.handleGetOtherUser);
+
+userRoute.post(
+  "/follow",
+  validators.followValidator,
+  userControllers.handleFollow
+);
+
 export default userRoute;

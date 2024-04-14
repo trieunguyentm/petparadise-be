@@ -311,3 +311,125 @@ export const handleSavePostService = async ({
     return dataResponse;
   }
 };
+
+export const handleGetOtherUserService = async ({
+  user,
+  limit,
+  offset,
+}: {
+  user: { id: string; username: string; email: string };
+  limit: number;
+  offset: number;
+}) => {
+  try {
+    await connectMongoDB();
+    // Truy vấn để lấy các người dùng khác không bao gồm người dùng hiện tại
+    const otherUsers = await User.find({ _id: { $ne: user.id } }) // Sử dụng $ne để loại trừ người dùng hiện tại
+      .skip(offset)
+      .limit(limit)
+      .select("-password -chats -email -savedPosts -likedPosts") // Loại bỏ các trường nhạy cảm
+      .exec();
+    // Return
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Successfully retrieved other users",
+      data: otherUsers,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Fail when to get other user",
+      error: "Fail when to get other user: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleFollowService = async ({
+  user,
+  peopleID,
+}: {
+  user: { id: string; email: string; username: string };
+  peopleID: string;
+}) => {
+  if (user.id === peopleID) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Can not follow user",
+      error: "Can not follow user: ",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return dataResponse;
+  }
+  try {
+    await connectMongoDB();
+    const userInfo = await User.findById(user.id)
+      .populate({
+        path: "followers following",
+        model: User,
+      })
+      .select("-password")
+      .exec();
+    const otherPeopleInfo = await User.findById(peopleID)
+      .populate({
+        path: "followers following",
+        model: User,
+      })
+      .select("-password")
+      .exec();
+    if (!userInfo || !otherPeopleInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Not found user",
+        error: "Not found user",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    /** Kiểm tra trạng thái đã follow của người dùng */
+    const isFollowing = userInfo.following.find(
+      (item) => item._id.toString() === peopleID.toString()
+    );
+    let tmp: number = 0;
+    if (isFollowing) {
+      tmp = 1;
+      userInfo.following = userInfo.following.filter(
+        (item) => item._id.toString() !== peopleID.toString()
+      );
+      otherPeopleInfo.followers = otherPeopleInfo.followers.filter(
+        (item) => item._id.toString() !== user.id.toString()
+      );
+    } else {
+      tmp = 2;
+      userInfo.following.push(otherPeopleInfo);
+      otherPeopleInfo.followers.push(userInfo);
+    }
+    await userInfo.save();
+    await otherPeopleInfo.save();
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Handle follow success",
+      data: `${tmp == 1 ? "Unfollow" : "Follow"}`,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Fail when follow user",
+      error: "Fail when follow user: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};

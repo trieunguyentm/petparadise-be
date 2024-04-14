@@ -3,6 +3,8 @@ import { ErrorResponse, RequestCustom } from "../types";
 import { ERROR_CLIENT } from "../constants";
 import {
   handleChangePasswordService,
+  handleFollowService,
+  handleGetOtherUserService,
   handleGetUserService,
   handleLikePostService,
   handleSavePostService,
@@ -168,6 +170,66 @@ export const handleSavePost = async (req: RequestCustom, res: Response) => {
     return res.status(400).json(dataResponse);
   } else {
     const result = await handleSavePostService({ user, postID });
+    if (!result.success) {
+      return res.status(result.statusCode).json(result);
+    } else {
+      return res.status(result.statusCode).json(result);
+    }
+  }
+};
+
+export const handleGetOtherUser = async (req: RequestCustom, res: Response) => {
+  // Parse the query parameters and provide default values if necessary
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = parseInt(req.query.offset as string) || 0;
+  const { user } = req;
+  if (!user) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(dataResponse);
+  } else {
+    const result = await handleGetOtherUserService({ user, limit, offset });
+    if (!result.success) {
+      return res.status(result.statusCode).json(result);
+    } else {
+      return res.status(result.statusCode).json(result);
+    }
+  }
+};
+
+export const handleFollow = async (req: RequestCustom, res: Response) => {
+  // Kiểm tra kết quả validation
+  const errors = validationResult(req);
+  // Nếu có lỗi validation, gửi lại lỗi cho client
+  if (!errors.isEmpty()) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Invalid data: ${errors.array()[0].msg}`,
+      error: errors.array()[0].msg,
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  const { user } = req;
+  const { peopleID } = req.body;
+  if (!user) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(dataResponse);
+  }
+  else {
+    const result = await handleFollowService({ user, peopleID });
     if (!result.success) {
       return res.status(result.statusCode).json(result);
     } else {

@@ -20,3 +20,7 @@ export const likePostValidator = [
 export const savePostValidator = [
   body("postID").notEmpty().withMessage("Post ID is required"),
 ];
+
+export const followValidator = [
+  body("peopleID").notEmpty().withMessage("People ID is required"),
+];
