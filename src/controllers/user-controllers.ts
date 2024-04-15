@@ -7,6 +7,7 @@ import {
   handleGetOtherUserService,
   handleGetUserService,
   handleLikePostService,
+  handleLogoutAllDeviceService,
   handleLogoutService,
   handleSavePostService,
   handleUpdateService,
@@ -252,6 +253,32 @@ export const handleLogout = async (req: RequestCustom, res: Response) => {
     return res.status(400).json(dataResponse);
   } else {
     const result = await handleLogoutService({ user, tokenId });
+    if (!result.success) {
+      return res.status(result.statusCode).json(result);
+    } else {
+      res.cookie("t", "", { maxAge: 0 });
+      return res.status(result.statusCode).json(result);
+    }
+  }
+};
+
+export const handleLogoutAllDevice = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  const tokenId = req.cookies["t"];
+  const { user } = req;
+  if (!user) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(dataResponse);
+  } else {
+    const result = await handleLogoutAllDeviceService({ user, tokenId });
     if (!result.success) {
       return res.status(result.statusCode).json(result);
     } else {

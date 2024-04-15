@@ -467,3 +467,41 @@ export const handleLogoutService = async ({
     return dataResponse;
   }
 };
+
+export const handleLogoutAllDeviceService = async ({
+  user,
+  tokenId,
+}: {
+  user: { id: string; username: string; email: string };
+  tokenId: string;
+}) => {
+  try {
+    const client = await connectRedis();
+    // Lấy tất cả các tokenId của người dùng
+    const tokenIds = await client.sMembers(`${user.id}`);
+    // Xóa tất cả các tokenId trong Redis
+    const deletePromises: any = tokenIds.map((tokenId) => client.del(tokenId));
+    await Promise.all(deletePromises);
+
+    // Xóa SET chứa danh sách tokenId của người dùng
+    await client.del(`${user.id}`);
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Logout all device success",
+      data: "Logout all device success",
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Fail when logout all device, please try again",
+      error: "Fail when logout all device: " + error?.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};

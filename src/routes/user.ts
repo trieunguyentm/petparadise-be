@@ -39,4 +39,6 @@ userRoute.post(
 
 userRoute.get("/logout", userControllers.handleLogout);
 
+userRoute.get("/logout-all-device", userControllers.handleLogoutAllDevice);
+
 export default userRoute;
