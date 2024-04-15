@@ -5,6 +5,7 @@ import User, { IUserDocument } from "../models/user";
 import bcrypt from "bcryptjs";
 import cloudinary from "../utils/cloudinary-config";
 import Post from "../models/post";
+import { connectRedis } from "../db/redis";
 
 export const handleGetUserService = async ({
   user,
@@ -427,6 +428,39 @@ export const handleFollowService = async ({
       success: false,
       message: "Fail when follow user",
       error: "Fail when follow user: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleLogoutService = async ({
+  user,
+  tokenId,
+}: {
+  user: { id: string; username: string; email: string };
+  tokenId: string;
+}) => {
+  try {
+    const client = await connectRedis();
+    /** Xóa tokenId */
+    await client.del(tokenId.toString());
+    /** Xóa tokenId khỏi SET chứa danh sách tokenId của người dùng */
+    await client.sRem(`${user.id.toString()}`, tokenId.toString());
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Logout success",
+      data: "Logout success",
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Fail when logout, please try again",
+      error: "Fail when logout: " + error?.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

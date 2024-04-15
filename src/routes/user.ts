@@ -37,4 +37,6 @@ userRoute.post(
   userControllers.handleFollow
 );
 
+userRoute.get("/logout", userControllers.handleLogout);
+
 export default userRoute;
