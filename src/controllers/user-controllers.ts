@@ -255,6 +255,7 @@ export const handleLogout = async (req: RequestCustom, res: Response) => {
     if (!result.success) {
       return res.status(result.statusCode).json(result);
     } else {
+      res.cookie("t", "", { maxAge: 0 });
       return res.status(result.statusCode).json(result);
     }
   }
