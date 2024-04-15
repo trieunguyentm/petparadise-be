@@ -10,6 +10,7 @@ import {
   handleLogoutAllDeviceService,
   handleLogoutService,
   handleSavePostService,
+  handleSearchUserService,
   handleUpdateService,
 } from "../services/user-services";
 import { validationResult } from "express-validator";
@@ -285,5 +286,40 @@ export const handleLogoutAllDevice = async (
       res.cookie("t", "", { maxAge: 0 });
       return res.status(result.statusCode).json(result);
     }
+  }
+};
+
+export const handleSearchUser = async (req: RequestCustom, res: Response) => {
+  // Kiểm tra kết quả validation
+  const errors = validationResult(req);
+  // Nếu có lỗi validation, gửi lại lỗi cho client
+  if (!errors.isEmpty()) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Invalid data: ${errors.array()[0].msg}`,
+      error: errors.array()[0].msg,
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  const { query } = req.query;
+  // Lấy query từ req.query và đảm bảo nó là một chuỗi
+  if (typeof query !== "string") {
+    const response: ErrorResponse = {
+      success: false,
+      message: "Query must be a string.",
+      error: "Invalid query parameter",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  const result = await handleSearchUserService({ query });
+  // Check the result and respond accordingly
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
   }
 };

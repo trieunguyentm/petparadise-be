@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import cloudinary from "../utils/cloudinary-config";
 import Post from "../models/post";
 import { connectRedis } from "../db/redis";
+import { normalizeQuery } from "../utils/normalize";
 
 export const handleGetUserService = async ({
   user,
@@ -499,6 +500,41 @@ export const handleLogoutAllDeviceService = async ({
       success: false,
       message: "Fail when logout all device, please try again",
       error: "Fail when logout all device: " + error?.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleSearchUserService = async ({ query }: { query: string }) => {
+  try {
+    await connectMongoDB();
+    const newQuery = normalizeQuery(query);
+    const regexPattern = new RegExp(newQuery, "i");
+    const searchedUser = await User.find({
+      $or: [
+        { username: { $regex: regexPattern } },
+        { email: { $regex: regexPattern } },
+      ],
+    })
+      .select("-password")
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Search user successfully",
+      data: searchedUser,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to search user",
+      error: "Failed to search user: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

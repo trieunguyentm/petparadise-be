@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 
 export const changePasswordValidator = [
   body("currentPassword")
@@ -23,4 +23,8 @@ export const savePostValidator = [
 
 export const followValidator = [
   body("peopleID").notEmpty().withMessage("People ID is required"),
+];
+
+export const searchValidator = [
+  query("query").notEmpty().withMessage("Query is required"),
 ];

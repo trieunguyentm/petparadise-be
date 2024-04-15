@@ -41,4 +41,10 @@ userRoute.get("/logout", userControllers.handleLogout);
 
 userRoute.get("/logout-all-device", userControllers.handleLogoutAllDevice);
 
+userRoute.get(
+  "/search",
+  validators.searchValidator,
+  userControllers.handleSearchUser
+);
+
 export default userRoute;

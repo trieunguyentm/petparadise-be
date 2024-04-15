@@ -6,6 +6,7 @@ import { ErrorResponse, SuccessResponse } from "../types";
 import { connectMongoDB } from "../db/mongodb";
 import User from "../models/user";
 import Comment from "../models/comment";
+import { normalizeQuery } from "../utils/normalize";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -126,7 +127,8 @@ export const handleGetPostService = async ({
 export const handleSearchPostService = async ({ query }: { query: string }) => {
   try {
     await connectMongoDB();
-    const regexPattern = new RegExp(query, "i");
+    const newQuery = normalizeQuery(query);
+    const regexPattern = new RegExp(newQuery, "i");
 
     const searchedPosts = await Post.find({
       $or: [
