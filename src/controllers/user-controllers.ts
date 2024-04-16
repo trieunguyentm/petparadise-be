@@ -231,6 +231,16 @@ export const handleFollow = async (req: RequestCustom, res: Response) => {
     };
     return res.status(400).json(dataResponse);
   } else {
+    if (user.id === peopleID) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Cannot follow self",
+        error: "Cannot follow self",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return res.status(400).json(dataResponse);
+    }
     const result = await handleFollowService({ user, peopleID });
     if (!result.success) {
       return res.status(result.statusCode).json(result);
