@@ -7,6 +7,8 @@ import { connectMongoDB } from "../db/mongodb";
 import User from "../models/user";
 import Comment from "../models/comment";
 import { normalizeQuery } from "../utils/normalize";
+import CommentModel from "../models/comment";
+import path from "path";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -182,6 +184,12 @@ export const handleGetDetailPostService = async ({
       .populate({
         path: "comments",
         model: Comment,
+        options: { sort: { createdAt: -1 } },
+        populate: {
+          path: "poster",
+          model: User,
+          select: "-password",
+        },
       })
       .exec();
     if (!post) {
@@ -209,6 +217,71 @@ export const handleGetDetailPostService = async ({
       success: false,
       message: "Failed to get post",
       error: "Failed to get post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleAddCommentService = async ({
+  user,
+  postId,
+  content,
+  file,
+}: {
+  user: { id: string; username: string; email: string };
+  postId: string;
+  content: string;
+  file: Express.Multer.File | undefined;
+}) => {
+  try {
+    await connectMongoDB();
+    const [userInfo, postInfo] = await Promise.all([
+      User.findById(user.id),
+      Post.findById(postId),
+    ]);
+    if (!userInfo || !postInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Not found user or post",
+        error: "Not found user or post",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    } else {
+      /** Đăng ảnh */
+      let imageURL: string = "";
+      if (file) {
+        imageURL = await uploadImage(file);
+      }
+      /** Tạo comment mới */
+      const newComment = await CommentModel.create({
+        poster: user.id,
+        image: imageURL,
+        content: content,
+        post: postId,
+      });
+      /** Thêm comment này vào post */
+      postInfo.comments.push(newComment);
+      await postInfo.save();
+      /** Return */
+      const dataResponse: SuccessResponse = {
+        success: true,
+        message: "Add comment successfully",
+        data: newComment,
+        statusCode: 200,
+        type: SUCCESS,
+      };
+      return dataResponse;
+    }
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed when add comment",
+      error: "Failed when add comment: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

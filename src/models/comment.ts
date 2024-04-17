@@ -1,10 +1,12 @@
 import mongoose, { Model, Schema } from "mongoose";
+import { IUserDocument } from "./user";
+import { IPostDocument } from "./post";
 
 export interface ICommentDocument extends mongoose.Document {
-  poster: Schema.Types.ObjectId;
+  poster: IUserDocument;
   createdAt: Date;
-  likes: Schema.Types.ObjectId[];
-  post: Schema.Types.ObjectId;
+  likes: IUserDocument[];
+  post: IPostDocument;
   content: string;
   image: string;
 }
@@ -31,8 +33,8 @@ const commentSchema = new Schema<ICommentDocument>({
 // Thêm composite index để tối ưu hóa việc query comment theo post và sắp xếp theo thời gian từ mới nhất đến cũ hơn
 commentSchema.index({ post: 1, createdAt: -1 });
 
-const Comment: Model<ICommentDocument> =
+const CommentModel: Model<ICommentDocument> =
   mongoose.models?.Comment ||
   mongoose.model<ICommentDocument>("Comment", commentSchema);
 
-export default Comment;
+export default CommentModel;

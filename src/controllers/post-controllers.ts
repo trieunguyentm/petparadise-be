@@ -2,6 +2,7 @@ import { Response } from "express";
 import { ErrorResponse, RequestCustom } from "../types";
 import { ERROR_CLIENT } from "../constants";
 import {
+  handleAddCommentService,
   handleCreatePostService,
   handleGetDetailPostService,
   handleGetPostService,
@@ -120,6 +121,47 @@ export const handleGetDetailPost = async (
       return res.status(result.statusCode).json(result);
     } else {
       return res.status(200).json(result);
+    }
+  }
+};
+
+export const handleAddComment = async (req: RequestCustom, res: Response) => {
+  // Kiểm tra kết quả validation
+  const errors = validationResult(req);
+  // Nếu có lỗi validation, gửi lại lỗi cho client
+  if (!errors.isEmpty()) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Invalid data: ${errors.array()[0].msg}`,
+      error: errors.array()[0].msg,
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  const { user } = req;
+  if (!user) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(dataResponse);
+  } else {
+    const file = req.file;
+    const { postId, content } = req.body;
+    const result = await handleAddCommentService({
+      user,
+      postId,
+      content,
+      file,
+    });
+    if (!result.success) {
+      return res.status(result.statusCode).json(result);
+    } else {
+      return res.status(result.statusCode).json(result);
     }
   }
 };

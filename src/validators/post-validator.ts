@@ -7,3 +7,8 @@ export const createPostValidator = [
 export const searchPostValidator = [
   query("query").notEmpty().withMessage("Query is required"),
 ];
+
+export const addCommentValidator = [
+  body("content").notEmpty().withMessage("Content is required"),
+  body("postId").notEmpty().withMessage("Post Id is required"),
+];

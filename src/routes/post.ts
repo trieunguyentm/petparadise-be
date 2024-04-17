@@ -24,4 +24,11 @@ postRoute.get(
 
 postRoute.get("/detail/:postId", postControllers.handleGetDetailPost);
 
+postRoute.post(
+  "/addComment",
+  upload.single("photo"),
+  validators.addCommentValidator,
+  postControllers.handleAddComment
+);
+
 export default postRoute;

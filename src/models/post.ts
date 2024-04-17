@@ -1,12 +1,13 @@
 import mongoose, { Model } from "mongoose";
 import { IUserDocument } from "./user";
+import { ICommentDocument } from "./comment";
 
 export interface IPostDocument extends mongoose.Document {
   poster: mongoose.Schema.Types.ObjectId;
   createdAt: Date;
   likes: IUserDocument[];
   saves: IUserDocument[];
-  comments: mongoose.Schema.Types.ObjectId[];
+  comments: ICommentDocument[];
   images: string[];
   content: string;
   tags: string[];
