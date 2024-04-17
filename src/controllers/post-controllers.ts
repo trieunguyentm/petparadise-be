@@ -3,6 +3,7 @@ import { ErrorResponse, RequestCustom } from "../types";
 import { ERROR_CLIENT } from "../constants";
 import {
   handleCreatePostService,
+  handleGetDetailPostService,
   handleGetPostService,
   handleSearchPostService,
 } from "../services/post-services";
@@ -95,5 +96,30 @@ export const handleSearchPost = async (req: RequestCustom, res: Response) => {
     return res.status(result.statusCode).json(result);
   } else {
     return res.status(200).json(result);
+  }
+};
+
+export const handleGetDetailPost = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  const { postId } = req.params;
+  if (!postId) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Invalid post id`,
+      error: "Not provide post id",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  } else {
+    const result = await handleGetDetailPostService({ postId });
+    // Check the result and respond accordingly
+    if (!result.success) {
+      return res.status(result.statusCode).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
   }
 };

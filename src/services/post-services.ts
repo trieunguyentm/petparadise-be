@@ -1,7 +1,7 @@
 import cloudinary from "../utils/cloudinary-config";
 import Post from "../models/post";
 import { Stream } from "stream";
-import { ERROR_SERVER, SUCCESS } from "../constants";
+import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { ErrorResponse, SuccessResponse } from "../types";
 import { connectMongoDB } from "../db/mongodb";
 import User from "../models/user";
@@ -154,6 +154,55 @@ export const handleSearchPostService = async ({ query }: { query: string }) => {
       type: SUCCESS,
     };
     return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get post",
+      error: "Failed to get post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetDetailPostService = async ({
+  postId,
+}: {
+  postId: string;
+}) => {
+  try {
+    await connectMongoDB();
+    const post = await Post.findById(postId)
+      .populate({
+        path: "poster likes saves",
+        model: User,
+      })
+      .populate({
+        path: "comments",
+        model: Comment,
+      })
+      .exec();
+    if (!post) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Not found post",
+        error: "Not found post with id: " + postId,
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    } else {
+      const dataResponse: SuccessResponse = {
+        success: true,
+        message: "Get post successfully",
+        data: post,
+        statusCode: 200,
+        type: SUCCESS,
+      };
+      return dataResponse;
+    }
   } catch (error: any) {
     console.log(error);
     let dataResponse: ErrorResponse = {

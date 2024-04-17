@@ -22,4 +22,6 @@ postRoute.get(
   postControllers.handleSearchPost
 );
 
+postRoute.get("/detail/:postId", postControllers.handleGetDetailPost);
+
 export default postRoute;
