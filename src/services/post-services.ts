@@ -10,6 +10,7 @@ import { normalizeQuery } from "../utils/normalize";
 import CommentModel from "../models/comment";
 import path from "path";
 import { pusherServer } from "../utils/pusher";
+import { model } from "mongoose";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -104,6 +105,11 @@ export const handleGetPostService = async ({
       .populate({
         path: "comments",
         model: Comment,
+        populate: {
+          path: "poster",
+          model: User,
+          select: "-password",
+        },
       })
       .exec();
     const dataResponse: SuccessResponse = {
@@ -259,22 +265,36 @@ export const handleAddCommentService = async ({
       }
       /** Tạo comment mới */
       const newComment = await CommentModel.create({
-        poster: userInfo,
+        poster: userInfo._id,
         image: imageURL,
         content: content,
-        post: postInfo,
+        post: postInfo._id,
       });
+      await newComment.populate("poster", "username profileImage"); // Populate only needed fields
+
       /** Thêm comment này vào post */
-      postInfo.comments.push(newComment);
+      postInfo.comments.push(newComment._id);
       await postInfo.save();
+
+      /** Prepare the data for Pusher - only include necessary fields */
+      const commentDataForPusher = {
+        _id: newComment._id,
+        poster: {
+          _id: userInfo._id,
+          username: userInfo.username,
+          profileImage: userInfo.profileImage,
+        },
+        content: newComment.content,
+        image: newComment.image,
+        createdAt: newComment.createdAt,
+      };
 
       /** Pusher */
       await pusherServer.trigger(
         `post-${postId}-comments`,
         `new-comment`,
-        newComment
+        commentDataForPusher
       );
-
       /** Return */
       const dataResponse: SuccessResponse = {
         success: true,
