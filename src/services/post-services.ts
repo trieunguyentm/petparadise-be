@@ -9,6 +9,7 @@ import Comment from "../models/comment";
 import { normalizeQuery } from "../utils/normalize";
 import CommentModel from "../models/comment";
 import path from "path";
+import { pusherServer } from "../utils/pusher";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -238,7 +239,7 @@ export const handleAddCommentService = async ({
   try {
     await connectMongoDB();
     const [userInfo, postInfo] = await Promise.all([
-      User.findById(user.id),
+      User.findById(user.id).select("-password"),
       Post.findById(postId),
     ]);
     if (!userInfo || !postInfo) {
@@ -258,14 +259,22 @@ export const handleAddCommentService = async ({
       }
       /** Tạo comment mới */
       const newComment = await CommentModel.create({
-        poster: user.id,
+        poster: userInfo,
         image: imageURL,
         content: content,
-        post: postId,
+        post: postInfo,
       });
       /** Thêm comment này vào post */
       postInfo.comments.push(newComment);
       await postInfo.save();
+
+      /** Pusher */
+      await pusherServer.trigger(
+        `post-${postId}-comments`,
+        `new-comment`,
+        newComment
+      );
+
       /** Return */
       const dataResponse: SuccessResponse = {
         success: true,
