@@ -7,6 +7,9 @@ import cloudinary from "../utils/cloudinary-config";
 import Post from "../models/post";
 import { connectRedis } from "../db/redis";
 import { normalizeQuery } from "../utils/normalize";
+import path from "path";
+import { model } from "mongoose";
+import CommentModel from "../models/comment";
 
 export const handleGetUserService = async ({
   user,
@@ -20,11 +23,22 @@ export const handleGetUserService = async ({
     ).populate({
       path: "likedPosts savedPosts",
       model: Post,
-      populate: {
-        path: "poster",
-        model: User,
-        select: "-password", // Loại bỏ trường password từ kết quả
-      },
+      populate: [
+        {
+          path: "poster",
+          model: "User",
+          select: "-password", // Loại bỏ trường password từ kết quả
+        },
+        {
+          path: "comments",
+          model: CommentModel,
+          populate: {
+            path: "poster",
+            model: "User",
+            select: "-password",
+          },
+        },
+      ],
     });
     if (!userInfo) {
       let dataResponse: ErrorResponse = {
