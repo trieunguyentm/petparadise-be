@@ -58,7 +58,6 @@ export const handleCreateChatService = async ({
     }
 
     const isGroup = members.length >= 2;
-    console.log("isGroup: " + isGroup);
     let chat;
     if (isGroup) {
       // Trường hợp là nhóm
@@ -67,14 +66,12 @@ export const handleCreateChatService = async ({
         isGroup: true,
         members: { $all: [user.id, ...members], $size: members.length + 1 },
       });
-      console.log("Chạy vào 1:", chat);
     } else {
       // Trường hợp chỉ có hai thành viên
       chat = await Chat.findOne({
         isGroup: false,
         members: { $all: [user.id, ...members], $size: 2 },
       });
-      console.log("Chạy vào 2:", chat);
     }
 
     if (!chat) {
@@ -87,12 +84,11 @@ export const handleCreateChatService = async ({
       chat = new Chat({
         members: [user.id, ...members],
         isGroup,
-        name: name || "",
-        groupPhoto: groupPhotoUrl || "",
+        name: isGroup ? name || "" : "",
+        groupPhoto: isGroup ? groupPhotoUrl || "" : "",
       });
 
       await chat.save();
-      console.log("Chạy vào 3: ", chat);
     }
     const dataResponse: SuccessResponse = {
       success: true,
