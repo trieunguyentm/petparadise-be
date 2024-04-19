@@ -32,6 +32,7 @@ export const handleGetUserService = async ({
         {
           path: "comments",
           model: CommentModel,
+          options: { sort: { createdAt: -1 } },
           populate: {
             path: "poster",
             model: "User",
