@@ -36,7 +36,7 @@ export const handleCreatePost = async (req: RequestCustom, res: Response) => {
   }
 
   const files: Express.Multer.File[] = req.files as Express.Multer.File[];
-  const { content, tags } = req.body; // Giả sử bạn nhận content và tags từ body
+  const { content, tags } = req.body; // Nhận content và tags từ body
 
   // Gọi service để xử lý logic tạo post
   const result = await handleCreatePostService({ user, files, content, tags });

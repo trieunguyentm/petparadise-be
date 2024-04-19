@@ -8,9 +8,7 @@ import User from "../models/user";
 import Comment from "../models/comment";
 import { normalizeQuery } from "../utils/normalize";
 import CommentModel from "../models/comment";
-import path from "path";
 import { pusherServer } from "../utils/pusher";
-import { model } from "mongoose";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
