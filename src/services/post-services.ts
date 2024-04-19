@@ -101,10 +101,12 @@ export const handleGetPostService = async ({
       .populate({
         path: "poster likes saves",
         model: User,
+        select: "-password",
       })
       .populate({
         path: "comments",
         model: Comment,
+        options: { sort: { createdAt: -1 } },
         populate: {
           path: "poster",
           model: User,
