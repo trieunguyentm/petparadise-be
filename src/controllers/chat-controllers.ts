@@ -2,7 +2,10 @@ import { Response } from "express";
 import { ErrorResponse, RequestCustom } from "../types";
 import { validationResult } from "express-validator";
 import { ERROR_CLIENT } from "../constants";
-import { handleCreateChatService } from "../services/chat-services";
+import {
+  handleCreateChatService,
+  handleGetChatService,
+} from "../services/chat-services";
 
 export const handleCreateChat = async (req: RequestCustom, res: Response) => {
   // Kiểm tra kết quả validation
@@ -47,6 +50,26 @@ export const handleCreateChat = async (req: RequestCustom, res: Response) => {
     name,
     groupPhoto: file,
   });
+  // Kiểm tra kết quả và phản hồi tương ứng
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleGetChat = async (req: RequestCustom, res: Response) => {
+  const { user } = req;
+  if (!user) {
+    return res.status(400).json({
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    });
+  }
+  const result = await handleGetChatService({ user });
   // Kiểm tra kết quả và phản hồi tương ứng
   if (!result.success) {
     return res.status(result.statusCode).json(result);

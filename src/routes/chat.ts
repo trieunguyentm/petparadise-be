@@ -14,4 +14,6 @@ chatRoute.post(
   chatControllers.handleCreateChat
 );
 
+chatRoute.get("/", chatControllers.handleGetChat);
+
 export default chatRoute;

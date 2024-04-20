@@ -3,8 +3,9 @@ import cloudinary from "../utils/cloudinary-config";
 import Chat from "../models/chat";
 import { connectMongoDB } from "../db/mongodb";
 import { ErrorResponse, SuccessResponse } from "../types";
-import { ERROR_SERVER } from "../constants";
+import { ERROR_SERVER, SUCCESS } from "../constants";
 import User from "../models/user";
+import { pusherServer } from "../utils/pusher";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -89,13 +90,31 @@ export const handleCreateChatService = async ({
       });
 
       await chat.save();
+
+      // Prepare the data to be sent to Pusher
+      const chatForPusher = {
+        _id: chat._id,
+        members: chat.members,
+        isGroup: chat.isGroup,
+        name: chat.name,
+        groupPhoto: chat.groupPhoto,
+        lastMessageAt: chat.lastMessageAt,
+      };
+      // Trigger an event to all members of the chat
+      chat.members.map(async (member) => {
+        await pusherServer.trigger(
+          member._id.toString(),
+          "new-chat",
+          chatForPusher
+        );
+      });
     }
     const dataResponse: SuccessResponse = {
       success: true,
       message: "Chat fetched or created successfully",
       data: chat,
       statusCode: 200,
-      type: "SUCCESS",
+      type: SUCCESS,
     };
     return dataResponse;
   } catch (error: any) {
@@ -104,6 +123,45 @@ export const handleCreateChatService = async ({
       success: false,
       message: "Failed when create chat",
       error: "Failed when create chat: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetChatService = async ({
+  user,
+}: {
+  user: { id: string; username: string; email: string };
+}) => {
+  try {
+    await connectMongoDB();
+
+    const allChats = await Chat.find({ members: user.id })
+      .sort({
+        lastMessageAt: -1,
+      })
+      .populate({
+        path: "members",
+        model: User,
+        select: "_id username profileImage",
+      });
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "List chat fetched successfully",
+      data: allChats,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed when fetch list chat",
+      error: "Failed when fetch list chat: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
