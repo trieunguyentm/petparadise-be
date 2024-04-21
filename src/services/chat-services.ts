@@ -3,7 +3,7 @@ import cloudinary from "../utils/cloudinary-config";
 import Chat from "../models/chat";
 import { connectMongoDB } from "../db/mongodb";
 import { ErrorResponse, SuccessResponse } from "../types";
-import { ERROR_SERVER, SUCCESS } from "../constants";
+import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import User from "../models/user";
 import { pusherServer } from "../utils/pusher";
 
@@ -166,5 +166,43 @@ export const handleGetChatService = async ({
       type: ERROR_SERVER,
     };
     return dataResponse;
+  }
+};
+
+export const handleCheckUserInChat = async ({
+  user,
+  chatId,
+}: {
+  user: { id: string; username: string; email: string };
+  chatId: string;
+}) => {
+  try {
+    await connectMongoDB();
+    // Tìm chat
+    const chat = await Chat.findOne({
+      _id: chatId,
+      members: user.id,
+    })
+      .populate({ path: "members", model: User })
+      .exec();
+    if (!chat) {
+      return {
+        inChat: false,
+        chat: null,
+        type: ERROR_CLIENT,
+      };
+    } else {
+      return {
+        inChat: true,
+        chat: chat,
+        type: SUCCESS,
+      };
+    }
+  } catch (error) {
+    return {
+      inChat: false,
+      chat: null,
+      type: ERROR_SERVER,
+    };
   }
 };

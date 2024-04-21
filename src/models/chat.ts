@@ -1,9 +1,10 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { IUserDocument } from "./user";
+import { IMessageDocument } from "./message";
 
 export interface IChatDocument extends mongoose.Document {
   members: IUserDocument[];
-  messages: Schema.Types.ObjectId[];
+  messages: IMessageDocument[];
   isGroup: Boolean;
   name: string;
   groupPhoto: string;

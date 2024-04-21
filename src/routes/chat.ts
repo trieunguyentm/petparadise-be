@@ -1,6 +1,6 @@
 import * as validators from "../validators/chat-validators";
 import * as chatControllers from "../controllers/chat-controllers";
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import { authenticate, upload } from "../validators/middleware";
 
 const chatRoute = Router();
@@ -15,5 +15,7 @@ chatRoute.post(
 );
 
 chatRoute.get("/", chatControllers.handleGetChat);
+
+chatRoute.get("/:chatId", chatControllers.handleGetDetailChat);
 
 export default chatRoute;

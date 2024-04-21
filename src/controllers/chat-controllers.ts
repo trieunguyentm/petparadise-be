@@ -1,8 +1,9 @@
 import { Response } from "express";
-import { ErrorResponse, RequestCustom } from "../types";
+import { ErrorResponse, RequestCustom, SuccessResponse } from "../types";
 import { validationResult } from "express-validator";
-import { ERROR_CLIENT } from "../constants";
+import { ERROR_CLIENT, SUCCESS } from "../constants";
 import {
+  handleCheckUserInChat,
   handleCreateChatService,
   handleGetChatService,
 } from "../services/chat-services";
@@ -75,5 +76,51 @@ export const handleGetChat = async (req: RequestCustom, res: Response) => {
     return res.status(result.statusCode).json(result);
   } else {
     return res.status(200).json(result);
+  }
+};
+
+export const handleGetDetailChat = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  const { user } = req;
+  if (!user) {
+    return res.status(400).json({
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    });
+  }
+  const { chatId } = req.params;
+  if (!chatId) {
+    return res.status(400).json({
+      success: false,
+      message: "Not provide chatId",
+      error: "Not provide chatId",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    });
+  }
+  /** Check user in chat */
+  const check = await handleCheckUserInChat({ user, chatId });
+  if (!check.inChat || check.chat === null) {
+    return res.status(400).json({
+      success: false,
+      message: "No access to conversations",
+      error: "No access to conversations",
+      statusCode: 403,
+      type: ERROR_CLIENT,
+    });
+  } else {
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get Detail Chat successfully",
+      data: check.chat,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return res.status(200).json(dataResponse);
   }
 };
