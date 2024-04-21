@@ -6,6 +6,7 @@ import {
   handleCheckUserInChat,
   handleCreateChatService,
   handleGetChatService,
+  handleGetMessageChatService,
 } from "../services/chat-services";
 
 export const handleCreateChat = async (req: RequestCustom, res: Response) => {
@@ -122,5 +123,37 @@ export const handleGetDetailChat = async (
       type: SUCCESS,
     };
     return res.status(200).json(dataResponse);
+  }
+};
+
+export const handleGetMessageChat = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  const { user } = req;
+  if (!user) {
+    return res.status(400).json({
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    });
+  }
+  // Parse the query parameters and provide default values if necessary
+  const limit = parseInt(req.query.limit as string) || 30;
+  const offset = parseInt(req.query.offset as string) || 0;
+  const { chatId } = req.params;
+  const result = await handleGetMessageChatService({
+    limit,
+    offset,
+    user,
+    chatId,
+  });
+  // Kiểm tra kết quả và phản hồi tương ứng
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
   }
 };

@@ -4,8 +4,9 @@ import Chat from "../models/chat";
 import { connectMongoDB } from "../db/mongodb";
 import { ErrorResponse, SuccessResponse } from "../types";
 import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
-import User from "../models/user";
+import User, { IUserDocument } from "../models/user";
 import { pusherServer } from "../utils/pusher";
+import Message from "../models/message";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -87,6 +88,7 @@ export const handleCreateChatService = async ({
         isGroup,
         name: isGroup ? name || "" : "",
         groupPhoto: isGroup ? groupPhotoUrl || "" : "",
+        lastMessage: `${user.username} started the conversation`,
       });
 
       await chat.save();
@@ -98,6 +100,7 @@ export const handleCreateChatService = async ({
         isGroup: chat.isGroup,
         name: chat.name,
         groupPhoto: chat.groupPhoto,
+        lastMessage: chat.lastMessage,
         lastMessageAt: chat.lastMessageAt,
       };
       // Trigger an event to all members of the chat
@@ -204,5 +207,83 @@ export const handleCheckUserInChat = async ({
       chat: null,
       type: ERROR_SERVER,
     };
+  }
+};
+
+export const handleGetMessageChatService = async ({
+  limit,
+  offset,
+  user,
+  chatId,
+}: {
+  limit: number;
+  offset: number;
+  user: { id: string; username: string; email: string };
+  chatId: string;
+}) => {
+  try {
+    await connectMongoDB();
+    // Check chatInfo
+    const chat = await Chat.findById(chatId).populate({
+      path: "members",
+      model: User,
+      select: "_id",
+    });
+    if (!chat) {
+      const dataResponse: ErrorResponse = {
+        success: false,
+        message: "Chat ID not found",
+        error: "Chat ID not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Check user in chat group
+    if (
+      !chat.members.some(
+        (member: IUserDocument) => member._id.toString() === user.id
+      )
+    ) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "User is not a member of the chat",
+        error: "Access denied",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    const messages = await Message.find({ chat: chatId })
+      .sort({
+        createdAt: -1,
+      })
+      .skip(offset)
+      .limit(limit)
+      .populate({
+        path: "sender",
+        model: User,
+        select: "_id username email profileImage",
+      })
+      .exec();
+    // Return
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get message successfully",
+      data: messages,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get message",
+      error: "Failed to get message: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
   }
 };

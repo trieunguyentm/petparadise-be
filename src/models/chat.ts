@@ -9,6 +9,7 @@ export interface IChatDocument extends mongoose.Document {
   name: string;
   groupPhoto: string;
   createdAt: Date;
+  lastMessage: string;
   lastMessageAt: Date;
 }
 
@@ -21,6 +22,7 @@ const chatSchema = new Schema<IChatDocument>({
   name: { type: String, default: "" },
   groupPhoto: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now },
+  lastMessage: { type: String, default: "" },
   lastMessageAt: { type: Date, default: Date.now, index: true },
 });
 

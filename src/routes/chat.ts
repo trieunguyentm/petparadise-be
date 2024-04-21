@@ -18,4 +18,6 @@ chatRoute.get("/", chatControllers.handleGetChat);
 
 chatRoute.get("/:chatId", chatControllers.handleGetDetailChat);
 
+chatRoute.get("/:chatId/messages", chatControllers.handleGetMessageChat);
+
 export default chatRoute;

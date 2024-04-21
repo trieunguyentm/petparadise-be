@@ -1,5 +1,5 @@
 import { Stream } from "stream";
-import { ERROR_CLIENT, ERROR_SERVER } from "../constants";
+import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { ErrorResponse, SuccessResponse } from "../types";
 import cloudinary from "../utils/cloudinary-config";
 import Chat from "../models/chat";
@@ -96,7 +96,7 @@ export const handleCreateMessageService = async ({
       message: "Message sent successfully",
       data: newMessage,
       statusCode: 200,
-      type: "SUCCESS",
+      type: SUCCESS,
     };
     return dataResponse;
   } catch (error: any) {
