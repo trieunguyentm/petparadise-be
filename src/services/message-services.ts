@@ -98,8 +98,17 @@ export const handleCreateMessageService = async ({
     chat.lastMessageAt = newMessage.createdAt;
     await chat.save();
 
-    /* Trigger a Pusher event for a specific chat about the new message */
+    /** Trigger a Pusher event for a specific chat about the new message */
     await pusherServer.trigger(chatId, "new-message", populatedNewMessage);
+
+    /** Triggers a Pusher event for each member of the chat about the chat update with the latest message */
+    chat.members.forEach(async (member: IUserDocument) => {
+      try {
+        await pusherServer.trigger(member._id.toString(), "update-chat", chat);
+      } catch (err) {
+        console.error(`Failed to trigger update-chat event`);
+      }
+    });
 
     // Return
     const dataResponse: SuccessResponse = {

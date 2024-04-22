@@ -89,6 +89,7 @@ export const handleCreateChatService = async ({
         name: isGroup ? name || "" : "",
         groupPhoto: isGroup ? groupPhotoUrl || "" : "",
         lastMessage: `${user.username} started the conversation`,
+        seenBy: [user.id],
       });
 
       await chat.save();

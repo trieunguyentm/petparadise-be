@@ -8,6 +8,7 @@ export interface IChatDocument extends mongoose.Document {
   isGroup: Boolean;
   name: string;
   groupPhoto: string;
+  seenBy: IUserDocument[];
   createdAt: Date;
   lastMessage: string;
   lastMessageAt: Date;
@@ -21,6 +22,7 @@ const chatSchema = new Schema<IChatDocument>({
   isGroup: { type: Boolean, default: false },
   name: { type: String, default: "" },
   groupPhoto: { type: String, default: "" },
+  seenBy: [{ type: Schema.Types.ObjectId, ref: "User", default: [] }],
   createdAt: { type: Date, default: Date.now },
   lastMessage: { type: String, default: "" },
   lastMessageAt: { type: Date, default: Date.now, index: true },
