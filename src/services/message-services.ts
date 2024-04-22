@@ -6,6 +6,7 @@ import Chat from "../models/chat";
 import User, { IUserDocument } from "../models/user";
 import Message from "../models/message";
 import { connectMongoDB } from "../db/mongodb";
+import { pusherServer } from "../utils/pusher";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -86,10 +87,20 @@ export const handleCreateMessageService = async ({
       createdAt: new Date(),
       seenBy: [user.id],
     });
+    // Populate the sender field with detailed information
+    const populatedNewMessage = await Message.findById(newMessage._id).populate(
+      { path: "sender", model: User, select: "_id username profileImage" }
+    );
     // Update the chat
     chat.messages.push(newMessage);
+    chat.lastMessage = text;
+    if (imageUrl !== "") chat.lastMessage = `${user.username} sent a photo`;
     chat.lastMessageAt = newMessage.createdAt;
     await chat.save();
+
+    /* Trigger a Pusher event for a specific chat about the new message */
+    await pusherServer.trigger(chatId, "new-message", populatedNewMessage);
+
     // Return
     const dataResponse: SuccessResponse = {
       success: true,
