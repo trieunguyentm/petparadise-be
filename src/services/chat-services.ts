@@ -1,6 +1,6 @@
 import { Stream } from "stream";
 import cloudinary from "../utils/cloudinary-config";
-import Chat from "../models/chat";
+import Chat, { IChatDocument } from "../models/chat";
 import { connectMongoDB } from "../db/mongodb";
 import { ErrorResponse, SuccessResponse } from "../types";
 import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
@@ -208,6 +208,47 @@ export const handleCheckUserInChat = async ({
       chat: null,
       type: ERROR_SERVER,
     };
+  }
+};
+
+export const handleSeenService = async ({
+  user,
+  chatId,
+}: {
+  user: { id: string; username: string; email: string };
+  chatId: string;
+}) => {
+  try {
+    await connectMongoDB();
+    const updatedChat = (await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        $addToSet: { seenBy: user.id },
+      },
+      { new: true }
+    ).exec()) as IChatDocument;
+    /** Trigger seen-chat to client */
+
+    await pusherServer.trigger(user.id.toString(), "seen-chat", updatedChat);
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Seen successfully",
+      data: "Seen successfully",
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed when seen chat",
+      error: "Failed when seen chat: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
   }
 };
 

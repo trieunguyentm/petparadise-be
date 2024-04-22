@@ -7,6 +7,7 @@ import {
   handleCreateChatService,
   handleGetChatService,
   handleGetMessageChatService,
+  handleSeenService,
 } from "../services/chat-services";
 
 export const handleCreateChat = async (req: RequestCustom, res: Response) => {
@@ -123,6 +124,49 @@ export const handleGetDetailChat = async (
       type: SUCCESS,
     };
     return res.status(200).json(dataResponse);
+  }
+};
+
+export const handleSeen = async (req: RequestCustom, res: Response) => {
+  const { user } = req;
+  if (!user) {
+    return res.status(400).json({
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    });
+  }
+  const { chatId } = req.params;
+  if (!chatId) {
+    return res.status(400).json({
+      success: false,
+      message: "Not provide chatId",
+      error: "Not provide chatId",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    });
+  }
+  /** Check user in chat */
+  const check = await handleCheckUserInChat({ user, chatId });
+  if (!check.inChat || check.chat === null) {
+    return res.status(400).json({
+      success: false,
+      message: "No access to conversations",
+      error: "No access to conversations",
+      statusCode: 403,
+      type: ERROR_CLIENT,
+    });
+  } else {
+    let chatId = check.chat._id.toString();
+    const result = await handleSeenService({ user, chatId });
+    // Kiểm tra kết quả và phản hồi tương ứng
+    if (!result.success) {
+      return res.status(result.statusCode).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
   }
 };
 

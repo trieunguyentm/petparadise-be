@@ -96,6 +96,10 @@ export const handleCreateMessageService = async ({
     chat.lastMessage = text;
     if (imageUrl !== "") chat.lastMessage = `${user.username} sent a photo`;
     chat.lastMessageAt = newMessage.createdAt;
+    const userInfo = (await User.findById(user.id).select(
+      "_id username email profileImage"
+    )) as IUserDocument;
+    chat.seenBy = [userInfo];
     await chat.save();
 
     /** Trigger a Pusher event for a specific chat about the new message */
