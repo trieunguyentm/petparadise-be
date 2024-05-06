@@ -32,6 +32,11 @@ authRoute.post(
   authControllers.handleRecoveryPassword
 );
 
+authRoute.get(
+  "/resend-verify-otp-recovery",
+  authControllers.handleResendVerifyOTPRecovery
+);
+
 authRoute.post(
   "/verify-otp-recovery",
   validators.verifyOTPValidator,

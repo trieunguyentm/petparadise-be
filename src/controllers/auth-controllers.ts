@@ -4,6 +4,7 @@ import {
   handleLoginService,
   handleRecoveryPasswordService,
   handleRegisterService,
+  handleResendVerifyOTPRecoveryService,
   handleResendVerifyOTPService,
   handleVerifyOTPRecoveryService,
   handleVerifyOTPService,
@@ -148,6 +149,10 @@ export const handleVerifyOTP = async (req: Request, res: Response) => {
   }
   const result = await handleVerifyOTPService({ otpCode, verifyOtpCookie });
   if (!result.success) {
+    if (result.type === ERROR_SESSION) {
+      // Xóa cookie "verify-otp" bằng cách set nó với maxAge là 0 hoặc set expire date là quá khứ
+      res.cookie("verify-otp", "", { maxAge: 0 });
+    }
     return res.status(result.statusCode).json(result);
   } else {
     // Xóa cookie "verify-otp" bằng cách set nó với maxAge là 0 hoặc set expire date là quá khứ
@@ -185,6 +190,37 @@ export const handleRecoveryPassword = async (req: Request, res: Response) => {
   }
 };
 
+export const handleResendVerifyOTPRecovery = async (
+  req: Request,
+  res: Response
+) => {
+  const verifyOtpRecoveryCookie = req.cookies["verify-otp-recovery"];
+  if (!verifyOtpRecoveryCookie) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Session expired",
+      error: "Session expired",
+      statusCode: 401,
+      type: ERROR_SESSION,
+    };
+    return res.status(401).json(dataResponse);
+  }
+  const result = await handleResendVerifyOTPRecoveryService({
+    verifyOtpRecoveryCookie,
+  });
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    // Set cookie
+    res.cookie("verify-otp-recovery", result.data?.newKey, {
+      maxAge: 300 * 1000,
+      httpOnly: true,
+      secure: true,
+    });
+    return res.status(result.statusCode).json(result);
+  }
+};
+
 export const handleVerifyOTPRecovery = async (req: Request, res: Response) => {
   // Kiểm tra kết quả validation
   const errors = validationResult(req);
@@ -217,6 +253,10 @@ export const handleVerifyOTPRecovery = async (req: Request, res: Response) => {
     verifyOtpCookie,
   });
   if (!result.success) {
+    if (result.type === ERROR_SESSION) {
+      // Xóa cookie "verify-otp" bằng cách set nó với maxAge là 0 hoặc set expire date là quá khứ
+      res.cookie("verify-otp-recovery", "", { maxAge: 0 });
+    }
     return res.status(result.statusCode).json(result);
   } else {
     // Xóa cookie "verify-otp" bằng cách set nó với maxAge là 0 hoặc set expire date là quá khứ

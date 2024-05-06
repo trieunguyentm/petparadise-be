@@ -244,7 +244,7 @@ export const handleVerifyOTPService = async ({
     return dataResponse;
   }
   if (otpCode.toString() !== userData.randomCode.toString()) {
-    if (userData.fail === 5) {
+    if (userData.fail >= 5) {
       let dataResponse: ErrorResponse = {
         success: false,
         message: "The number of incorrect OTP entries has exceeded 5 times",
@@ -252,6 +252,7 @@ export const handleVerifyOTPService = async ({
         statusCode: 403,
         type: ERROR_SESSION,
       };
+      await client.del(verifyOtpCookie);
       return dataResponse;
     }
     const ttl = await client.TTL(verifyOtpCookie);
@@ -337,7 +338,7 @@ export const handleRecoveryPasswordService = async ({
     // Tạo uuid chứa OTP và thông tin đăng ký
     const id = v4();
     const client = await connectRedis();
-    client.set(id, JSON.stringify({ email, randomCode }), {
+    client.set(id, JSON.stringify({ email, randomCode, count: 0, fail: 0 }), {
       EX: 300,
     });
     // Send HTML Content
@@ -359,6 +360,113 @@ export const handleRecoveryPasswordService = async ({
     let dataResponse: ErrorResponse = {
       success: false,
       message: "Error when sending email for recovery password",
+      error: error as string,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleResendVerifyOTPRecoveryService = async ({
+  verifyOtpRecoveryCookie,
+}: {
+  verifyOtpRecoveryCookie: string;
+}) => {
+  const client = await connectRedis();
+  const data = await client.get(verifyOtpRecoveryCookie);
+  if (!data) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Session expired",
+      error: "Session expired",
+      statusCode: 401,
+      type: ERROR_SESSION,
+    };
+    return dataResponse;
+  }
+  // Nếu có dữ liệu, chuyển từ JSON về Object
+  const userData: {
+    email: string;
+    randomCode: number;
+    count: number;
+    fail: number;
+  } = JSON.parse(data);
+  if (!userData.email) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Invalid Session",
+      error: "Invalid Session",
+      statusCode: 401,
+      type: ERROR_SESSION,
+    };
+    return dataResponse;
+  }
+  // Kiểm tra số lần resend
+  if (userData.count >= 5) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: `Maximum number of OTP sent times has been reached`,
+      error: "Maximum number of OTP sent times has been reached",
+      statusCode: 403,
+      type: ERROR_SESSION,
+    };
+    return dataResponse;
+  }
+  // Kiểm tra thời gian còn sống của key
+  const ttl = await client.TTL(verifyOtpRecoveryCookie);
+  // Chỉ có thể resend sau 60s
+  if (ttl > 240) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: `You can request a new verify OTP after ${ttl - 240} seconds`,
+      error: "Not can request a new verify OTP",
+      statusCode: 403,
+      type: ERROR_CLIENT,
+    };
+    return dataResponse;
+  }
+  try {
+    // Thực hiện việc resend otp
+    // Tạo random code mới
+    const newRandomCode = Math.floor(100000 + Math.random() * 900000);
+    // Tạo key mới
+    const newKey = v4();
+    await client.set(
+      newKey,
+      JSON.stringify({
+        email: userData.email,
+        randomCode: newRandomCode,
+        count: userData.count + 1,
+        fail: userData.fail,
+      }),
+      {
+        EX: 300,
+      }
+    );
+    await client.del(verifyOtpRecoveryCookie);
+    // Send HTML Content
+    const emailBody = await generateRecoveryPasswordMail(
+      userData.email,
+      newRandomCode
+    );
+    // Send Email
+    const subject = "Recovery Password in Pet Paradise";
+    await sendEmail(userData.email, subject, emailBody);
+    // Response
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Verify OTP for recovery password of account",
+      data: { newKey },
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Error when resend new verify OTP for recovery password",
       error: error as string,
       statusCode: 500,
       type: ERROR_SERVER,
@@ -390,14 +498,50 @@ export const handleVerifyOTPRecoveryService = async ({
   const infoEmail: {
     email: string;
     randomCode: number;
+    count: number;
+    fail: number;
   } = JSON.parse(data);
+  if (!infoEmail.email) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Invalid Session",
+      error: "Invalid Session",
+      statusCode: 401,
+      type: ERROR_SESSION,
+    };
+    return dataResponse;
+  }
   if (otpCode.toString() !== infoEmail.randomCode.toString()) {
+    if (infoEmail.fail >= 5) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "The number of incorrect OTP entries has exceeded 5 times",
+        error: "Incorrect OTP",
+        statusCode: 403,
+        type: ERROR_SESSION,
+      };
+      await client.del(verifyOtpCookie);
+      return dataResponse;
+    }
+    const ttl = await client.TTL(verifyOtpCookie);
+    await client.set(
+      verifyOtpCookie,
+      JSON.stringify({
+        email: infoEmail.email,
+        randomCode: infoEmail.randomCode,
+        count: infoEmail.count,
+        fail: infoEmail.fail + 1,
+      }),
+      {
+        EX: ttl,
+      }
+    );
     let dataResponse: ErrorResponse = {
       success: false,
       message: "Invalid OTP Code",
       error: "Invalid OTP Code",
       statusCode: 401,
-      type: ERROR_SESSION,
+      type: ERROR_CLIENT,
     };
     return dataResponse;
   }
