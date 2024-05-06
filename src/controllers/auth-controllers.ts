@@ -4,6 +4,7 @@ import {
   handleLoginService,
   handleRecoveryPasswordService,
   handleRegisterService,
+  handleResendVerifyOTPService,
   handleVerifyOTPRecoveryService,
   handleVerifyOTPService,
 } from "../services/auth-services";
@@ -87,6 +88,32 @@ export const handleRegister = async (req: Request, res: Response) => {
       maxAge: 300 * 1000,
       httpOnly: true,
       secure: false,
+    });
+    return res.status(result.statusCode).json(result);
+  }
+};
+
+export const handleResendVerifyOTP = async (req: Request, res: Response) => {
+  const verifyOtpCookie = req.cookies["verify-otp"];
+  if (!verifyOtpCookie) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Session expired",
+      error: "Session expired",
+      statusCode: 401,
+      type: ERROR_SESSION,
+    };
+    return res.status(401).json(dataResponse);
+  }
+  const result = await handleResendVerifyOTPService({ verifyOtpCookie });
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    // Set cookie
+    res.cookie("verify-otp", result.data?.newKey, {
+      maxAge: 300 * 1000,
+      httpOnly: true,
+      secure: true,
     });
     return res.status(result.statusCode).json(result);
   }

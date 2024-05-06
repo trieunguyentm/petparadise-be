@@ -18,6 +18,8 @@ authRoute.post(
   authControllers.handleRegister
 );
 
+authRoute.get("/resend-verify-otp", authControllers.handleResendVerifyOTP);
+
 authRoute.post(
   "/verify-otp",
   validators.verifyOTPValidator,

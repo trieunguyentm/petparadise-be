@@ -56,9 +56,20 @@ export const handleRegisterService = async ({
     // Tạo uuid chứa OTP và thông tin đăng ký
     const id = v4();
     const client = await connectRedis();
-    client.set(id, JSON.stringify({ username, email, password, randomCode }), {
-      EX: 300,
-    });
+    client.set(
+      id,
+      JSON.stringify({
+        username,
+        email,
+        password,
+        randomCode,
+        count: 0,
+        fail: 0,
+      }),
+      {
+        EX: 300,
+      }
+    );
     // Send HTML Content
     const emailBody = await generateRegisterMail(email, randomCode);
     // Send Email
@@ -78,6 +89,114 @@ export const handleRegisterService = async ({
     let dataResponse: ErrorResponse = {
       success: false,
       message: "Error when sending email",
+      error: error as string,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleResendVerifyOTPService = async ({
+  verifyOtpCookie,
+}: {
+  verifyOtpCookie: string;
+}) => {
+  const client = await connectRedis();
+  const data = await client.get(verifyOtpCookie);
+  if (!data) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Session expired",
+      error: "Session expired",
+      statusCode: 401,
+      type: ERROR_SESSION,
+    };
+    return dataResponse;
+  }
+  // Nếu có dữ liệu, chuyển từ JSON về Object
+  const userData: {
+    username: string;
+    password: string;
+    email: string;
+    randomCode: number;
+    count: number;
+    fail: number;
+  } = JSON.parse(data);
+  if (!userData.username) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Invalid Session",
+      error: "Invalid Session",
+      statusCode: 401,
+      type: ERROR_SESSION,
+    };
+    return dataResponse;
+  }
+  // Kiểm tra số lần resend
+  if (userData.count >= 5) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: `Maximum number of OTP sent times has been reached`,
+      error: "Maximum number of OTP sent times has been reached",
+      statusCode: 403,
+      type: ERROR_SESSION,
+    };
+    return dataResponse;
+  }
+  // Kiểm tra thời gian sống của key
+  const ttl = await client.TTL(verifyOtpCookie);
+  // Chỉ có thể resend sau 60s
+  if (ttl > 240) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: `You can request a new verify OTP after ${ttl - 240} seconds`,
+      error: "Not can request a new verify OTP",
+      statusCode: 403,
+      type: ERROR_CLIENT,
+    };
+    return dataResponse;
+  }
+  try {
+    // Thực hiện việc resend otp
+    // Tạo random code mới
+    const newRandomCode = Math.floor(100000 + Math.random() * 900000);
+    // Tạo key mới
+    const newKey = v4();
+    await client.set(
+      newKey,
+      JSON.stringify({
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+        randomCode: newRandomCode,
+        count: userData.count + 1,
+        fail: userData.fail,
+      }),
+      {
+        EX: 300,
+      }
+    );
+    await client.del(verifyOtpCookie)
+    // Send HTML Content
+    const emailBody = await generateRegisterMail(userData.email, newRandomCode);
+    // Send Email
+    const subject = "Verify OTP for register";
+    await sendEmail(userData.email, subject, emailBody);
+    // Response
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Verify OTP for register",
+      data: { newKey },
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Error when resend new verify OTP",
       error: error as string,
       statusCode: 500,
       type: ERROR_SERVER,
@@ -111,7 +230,19 @@ export const handleVerifyOTPService = async ({
     password: string;
     email: string;
     randomCode: number;
+    count: number;
+    fail: number;
   } = JSON.parse(data);
+  if (!userData.username) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Invalid Session",
+      error: "Invalid Session",
+      statusCode: 401,
+      type: ERROR_SESSION,
+    };
+    return dataResponse;
+  }
   if (otpCode.toString() !== userData.randomCode.toString()) {
     let dataResponse: ErrorResponse = {
       success: false,
