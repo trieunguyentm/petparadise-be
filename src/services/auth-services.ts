@@ -177,7 +177,7 @@ export const handleResendVerifyOTPService = async ({
         EX: 300,
       }
     );
-    await client.del(verifyOtpCookie)
+    await client.del(verifyOtpCookie);
     // Send HTML Content
     const emailBody = await generateRegisterMail(userData.email, newRandomCode);
     // Send Email
@@ -244,12 +244,37 @@ export const handleVerifyOTPService = async ({
     return dataResponse;
   }
   if (otpCode.toString() !== userData.randomCode.toString()) {
+    if (userData.fail === 5) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "The number of incorrect OTP entries has exceeded 5 times",
+        error: "Incorrect OTP",
+        statusCode: 403,
+        type: ERROR_SESSION,
+      };
+      return dataResponse;
+    }
+    const ttl = await client.TTL(verifyOtpCookie);
+    await client.set(
+      verifyOtpCookie,
+      JSON.stringify({
+        username: userData.username,
+        mail: userData.email,
+        password: userData.password,
+        randomCode: userData.randomCode,
+        count: userData.count,
+        fail: userData.fail + 1,
+      }),
+      {
+        EX: ttl,
+      }
+    );
     let dataResponse: ErrorResponse = {
       success: false,
       message: "Invalid OTP Code",
       error: "Invalid OTP Code",
       statusCode: 401,
-      type: ERROR_SESSION,
+      type: ERROR_CLIENT,
     };
     return dataResponse;
   }
