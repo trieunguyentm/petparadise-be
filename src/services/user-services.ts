@@ -368,6 +368,50 @@ export const handleGetOtherUserService = async ({
   }
 };
 
+export const handleGetOtherUserBySearchService = async ({
+  user,
+  search,
+  limit,
+  offset,
+}: {
+  user: { id: string; username: string; email: string };
+  search: string;
+  limit: number;
+  offset: number;
+}) => {
+  try {
+    await connectMongoDB();
+    // Truy vấn để lấy các người dùng có username chứa chuỗi tìm kiếm và loại trừ người dùng hiện tại
+    const otherUsers = await User.find({
+      _id: { $ne: user.id },
+      username: { $regex: search, $options: "i" }, // $regex cung cấp khả năng tìm kiếm mềm dẻo, $options: 'i' để không phân biệt hoa thường
+    })
+      .skip(offset)
+      .limit(limit)
+      .select("-password -chats -email -savedPosts -likedPosts") // Loại bỏ các trường nhạy cảm
+      .exec();
+
+    // Return
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Successfully retrieved other users based on search",
+      data: otherUsers,
+      statusCode: 200,
+      type: "SUCCESS",
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Fail when to get other user",
+      error: "Fail when to get other user: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
 export const handleFollowService = async ({
   user,
   peopleID,

@@ -31,6 +31,8 @@ userRoute.post(
 
 userRoute.get("/other", userControllers.handleGetOtherUser);
 
+userRoute.get("/other/:search", userControllers.handleGetOtherUserBySearch)
+
 userRoute.post(
   "/follow",
   validators.followValidator,

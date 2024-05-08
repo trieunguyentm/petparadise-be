@@ -4,6 +4,7 @@ import { ERROR_CLIENT } from "../constants";
 import {
   handleChangePasswordService,
   handleFollowService,
+  handleGetOtherUserBySearchService,
   handleGetOtherUserService,
   handleGetUserService,
   handleLikePostService,
@@ -197,6 +198,38 @@ export const handleGetOtherUser = async (req: RequestCustom, res: Response) => {
     return res.status(400).json(dataResponse);
   } else {
     const result = await handleGetOtherUserService({ user, limit, offset });
+    if (!result.success) {
+      return res.status(result.statusCode).json(result);
+    } else {
+      return res.status(result.statusCode).json(result);
+    }
+  }
+};
+
+export const handleGetOtherUserBySearch = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  const { search } = req.params;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = parseInt(req.query.offset as string) || 0;
+  const { user } = req;
+  if (!user) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(dataResponse);
+  } else {
+    const result = await handleGetOtherUserBySearchService({
+      user,
+      search,
+      offset,
+      limit,
+    });
     if (!result.success) {
       return res.status(result.statusCode).json(result);
     } else {

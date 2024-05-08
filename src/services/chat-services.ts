@@ -226,7 +226,13 @@ export const handleSeenService = async ({
         $addToSet: { seenBy: user.id },
       },
       { new: true }
-    ).exec()) as IChatDocument;
+    )
+      .populate({
+        path: "members",
+        model: User,
+        select: "_id profileImage username",
+      })
+      .exec()) as IChatDocument;
     /** Trigger seen-chat to client */
 
     await pusherServer.trigger(user.id.toString(), "seen-chat", updatedChat);
