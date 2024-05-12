@@ -4,7 +4,8 @@ import { ICommentDocument } from "./comment";
 
 export interface ILostPetPostDocument extends mongoose.Document {
   poster: IUserDocument;
-  createdAt: Date;
+  // createdAt: Date;
+  // updatedAt: Date;
   petName?: string;
   petType:
     | "dog"
@@ -30,48 +31,54 @@ export interface ILostPetPostDocument extends mongoose.Document {
   status: "unfinished" | "finished";
 }
 
-const lostPetPostSchema = new mongoose.Schema<ILostPetPostDocument>({
-  poster: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-    index: true,
-  },
-  createdAt: { type: Date, default: Date.now, index: true },
-  petName: { type: String },
-  petType: {
-    type: String,
-    required: true,
-    enum: [
-      "dog",
-      "cat",
-      "bird",
-      "rabbit",
-      "fish",
-      "rodents",
-      "reptile",
-      "other",
+const lostPetPostSchema = new mongoose.Schema<ILostPetPostDocument>(
+  {
+    poster: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    // createdAt: { type: Date, default: Date.now, index: true },
+    // updatedAt: { type: Date, default: Date.now, index: true },
+    petName: { type: String },
+    petType: {
+      type: String,
+      required: true,
+      enum: [
+        "dog",
+        "cat",
+        "bird",
+        "rabbit",
+        "fish",
+        "rodents",
+        "reptile",
+        "other",
+      ],
+    },
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+    },
+    breed: { type: String },
+    color: { type: String },
+    lastSeenLocation: { type: String, required: true },
+    lastSeenDate: { type: Date },
+    contactInfo: { type: String, required: true },
+    description: { type: String, required: true },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
+    comments: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: [] },
     ],
+    images: [{ type: String }],
+    size: { type: String, enum: ["small", "medium", "big"] },
+    tags: [{ type: String, index: true }],
+    status: { type: String, enum: ["unfinished", "finished"] },
   },
-  gender: {
-    type: String,
-    enum: ["male", "female"],
-  },
-  breed: { type: String },
-  color: { type: String },
-  lastSeenLocation: { type: String, required: true },
-  lastSeenDate: { type: Date },
-  contactInfo: { type: String, required: true },
-  description: { type: String, required: true },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
-  comments: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: [] },
-  ],
-  images: [{ type: String }],
-  size: { type: String, enum: ["small", "medium", "big"] },
-  tags: [{ type: String, index: true }],
-  status: { type: String, enum: ["unfinished", "finished"] },
-});
+  {
+    timestamps: true,
+  }
+);
 
 // Index for sorting posts by createdAt and supporting efficient query lookups
 // This helps in fetching the latest posts efficiently

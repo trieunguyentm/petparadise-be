@@ -140,3 +140,39 @@ export const handleGetFindPetPostService = async ({
     return dataResponse;
   }
 };
+
+export const handleGetFindPetPostByIdService = async ({
+  postId,
+}: {
+  postId: string;
+}) => {
+  try {
+    await connectMongoDB();
+    const findPetPost = await LostPetPost.findById(postId)
+      .populate({
+        path: "poster",
+        model: User,
+        select: "username email profileImage",
+      })
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get find pet post successfully",
+      data: findPetPost,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get post",
+      error: "Failed to get post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};

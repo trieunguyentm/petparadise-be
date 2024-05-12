@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 export const createFindPetPostValidator = [
   body("typePet")
@@ -44,4 +44,8 @@ export const createFindPetPostValidator = [
     .withMessage("contactInfo is required")
     .isString()
     .withMessage("contactInfo must be a string"),
+];
+
+export const getFindPetPostByIdValidator = [
+  param("postId").notEmpty().withMessage("postId must be a ID"),
 ];
