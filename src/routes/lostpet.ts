@@ -14,4 +14,6 @@ lostPetRoute.post(
   lostPetControllers.handleCreateFindPetPost
 );
 
+lostPetRoute.get("/find-pet-post", lostPetControllers.handleGetFindPetPost);
+
 export default lostPetRoute;

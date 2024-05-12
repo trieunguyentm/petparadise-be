@@ -3,9 +3,9 @@ import { IUserDocument } from "./user";
 import { ICommentDocument } from "./comment";
 
 export interface ILostPetPostDocument extends mongoose.Document {
-  poster: mongoose.Schema.Types.ObjectId;
+  poster: IUserDocument;
   createdAt: Date;
-  petName: string;
+  petName?: string;
   petType:
     | "dog"
     | "cat"
@@ -15,8 +15,9 @@ export interface ILostPetPostDocument extends mongoose.Document {
     | "rodents"
     | "reptile"
     | "other";
-  breed: string;
-  color: string;
+  gender?: "male" | "female";
+  breed?: string;
+  color?: string;
   lastSeenLocation: string;
   lastSeenDate: Date;
   contactInfo: string;
@@ -26,7 +27,7 @@ export interface ILostPetPostDocument extends mongoose.Document {
   images: string[];
   size: "small" | "medium" | "big";
   tags: string[];
-  status: "unfinished" | "finished"
+  status: "unfinished" | "finished";
 }
 
 const lostPetPostSchema = new mongoose.Schema<ILostPetPostDocument>({
@@ -52,6 +53,10 @@ const lostPetPostSchema = new mongoose.Schema<ILostPetPostDocument>({
       "other",
     ],
   },
+  gender: {
+    type: String,
+    enum: ["male", "female"],
+  },
   breed: { type: String },
   color: { type: String },
   lastSeenLocation: { type: String, required: true },
@@ -65,6 +70,7 @@ const lostPetPostSchema = new mongoose.Schema<ILostPetPostDocument>({
   images: [{ type: String }],
   size: { type: String, enum: ["small", "medium", "big"] },
   tags: [{ type: String, index: true }],
+  status: { type: String, enum: ["unfinished", "finished"] },
 });
 
 // Index for sorting posts by createdAt and supporting efficient query lookups

@@ -61,8 +61,8 @@ export const handleCreateFindPetPostService = async ({
     const imageUrls = await Promise.all(files.map((file) => uploadImage(file)));
 
     await connectMongoDB();
-    // Tạo bài đăng tìm thú cưng mới
-    const newFindPetPost = await LostPetPost.create({
+
+    let dataCreate: any = {
       poster: user.id,
       petType: typePet,
       lastSeenLocation,
@@ -70,7 +70,11 @@ export const handleCreateFindPetPostService = async ({
       description,
       contactInfo,
       images: imageUrls,
-    });
+    };
+    if (genderPet) dataCreate = { ...dataCreate, gender: genderPet };
+    if (sizePet) dataCreate = { ...dataCreate, size: sizePet };
+    // Tạo bài đăng tìm thú cưng mới
+    const newFindPetPost = await LostPetPost.create(dataCreate);
 
     const userInfo = await User.findById(user.id);
     userInfo?.findPetPosts.push(newFindPetPost);
@@ -90,6 +94,46 @@ export const handleCreateFindPetPostService = async ({
       success: false,
       message: "Failed to create post find pet",
       error: "Failed to create post find pet: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetFindPetPostService = async ({
+  limit,
+  offset,
+}: {
+  limit: number;
+  offset: number;
+}) => {
+  try {
+    await connectMongoDB();
+    const findPetPosts = await LostPetPost.find()
+      .skip(offset)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "poster",
+        model: User,
+        select: "-password",
+      })
+      .exec();
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get find pet post successfully",
+      data: findPetPosts,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get post",
+      error: "Failed to get post: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
