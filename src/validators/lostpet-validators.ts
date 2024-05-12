@@ -1,0 +1,47 @@
+import { body } from "express-validator";
+
+export const createFindPetPostValidator = [
+  body("typePet")
+    .isIn([
+      "dog",
+      "cat",
+      "bird",
+      "rabbit",
+      "fish",
+      "rodents",
+      "reptile",
+      "other",
+    ])
+    .withMessage("typePet is required and must be one of the specified values"),
+  body("genderPet")
+    .optional()
+    .isIn(["male", "female"])
+    .withMessage("genderPet, if provided, must be either 'male' or 'female'"),
+  body("sizePet")
+    .optional()
+    .isIn(["small", "medium", "big"])
+    .withMessage(
+      "sizePet, if provided, must be either 'small', 'medium' or 'big'"
+    ),
+  body("lastSeenLocation")
+    .notEmpty()
+    .withMessage("lastSeenLocation is required")
+    .isString()
+    .withMessage("lastSeenLocation must be a string"),
+  body("lastSeenDate")
+    .notEmpty()
+    .withMessage("lastSeenDate is required")
+    .isISO8601()
+    .withMessage("lastSeenDate must be a valid date"),
+  body("description")
+    .notEmpty()
+    .withMessage("description is required")
+    .isString()
+    .withMessage("description must be a string"),
+  // contactInfo: bắt buộc, kiểu dữ liệu string
+  body("contactInfo")
+    .notEmpty()
+    .withMessage("contactInfo is required")
+    .isString()
+    .withMessage("contactInfo must be a string"),
+];

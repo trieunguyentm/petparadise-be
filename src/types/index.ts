@@ -30,3 +30,17 @@ export interface RequestCustom extends Request {
     email: string;
   };
 }
+
+export type TypePet =
+  | "dog"
+  | "cat"
+  | "bird"
+  | "rabbit"
+  | "fish"
+  | "rodents"
+  | "reptile"
+  | "other";
+
+export type GenderPet = "male" | "female";
+
+export type SizePet = "small" | "medium" | "big";
