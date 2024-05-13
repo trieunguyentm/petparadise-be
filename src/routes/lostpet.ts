@@ -22,4 +22,11 @@ lostPetRoute.get(
   lostPetControllers.handleGetFindPetPostById
 );
 
+lostPetRoute.post(
+  "/find-pet-post/comment",
+  upload.array("photos"),
+  validators.postComment,
+  lostPetControllers.handleAddComment
+);
+
 export default lostPetRoute;

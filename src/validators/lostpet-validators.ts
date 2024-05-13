@@ -49,3 +49,8 @@ export const createFindPetPostValidator = [
 export const getFindPetPostByIdValidator = [
   param("postId").notEmpty().withMessage("postId must be a ID"),
 ];
+
+export const postComment = [
+  body("content").notEmpty().withMessage("Content is required"),
+  body("postId").notEmpty().withMessage("Post Id is required"),
+];

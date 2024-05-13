@@ -7,10 +7,11 @@ import {
   SuccessResponse,
   TypePet,
 } from "../types";
-import { ERROR_SERVER, SUCCESS } from "../constants";
+import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
 import LostPetPost from "../models/lostPetPost";
 import User from "../models/user";
+import FindPetCommentModel from "../models/findPetComment";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -170,6 +171,73 @@ export const handleGetFindPetPostByIdService = async ({
       success: false,
       message: "Failed to get post",
       error: "Failed to get post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleAddCommentService = async ({
+  user,
+  postId,
+  content,
+  files,
+}: {
+  user: { id: string; username: string; email: string };
+  postId: string;
+  content: string;
+  files: Express.Multer.File[] | undefined;
+}) => {
+  try {
+    await connectMongoDB();
+    const [userInfo, postInfo] = await Promise.all([
+      User.findById(user.id).select("-password"),
+      LostPetPost.findById(postId),
+    ]);
+    if (!userInfo || !postInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Not found user or post",
+        error: "Not found user or post",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    } else {
+      // Hàm uploadImage để tải ảnh lên Cloudinary và trả về URL
+      let imageUrls: string[] = [];
+      if (files) {
+        imageUrls = await Promise.all(files.map((file) => uploadImage(file)));
+      }
+      // Tạo comment
+      const newComment = await FindPetCommentModel.create({
+        poster: userInfo._id,
+        images: imageUrls,
+        content: content,
+        post: postInfo._id,
+      });
+      await newComment.populate("poster", "username profileImage");
+
+      // Thêm comment này vào post
+      postInfo.comments.push(newComment._id);
+      await postInfo.save();
+      /** Return */
+      const dataResponse: SuccessResponse = {
+        success: true,
+        message: "Add comment successfully",
+        data: newComment,
+        statusCode: 200,
+        type: SUCCESS,
+      };
+      return dataResponse;
+    }
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed when add comment",
+      error: "Failed when add comment: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
