@@ -29,4 +29,10 @@ lostPetRoute.post(
   lostPetControllers.handleAddComment
 );
 
+lostPetRoute.get(
+  "/find-pet-post/:postId/comment",
+  validators.getComment,
+  lostPetControllers.handleGetCommentByPost
+);
+
 export default lostPetRoute;

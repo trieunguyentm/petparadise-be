@@ -12,6 +12,7 @@ import { connectMongoDB } from "../db/mongodb";
 import LostPetPost from "../models/lostPetPost";
 import User from "../models/user";
 import FindPetCommentModel from "../models/findPetComment";
+import { pusherServer } from "../utils/pusher";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -222,6 +223,14 @@ export const handleAddCommentService = async ({
       // Thêm comment này vào post
       postInfo.comments.push(newComment._id);
       await postInfo.save();
+
+      // Pusher
+      await pusherServer.trigger(
+        `find-pet-post-${postId}-comments`,
+        `new-comment`,
+        newComment
+      );
+
       /** Return */
       const dataResponse: SuccessResponse = {
         success: true,
@@ -238,6 +247,46 @@ export const handleAddCommentService = async ({
       success: false,
       message: "Failed when add comment",
       error: "Failed when add comment: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetCommentByPostService = async ({
+  postId,
+}: {
+  postId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    const comments = await FindPetCommentModel.find({ post: postId })
+      .populate({
+        path: "poster",
+        model: User,
+        select: "username email profileImage",
+      })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    // Return the comments
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Comments retrieved successfully",
+      data: comments,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get comment",
+      error: "Failed to get comment: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
