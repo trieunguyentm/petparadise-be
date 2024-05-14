@@ -14,6 +14,11 @@ import User from "../models/user";
 import FindPetCommentModel from "../models/findPetComment";
 import { pusherServer } from "../utils/pusher";
 
+// Helper function to escape regex characters
+function escapeRegex(text: string) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
+
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
     // Tạo một stream upload từ Cloudinary
@@ -136,6 +141,73 @@ export const handleGetFindPetPostService = async ({
       success: false,
       message: "Failed to get post",
       error: "Failed to get post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetFindPetPostBySearchService = async ({
+  petType,
+  gender,
+  size,
+  lastSeenLocation,
+  lastSeenDate,
+}: {
+  petType: "all" | TypePet;
+  gender: "all" | GenderPet;
+  size: "all" | SizePet;
+  lastSeenLocation: string;
+  lastSeenDate: Date | undefined;
+}) => {
+  let query: any = {};
+
+  if (petType !== "all") query.petType = petType;
+  if (gender !== "all") query.gender = gender;
+  if (size !== "all") query.size = size;
+  const [cityName, districtName, wardName] = lastSeenLocation.split("-");
+
+  if (cityName) {
+    query.lastSeenLocation = new RegExp("^" + escapeRegex(cityName), "i");
+    if (districtName) {
+      query.lastSeenLocation = new RegExp(
+        "^" + escapeRegex(`${cityName}-${districtName}`),
+        "i"
+      );
+      if (wardName) {
+        query.lastSeenLocation = new RegExp(
+          "^" + escapeRegex(`${cityName}-${districtName}-${wardName}`),
+          "i"
+        );
+      }
+    }
+  }
+  // Apply filter based on the date
+  if (lastSeenDate) {
+    const date = new Date(lastSeenDate);
+    query.createdAt = { $gte: date };
+  }
+  try {
+    const posts = await LostPetPost.find(query)
+      .populate("poster", "username profileImage")
+      .sort({ createdAt: -1 }) // Sorting by creation time, latest first
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Post created successfully",
+      data: posts,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to create post find pet",
+      error: "Failed to create post find pet: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

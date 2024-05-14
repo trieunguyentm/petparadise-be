@@ -1,5 +1,11 @@
 import { Response } from "express";
-import { ErrorResponse, RequestCustom } from "../types";
+import {
+  ErrorResponse,
+  GenderPet,
+  RequestCustom,
+  SizePet,
+  TypePet,
+} from "../types";
 import { validationResult } from "express-validator";
 import { ERROR_CLIENT } from "../constants";
 import {
@@ -7,6 +13,7 @@ import {
   handleCreateFindPetPostService,
   handleGetCommentByPostService,
   handleGetFindPetPostByIdService,
+  handleGetFindPetPostBySearchService,
   handleGetFindPetPostService,
 } from "../services/lostpet-services";
 
@@ -88,6 +95,37 @@ export const handleGetFindPetPost = async (
   const offset = parseInt(req.query.offset as string) || 0;
 
   const result = await handleGetFindPetPostService({ limit, offset });
+
+  // Check the result and respond accordingly
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleGetFindPetPostBySearch = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  const {
+    petType = "all",
+    gender = "all",
+    size = "all",
+    lastSeenLocation = "",
+    lastSeenDate = "",
+  } = req.query;
+
+  // Cast the parameters to their respective types
+  const searchParams = {
+    petType: petType as "all" | TypePet,
+    gender: gender as "all" | GenderPet,
+    size: size as "all" | SizePet,
+    lastSeenLocation: lastSeenLocation as string,
+    lastSeenDate: lastSeenDate ? new Date(lastSeenDate as string) : undefined,
+  };
+
+  const result = await handleGetFindPetPostBySearchService(searchParams);
 
   // Check the result and respond accordingly
   if (!result.success) {

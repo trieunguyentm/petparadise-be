@@ -17,6 +17,12 @@ lostPetRoute.post(
 lostPetRoute.get("/find-pet-post", lostPetControllers.handleGetFindPetPost);
 
 lostPetRoute.get(
+  "/find-pet-post-by-search",
+  validators.getFindPetPostBySearchValidator,
+  lostPetControllers.handleGetFindPetPostBySearch
+);
+
+lostPetRoute.get(
   "/find-pet-post/:postId",
   validators.getFindPetPostByIdValidator,
   lostPetControllers.handleGetFindPetPostById

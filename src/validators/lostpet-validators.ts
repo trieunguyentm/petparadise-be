@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 
 export const createFindPetPostValidator = [
   body("typePet")
@@ -58,6 +58,50 @@ export const createFindPetPostValidator = [
 
 export const getFindPetPostByIdValidator = [
   param("postId").notEmpty().withMessage("postId must be a ID"),
+];
+
+export const getFindPetPostBySearchValidator = [
+  query("petType")
+    .optional()
+    .isIn([
+      "all",
+      "dog",
+      "cat",
+      "bird",
+      "rabbit",
+      "fish",
+      "rodents",
+      "reptile",
+      "other",
+    ])
+    .withMessage(
+      "petType must be one of 'all', 'dog', 'cat', 'bird', 'rabbit', 'fish', 'rodents', 'reptile', 'other'"
+    ),
+  query("gender")
+    .optional()
+    .isIn(["all", "male", "female"])
+    .withMessage("gender must be one of 'all', 'male', or 'female'"),
+  query("size")
+    .optional()
+    .isIn(["all", "small", "medium", "big"])
+    .withMessage("size must be one of 'all', 'small', 'medium', or 'big'"),
+  query("lastSeenLocation")
+    .optional()
+    .isString()
+    .withMessage("lastSeenLocation must be a string")
+    .custom((value) => {
+      const locationPattern = /^[^\s]+-[^\s]+-[^\s]+$/;
+      if (!locationPattern.test(value)) {
+        throw new Error(
+          "lastSeenLocation must be formatted as 'city-district-ward'"
+        );
+      }
+      return true;
+    }),
+  query("lastSeenDate")
+    .optional()
+    .isISO8601()
+    .withMessage("lastSeenDate must be a valid date"),
 ];
 
 export const postComment = [
