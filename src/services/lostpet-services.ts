@@ -268,7 +268,7 @@ export const handleUpdateFindPetPostByIdService = async ({
         message: "Post not found",
         error: "Post not found",
         statusCode: 404,
-        type: ERROR_SERVER,
+        type: ERROR_CLIENT,
       };
       return dataResponse;
     }
@@ -279,7 +279,7 @@ export const handleUpdateFindPetPostByIdService = async ({
         message: "Unauthorized",
         error: "You do not have permission to update this post",
         statusCode: 403,
-        type: ERROR_SERVER,
+        type: ERROR_CLIENT,
       };
       return dataResponse;
     }
@@ -302,6 +302,63 @@ export const handleUpdateFindPetPostByIdService = async ({
       success: false,
       message: "Failed to update post",
       error: "Failed to update post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleDeleteFindPetPostByIdService = async ({
+  postId,
+  user,
+}: {
+  postId: string;
+  user: { id: string; username: string; email: string };
+}) => {
+  try {
+    await connectMongoDB();
+    // Find the post by ID
+    const post = await LostPetPost.findById(postId);
+    if (!post) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Post not found",
+        error: "Post not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Check if the user is the owner of the post
+    if (post.poster.toString() !== user.id) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Unauthorized",
+        error: "You do not have permission to delete this post",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Delete the post
+    await LostPetPost.findByIdAndDelete(postId);
+    // Remove the post reference from the user's findPetPosts array
+    await User.updateOne({ _id: user.id }, { $pull: { findPetPosts: postId } });
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Delete find pet post successfully",
+      data: "Delete successfully",
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to delete post",
+      error: "Failed to delete post: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

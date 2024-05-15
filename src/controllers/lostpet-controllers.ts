@@ -11,6 +11,7 @@ import { ERROR_CLIENT } from "../constants";
 import {
   handleAddCommentService,
   handleCreateFindPetPostService,
+  handleDeleteFindPetPostByIdService,
   handleGetCommentByPostService,
   handleGetFindPetPostByIdService,
   handleGetFindPetPostBySearchService,
@@ -162,7 +163,7 @@ export const handleGetFindPetPostById = async (
   }
 };
 
-export const handleUpdatePetPostById = async (
+export const handleUpdateFindPetPostById = async (
   req: RequestCustom,
   res: Response
 ) => {
@@ -188,8 +189,45 @@ export const handleUpdatePetPostById = async (
     };
     return res.status(400).json(response);
   }
-  
+
   const result = await handleUpdateFindPetPostByIdService({ postId, user });
+
+  // Check the result and respond accordingly
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleDeleteFindPetPostById = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  const { postId } = req.params;
+  if (!postId) {
+    const response: ErrorResponse = {
+      success: false,
+      message: "Not provide post Id",
+      error: "Not provide post Id",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  const user = req.user;
+  if (!user) {
+    const response: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+
+  const result = await handleDeleteFindPetPostByIdService({ postId, user });
 
   // Check the result and respond accordingly
   if (!result.success) {

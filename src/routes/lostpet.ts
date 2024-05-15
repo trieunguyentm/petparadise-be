@@ -31,7 +31,13 @@ lostPetRoute.get(
 lostPetRoute.put(
   "/find-pet-post/:postId",
   validators.updateFindPetPostByIdValidator,
-  lostPetControllers.handleUpdatePetPostById
+  lostPetControllers.handleUpdateFindPetPostById
+);
+
+lostPetRoute.delete(
+  "/find-pet-post/:postId",
+  validators.deleteFindPetPostByIdValidator,
+  lostPetControllers.handleDeleteFindPetPostById
 );
 
 lostPetRoute.post(
