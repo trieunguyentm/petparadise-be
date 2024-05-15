@@ -4,6 +4,7 @@ import { ERROR_CLIENT } from "../constants";
 import {
   handleChangePasswordService,
   handleFollowService,
+  handleGetNotificationService,
   handleGetOtherUserBySearchService,
   handleGetOtherUserService,
   handleGetUserService,
@@ -275,6 +276,33 @@ export const handleFollow = async (req: RequestCustom, res: Response) => {
       return res.status(400).json(dataResponse);
     }
     const result = await handleFollowService({ user, peopleID });
+    if (!result.success) {
+      return res.status(result.statusCode).json(result);
+    } else {
+      return res.status(result.statusCode).json(result);
+    }
+  }
+};
+
+export const handleGetNotification = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  const { user } = req;
+  // Parse the query parameters and provide default values if necessary
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = parseInt(req.query.offset as string) || 0;
+  if (!user) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(dataResponse);
+  } else {
+    const result = await handleGetNotificationService({ user, limit, offset });
     if (!result.success) {
       return res.status(result.statusCode).json(result);
     } else {

@@ -39,6 +39,8 @@ userRoute.post(
   userControllers.handleFollow
 );
 
+userRoute.get("/notification", userControllers.handleGetNotification)
+
 userRoute.get("/logout", userControllers.handleLogout);
 
 userRoute.get("/logout-all-device", userControllers.handleLogoutAllDevice);

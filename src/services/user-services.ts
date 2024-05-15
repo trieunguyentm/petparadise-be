@@ -7,9 +7,9 @@ import cloudinary from "../utils/cloudinary-config";
 import Post from "../models/post";
 import { connectRedis } from "../db/redis";
 import { normalizeQuery } from "../utils/normalize";
-import path from "path";
-import { model } from "mongoose";
 import CommentModel from "../models/comment";
+import Notification from "../models/notification";
+import { pusherServer } from "../utils/pusher";
 
 export const handleGetUserService = async ({
   user,
@@ -422,46 +422,45 @@ export const handleFollowService = async ({
   if (user.id === peopleID) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Can not follow user",
-      error: "Can not follow user: ",
+      message: "Cannot follow yourself",
+      error: "Cannot follow yourself",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
     return dataResponse;
   }
+
   try {
     await connectMongoDB();
     const userInfo = await User.findById(user.id)
-      .populate({
-        path: "followers following",
-        model: User,
-      })
+      .populate({ path: "followers following", model: User })
       .select("-password")
       .exec();
     const otherPeopleInfo = await User.findById(peopleID)
-      .populate({
-        path: "followers following",
-        model: User,
-      })
+      .populate({ path: "followers following", model: User })
       .select("-password")
       .exec();
+
     if (!userInfo || !otherPeopleInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Not found user",
-        error: "Not found user",
+        message: "User not found",
+        error: "User not found",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
       return dataResponse;
     }
+
     /** Kiểm tra trạng thái đã follow của người dùng */
     const isFollowing = userInfo.following.find(
       (item) => item._id.toString() === peopleID.toString()
     );
-    let tmp: number = 0;
+
+    let action: string;
+
     if (isFollowing) {
-      tmp = 1;
+      action = "Unfollow";
       userInfo.following = userInfo.following.filter(
         (item) => item._id.toString() !== peopleID.toString()
       );
@@ -469,16 +468,36 @@ export const handleFollowService = async ({
         (item) => item._id.toString() !== user.id.toString()
       );
     } else {
-      tmp = 2;
+      action = "Follow";
       userInfo.following.push(otherPeopleInfo);
       otherPeopleInfo.followers.push(userInfo);
     }
+
     await userInfo.save();
     await otherPeopleInfo.save();
+    // Nếu Follow (tmp === 2) tạo notification
+    if (action === "Follow") {
+      // Create a notification
+      const notification = new Notification({
+        receiver: otherPeopleInfo._id,
+        status: "unseen",
+        title: "New Follower",
+        subtitle: `${user.username} started following you`,
+      });
+      await notification.save();
+
+      // Pusher: Send the notification
+      await pusherServer.trigger(
+        `user-${otherPeopleInfo._id.toString()}-notifications`,
+        `new-notification`,
+        notification
+      );
+    }
+
     let dataResponse: SuccessResponse = {
       success: true,
       message: "Handle follow success",
-      data: `${tmp == 1 ? "Unfollow" : "Follow"}`,
+      data: action,
       statusCode: 200,
       type: SUCCESS,
     };
@@ -488,6 +507,54 @@ export const handleFollowService = async ({
       success: false,
       message: "Fail when follow user",
       error: "Fail when follow user: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetNotificationService = async ({
+  user,
+  limit,
+  offset,
+}: {
+  user: { id: string; username: string; email: string };
+  limit: number;
+  offset: number;
+}) => {
+  try {
+    await connectMongoDB();
+    // Fetch notifications for the user with pagination and sort by createdAt in descending order
+    const notifications = await Notification.find({ receiver: user.id })
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit)
+      .exec();
+    // Count total notifications for the user
+    const totalNotifications = await Notification.countDocuments({
+      receiver: user.id,
+    });
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Fetched notifications successfully",
+      data: {
+        notifications,
+        total: totalNotifications,
+        limit,
+        offset,
+      },
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.error(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to fetch notifications",
+      error: "Failed to fetch notifications: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
