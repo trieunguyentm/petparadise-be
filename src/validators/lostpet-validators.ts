@@ -60,6 +60,10 @@ export const getFindPetPostByIdValidator = [
   param("postId").notEmpty().withMessage("postId must be a ID"),
 ];
 
+export const updateFindPetPostByIdValidator = [
+  param("postId").notEmpty().withMessage("postId must be a ID"),
+];
+
 export const getFindPetPostBySearchValidator = [
   query("petType")
     .optional()

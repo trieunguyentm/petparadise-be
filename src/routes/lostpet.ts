@@ -28,6 +28,12 @@ lostPetRoute.get(
   lostPetControllers.handleGetFindPetPostById
 );
 
+lostPetRoute.put(
+  "/find-pet-post/:postId",
+  validators.updateFindPetPostByIdValidator,
+  lostPetControllers.handleUpdatePetPostById
+);
+
 lostPetRoute.post(
   "/find-pet-post/comment",
   upload.array("photos"),

@@ -15,6 +15,7 @@ import {
   handleGetFindPetPostByIdService,
   handleGetFindPetPostBySearchService,
   handleGetFindPetPostService,
+  handleUpdateFindPetPostByIdService,
 } from "../services/lostpet-services";
 
 export const handleCreateFindPetPost = async (
@@ -152,6 +153,43 @@ export const handleGetFindPetPostById = async (
   }
 
   const result = await handleGetFindPetPostByIdService({ postId });
+
+  // Check the result and respond accordingly
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleUpdatePetPostById = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  const { postId } = req.params;
+  if (!postId) {
+    const response: ErrorResponse = {
+      success: false,
+      message: "Not provide post Id",
+      error: "Not provide post Id",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  const user = req.user;
+  if (!user) {
+    const response: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  
+  const result = await handleUpdateFindPetPostByIdService({ postId, user });
 
   // Check the result and respond accordingly
   if (!result.success) {

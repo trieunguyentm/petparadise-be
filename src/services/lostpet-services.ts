@@ -251,6 +251,64 @@ export const handleGetFindPetPostByIdService = async ({
   }
 };
 
+export const handleUpdateFindPetPostByIdService = async ({
+  postId,
+  user,
+}: {
+  postId: string;
+  user: { id: string; username: string; email: string };
+}) => {
+  try {
+    await connectMongoDB();
+    // Find the post by ID
+    const post = await LostPetPost.findById(postId);
+    if (!post) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Post not found",
+        error: "Post not found",
+        statusCode: 404,
+        type: ERROR_SERVER,
+      };
+      return dataResponse;
+    }
+    // Check if the user is the owner of the post
+    if (post.poster.toString() !== user.id) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Unauthorized",
+        error: "You do not have permission to update this post",
+        statusCode: 403,
+        type: ERROR_SERVER,
+      };
+      return dataResponse;
+    }
+    // Update the post
+    post.status = "finished";
+    // post.updatedAt = new Date();
+
+    await post.save();
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Update find pet post successfully",
+      data: post,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to update post",
+      error: "Failed to update post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
 export const handleAddCommentService = async ({
   user,
   postId,
