@@ -9,6 +9,7 @@ import Comment from "../models/comment";
 import { normalizeQuery } from "../utils/normalize";
 import CommentModel from "../models/comment";
 import { pusherServer } from "../utils/pusher";
+import Notification from "../models/notification";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -295,6 +296,23 @@ export const handleAddCommentService = async ({
         `new-comment`,
         commentDataForPusher
       );
+
+      const notification = new Notification({
+        receiver: postInfo.poster._id,
+        status: "unseen",
+        title: "New activity",
+        subtitle: `${user.username} commented in your post`,
+        moreInfo: `/post/${postId}`,
+      });
+      await notification.save();
+
+      // Pusher: Send the notification
+      await pusherServer.trigger(
+        `user-${postInfo.poster._id.toString()}-notifications`,
+        `new-notification`,
+        notification
+      );
+
       /** Return */
       const dataResponse: SuccessResponse = {
         success: true,

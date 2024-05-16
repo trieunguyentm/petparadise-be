@@ -3,7 +3,7 @@ import { IUserDocument } from "./user";
 import { ICommentDocument } from "./comment";
 
 export interface IPostDocument extends mongoose.Document {
-  poster: mongoose.Schema.Types.ObjectId;
+  poster: IUserDocument;
   createdAt: Date;
   likes: IUserDocument[];
   saves: IUserDocument[];

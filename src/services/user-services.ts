@@ -243,6 +243,25 @@ export const handleLikePostService = async ({
     }
     await userInfo.save();
     await postInfo.save();
+
+    if (!isLiked) {
+      const notification = new Notification({
+        receiver: postInfo.poster._id,
+        status: "unseen",
+        title: "New activity",
+        subtitle: `${user.username} liked your post`,
+        moreInfo: `/post/${postID}`,
+      });
+      await notification.save();
+
+      // Pusher: Send the notification
+      await pusherServer.trigger(
+        `user-${postInfo.poster._id.toString()}-notifications`,
+        `new-notification`,
+        notification
+      );
+    }
+
     let dataResponse: SuccessResponse = {
       success: true,
       message: "Like success",

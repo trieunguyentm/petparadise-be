@@ -13,6 +13,7 @@ import LostPetPost from "../models/lostPetPost";
 import User from "../models/user";
 import FindPetCommentModel from "../models/findPetComment";
 import { pusherServer } from "../utils/pusher";
+import Notification from "../models/notification";
 
 // Helper function to escape regex characters
 function escapeRegex(text: string) {
@@ -416,6 +417,22 @@ export const handleAddCommentService = async ({
         `find-pet-post-${postId}-comments`,
         `new-comment`,
         newComment
+      );
+
+      // Notification
+      const notification = new Notification({
+        receiver: postInfo.poster._id,
+        status: "unseen",
+        title: "New activity",
+        subtitle: `${user.username} has commented on your lost pet search post`,
+        moreInfo: `/find-pet/${postId}`,
+      });
+
+      // Pusher: Send the notification
+      await pusherServer.trigger(
+        `user-${postInfo.poster._id.toString()}-notifications`,
+        `new-notification`,
+        notification
       );
 
       /** Return */

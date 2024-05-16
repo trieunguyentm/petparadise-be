@@ -7,6 +7,7 @@ export interface INotificationDocument extends mongoose.Document {
   title: string;
   subtitle: string;
   content?: string;
+  moreInfo?: string;
 }
 
 const notificationSchema = new mongoose.Schema<INotificationDocument>(
@@ -33,6 +34,10 @@ const notificationSchema = new mongoose.Schema<INotificationDocument>(
     },
     content: {
       type: String,
+    },
+    moreInfo: {
+      type: String,
+      default: "",
     },
   },
   {
