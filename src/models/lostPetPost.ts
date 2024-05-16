@@ -1,11 +1,12 @@
 import mongoose, { Model } from "mongoose";
 import { IUserDocument } from "./user";
 import { ICommentDocument } from "./comment";
+import { IFindPetCommentDocument } from "./findPetComment";
 
 export interface ILostPetPostDocument extends mongoose.Document {
   poster: IUserDocument;
-  // createdAt: Date;
-  // updatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   petName?: string;
   petType:
     | "dog"
@@ -24,7 +25,7 @@ export interface ILostPetPostDocument extends mongoose.Document {
   contactInfo: string;
   description: string;
   likes: IUserDocument[];
-  comments: ICommentDocument[];
+  comments: IFindPetCommentDocument[];
   images: string[];
   size: "small" | "medium" | "big";
   tags: string[];
@@ -68,7 +69,7 @@ const lostPetPostSchema = new mongoose.Schema<ILostPetPostDocument>(
     description: { type: String, required: true },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
     comments: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: [] },
+      { type: mongoose.Schema.Types.ObjectId, ref: "FindPetComment", default: [] },
     ],
     images: [{ type: String }],
     size: { type: String, enum: ["small", "medium", "big"] },
