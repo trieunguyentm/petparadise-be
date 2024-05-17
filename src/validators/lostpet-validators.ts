@@ -30,7 +30,7 @@ export const createFindPetPostValidator = [
     .withMessage("lastSeenLocation must be a string")
     .custom((value) => {
       // Check if the value matches the pattern "city-district-ward"
-      const locationPattern = /^[^\s]+-[^\s]+-[^\s]+$/;
+      const locationPattern = /^[^\s].*-[^\s].*-[^\s].*$/;
       if (!locationPattern.test(value)) {
         throw new Error(
           "lastSeenLocation must be formatted as 'city-district-ward'"

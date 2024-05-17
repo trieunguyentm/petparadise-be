@@ -1,6 +1,7 @@
 import mongoose, { Model } from "mongoose";
 import { IPostDocument } from "./post";
 import { ILostPetPostDocument } from "./lostPetPost";
+import { IPetAdoptionPostDocument } from "./petAdoptionPost";
 
 export interface IUserDocument extends mongoose.Document {
   username: string;
@@ -11,6 +12,7 @@ export interface IUserDocument extends mongoose.Document {
   dateOfBirth?: Date;
   posts: IPostDocument[];
   findPetPosts: ILostPetPostDocument[];
+  petAdoptionPosts: IPetAdoptionPostDocument[];
   savedPosts: IPostDocument[];
   likedPosts: IPostDocument[];
   followers: IUserDocument[];
@@ -30,6 +32,13 @@ const userSchema = new mongoose.Schema<IUserDocument>({
   posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] }],
   findPetPosts: [
     { type: mongoose.Schema.Types.ObjectId, ref: "LostPetPost", default: [] },
+  ],
+  petAdoptionPosts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PetAdoptionPost",
+      default: [],
+    },
   ],
   savedPosts: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] },

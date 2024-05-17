@@ -24,6 +24,7 @@ export interface IPetAdoptionPostDocument extends mongoose.Document {
   images: string[]; // Các hình ảnh của thú cưng
   contactInfo: string; // Thông tin liên lạc để liên hệ
   status: "available" | "adopted"; // Trạng thái của bài đăng
+  reason: "lost-pet" | "your-pet"; // Lí do cần tìm chủ mới
   createdAt: Date; // Ngày tạo bài đăng
   updatedAt: Date; // Ngày cập nhật bài đăng
 }
@@ -74,6 +75,11 @@ const petAdoptionPostSchema = new Schema<IPetAdoptionPostDocument>(
       type: String,
       enum: ["available", "adopted"],
       default: "available",
+    },
+    reason: {
+      type: String,
+      enum: ["lost-pet", "your-pet"],
+      required: true,
     },
   },
   {

@@ -44,3 +44,5 @@ export type TypePet =
 export type GenderPet = "male" | "female";
 
 export type SizePet = "small" | "medium" | "big";
+
+export type ReasonFindOwner = "lost-pet" | "your-pet";
