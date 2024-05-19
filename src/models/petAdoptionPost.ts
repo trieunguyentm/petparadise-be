@@ -13,6 +13,7 @@ export interface IPetAdoptionPostDocument extends mongoose.Document {
     | "rodents"
     | "reptile"
     | "other";
+  sizePet?: "small" | "medium" | "big";
   gender?: "male" | "female";
   breed?: string; // Giống của thú cưng
   color?: string; // Màu lông
@@ -51,6 +52,10 @@ const petAdoptionPostSchema = new Schema<IPetAdoptionPostDocument>(
         "reptile",
         "other",
       ],
+    },
+    sizePet: {
+      type: String,
+      enum: ["small", "medium", "big"],
     },
     gender: {
       type: String,

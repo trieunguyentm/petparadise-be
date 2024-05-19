@@ -207,8 +207,8 @@ export const handleGetFindPetPostBySearchService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to create post find pet",
-      error: "Failed to create post find pet: " + error.message,
+      message: "Failed to get post find pet",
+      error: "Failed to get post find pet: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

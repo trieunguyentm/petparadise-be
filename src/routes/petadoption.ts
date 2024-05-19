@@ -14,4 +14,9 @@ petAdoptionRoute.post(
   petAdoptionControllers.handleCreatePetAdoptionPost
 );
 
+petAdoptionRoute.get(
+  "/pet-adoption-post",
+  petAdoptionControllers.handleGetPetAdoptionPost
+);
+
 export default petAdoptionRoute;
