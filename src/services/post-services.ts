@@ -296,22 +296,24 @@ export const handleAddCommentService = async ({
         `new-comment`,
         commentDataForPusher
       );
+      /** Nếu như user id khác với id của người đăng thì mới tạo thông báo cho người đăng */
+      if (postInfo.poster._id.toString() !== user.id) {
+        const notification = new Notification({
+          receiver: postInfo.poster._id,
+          status: "unseen",
+          title: "New activity",
+          subtitle: `${user.username} commented in your post`,
+          moreInfo: `/post/${postId}`,
+        });
+        await notification.save();
 
-      const notification = new Notification({
-        receiver: postInfo.poster._id,
-        status: "unseen",
-        title: "New activity",
-        subtitle: `${user.username} commented in your post`,
-        moreInfo: `/post/${postId}`,
-      });
-      await notification.save();
-
-      // Pusher: Send the notification
-      await pusherServer.trigger(
-        `user-${postInfo.poster._id.toString()}-notifications`,
-        `new-notification`,
-        notification
-      );
+        // Pusher: Send the notification
+        await pusherServer.trigger(
+          `user-${postInfo.poster._id.toString()}-notifications`,
+          `new-notification`,
+          notification
+        );
+      }
 
       /** Return */
       const dataResponse: SuccessResponse = {
