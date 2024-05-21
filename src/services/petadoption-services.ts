@@ -141,3 +141,39 @@ export const handleGetPetAdoptionPostService = async ({
     return dataResponse;
   }
 };
+
+export const handleGetPetAdoptionPostByIdService = async ({
+  postId,
+}: {
+  postId: string;
+}) => {
+  try {
+    await connectMongoDB();
+    const petAdoptionPost = await PetAdoptionPost.findById(postId)
+      .populate({
+        path: "poster",
+        model: User,
+        select: "username email profileImage",
+      })
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get pet adoption post successfully",
+      data: petAdoptionPost,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get post",
+      error: "Failed to get post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};

@@ -13,7 +13,7 @@ export interface IPetAdoptionPostDocument extends mongoose.Document {
     | "rodents"
     | "reptile"
     | "other";
-  sizePet?: "small" | "medium" | "big";
+  sizePet: "small" | "medium" | "big";
   gender?: "male" | "female";
   breed?: string; // Giống của thú cưng
   color?: string; // Màu lông

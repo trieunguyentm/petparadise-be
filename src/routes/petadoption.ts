@@ -19,4 +19,10 @@ petAdoptionRoute.get(
   petAdoptionControllers.handleGetPetAdoptionPost
 );
 
+petAdoptionRoute.get(
+  "/pet-adoption-post/:postId",
+  validators.getPetAdoptionPostByIdValidator,
+  petAdoptionControllers.handleGetPetAdoptionPostById
+);
+
 export default petAdoptionRoute;
