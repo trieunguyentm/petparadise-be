@@ -20,9 +20,34 @@ petAdoptionRoute.get(
 );
 
 petAdoptionRoute.get(
+  "/pet-adoption-post-by-search",
+  validators.getPetAdoptionPostBySearchValidator,
+  petAdoptionControllers.handleGetPetAdoptionPostBySearch
+);
+
+petAdoptionRoute.get(
   "/pet-adoption-post/:postId",
   validators.getPetAdoptionPostByIdValidator,
   petAdoptionControllers.handleGetPetAdoptionPostById
+);
+
+petAdoptionRoute.delete(
+  "/pet-adoption-post/:postId",
+  validators.deletePetAdoptionPostByIdValidator,
+  petAdoptionControllers.handleDeletePetAdoptionPostById
+);
+
+petAdoptionRoute.post(
+  "/pet-adoption-post/comment",
+  upload.array("photos"),
+  validators.postComment,
+  petAdoptionControllers.handleAddComment
+);
+
+petAdoptionRoute.get(
+  "/pet-adoption-post/:postId/comment",
+  validators.getComment,
+  petAdoptionControllers.handleGetCommentByPost
 );
 
 export default petAdoptionRoute;

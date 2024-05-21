@@ -45,4 +45,6 @@ export type GenderPet = "male" | "female";
 
 export type SizePet = "small" | "medium" | "big";
 
+export type StatusPetAdoption = "available" | "adopted";
+
 export type ReasonFindOwner = "lost-pet" | "your-pet";

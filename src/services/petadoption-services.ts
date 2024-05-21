@@ -4,13 +4,23 @@ import {
   ErrorResponse,
   GenderPet,
   ReasonFindOwner,
+  SizePet,
+  StatusPetAdoption,
   SuccessResponse,
   TypePet,
 } from "../types";
-import { ERROR_SERVER, SUCCESS } from "../constants";
+import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
 import PetAdoptionPost from "../models/petAdoptionPost";
 import User from "../models/user";
+import PetAdoptionCommentModel from "../models/petAdoptionComment";
+import { pusherServer } from "../utils/pusher";
+import Notification from "../models/notification";
+
+// Helper function to escape regex characters
+function escapeRegex(text: string) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -171,6 +181,267 @@ export const handleGetPetAdoptionPostByIdService = async ({
       success: false,
       message: "Failed to get post",
       error: "Failed to get post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleAddCommentService = async ({
+  user,
+  postId,
+  content,
+  files,
+}: {
+  user: { id: string; username: string; email: string };
+  postId: string;
+  content: string;
+  files: Express.Multer.File[] | undefined;
+}) => {
+  try {
+    await connectMongoDB();
+    const [userInfo, postInfo] = await Promise.all([
+      User.findById(user.id).select("-password"),
+      PetAdoptionPost.findById(postId),
+    ]);
+    if (!userInfo || !postInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Not found user or post",
+        error: "Not found user or post",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    } else {
+      // Hàm uploadImage để tải ảnh lên Cloudinary và trả về URL
+      let imageUrls: string[] = [];
+      if (files) {
+        imageUrls = await Promise.all(files.map((file) => uploadImage(file)));
+      }
+      // Tạo comment
+      const newComment = await PetAdoptionCommentModel.create({
+        poster: userInfo._id,
+        images: imageUrls,
+        content: content,
+        post: postInfo._id,
+      });
+      await newComment.populate("poster", "username profileImage");
+
+      // Thêm comment này vào post
+      postInfo.comments.push(newComment._id);
+      await postInfo.save();
+
+      // Pusher
+      await pusherServer.trigger(
+        `pet-adoption-post-${postId}-comments`,
+        `new-comment`,
+        newComment
+      );
+      // Nếu người cmt khác với người đăng bài thì tạo notification
+      if (user.id !== postInfo.poster._id.toString()) {
+        // Notification
+        const notification = new Notification({
+          receiver: postInfo.poster._id,
+          status: "unseen",
+          title: "New activity",
+          subtitle: `${user.username} has commented on your pet adoption post`,
+          moreInfo: `/pet-adoption/${postId}`,
+        });
+
+        // Pusher: Send the notification
+        await pusherServer.trigger(
+          `user-${postInfo.poster._id.toString()}-notifications`,
+          `new-notification`,
+          notification
+        );
+      }
+      /** Return */
+      const dataResponse: SuccessResponse = {
+        success: true,
+        message: "Add comment successfully",
+        data: newComment,
+        statusCode: 200,
+        type: SUCCESS,
+      };
+      return dataResponse;
+    }
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed when add comment",
+      error: "Failed when add comment: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetCommentByPostService = async ({
+  postId,
+}: {
+  postId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    const comments = await PetAdoptionCommentModel.find({
+      post: postId,
+    })
+      .populate({
+        path: "poster",
+        model: User,
+        select: "username email profileImage",
+      })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    // Return the comments
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Comments retrieved successfully",
+      data: comments,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get comment",
+      error: "Failed to get comment: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleDeletePetAdoptionPostByIdService = async ({
+  postId,
+  user,
+}: {
+  postId: string;
+  user: { id: string; username: string; email: string };
+}) => {
+  try {
+    await connectMongoDB();
+    // Find the post by ID
+    const post = await PetAdoptionPost.findById(postId);
+    if (!post) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Post not found",
+        error: "Post not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Check if the user is the owner of the post
+    if (post.poster.toString() !== user.id) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Unauthorized",
+        error: "You do not have permission to delete this post",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Delete the post
+    await PetAdoptionPost.findByIdAndDelete(postId);
+    // Remove the post reference from the user's petAdoptionPosts array
+    await User.updateOne(
+      { _id: user.id },
+      { $pull: { petAdoptionPosts: postId } }
+    );
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Delete pet adoption post successfully",
+      data: "Delete successfully",
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to delete post",
+      error: "Failed to delete post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetPetAdoptionPostBySearchService = async ({
+  petType,
+  gender,
+  size,
+  location,
+  status,
+  reason,
+}: {
+  petType: "all" | TypePet;
+  gender: "all" | GenderPet;
+  size: "all" | SizePet;
+  location: string;
+  status: "all" | StatusPetAdoption;
+  reason: "all" | ReasonFindOwner;
+}) => {
+  let query: any = {};
+
+  if (petType !== "all") query.petType = petType;
+  if (gender !== "all") query.gender = gender;
+  if (size !== "all") query.sizePet = size;
+
+  const [cityName, districtName, wardName] = location.split("-");
+  if (cityName) {
+    query.lastSeenLocation = new RegExp("^" + escapeRegex(cityName), "i");
+    if (districtName) {
+      query.lastSeenLocation = new RegExp(
+        "^" + escapeRegex(`${cityName}-${districtName}`),
+        "i"
+      );
+      if (wardName) {
+        query.lastSeenLocation = new RegExp(
+          "^" + escapeRegex(`${cityName}-${districtName}-${wardName}`),
+          "i"
+        );
+      }
+    }
+  }
+  if (status !== "all") query.status = status;
+  if (reason !== "all") query.reason = reason;
+  try {
+    await connectMongoDB();
+    const posts = await PetAdoptionPost.find(query)
+      .populate("poster", "username profileImage")
+      .sort({ createdAt: -1 })
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get post successfully",
+      data: posts,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get pet adoption post",
+      error: "Failed to get pet adoption post: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

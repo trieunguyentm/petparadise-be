@@ -190,6 +190,7 @@ export const handleGetFindPetPostBySearchService = async ({
     query.createdAt = { $gte: date };
   }
   try {
+    await connectMongoDB();
     const posts = await LostPetPost.find(query)
       .populate("poster", "username profileImage")
       .sort({ createdAt: -1 }) // Sorting by creation time, latest first
@@ -197,7 +198,7 @@ export const handleGetFindPetPostBySearchService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Post created successfully",
+      message: "Get post successfully",
       data: posts,
       statusCode: 200,
       type: SUCCESS,
@@ -418,23 +419,24 @@ export const handleAddCommentService = async ({
         `new-comment`,
         newComment
       );
+      // Nếu người cmt khác với người đăng bài thì tạo notification
+      if (user.id !== postInfo.poster._id.toString()) {
+        // Notification
+        const notification = new Notification({
+          receiver: postInfo.poster._id,
+          status: "unseen",
+          title: "New activity",
+          subtitle: `${user.username} has commented on your lost pet search post`,
+          moreInfo: `/find-pet/${postId}`,
+        });
 
-      // Notification
-      const notification = new Notification({
-        receiver: postInfo.poster._id,
-        status: "unseen",
-        title: "New activity",
-        subtitle: `${user.username} has commented on your lost pet search post`,
-        moreInfo: `/find-pet/${postId}`,
-      });
-
-      // Pusher: Send the notification
-      await pusherServer.trigger(
-        `user-${postInfo.poster._id.toString()}-notifications`,
-        `new-notification`,
-        notification
-      );
-
+        // Pusher: Send the notification
+        await pusherServer.trigger(
+          `user-${postInfo.poster._id.toString()}-notifications`,
+          `new-notification`,
+          notification
+        );
+      }
       /** Return */
       const dataResponse: SuccessResponse = {
         success: true,
