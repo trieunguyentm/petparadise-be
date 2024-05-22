@@ -623,6 +623,71 @@ export const handleGetNotificationService = async ({
   }
 };
 
+export const handleSeenNotificationService = async ({
+  user,
+  notificationId,
+}: {
+  user: { username: string; email: string; id: string };
+  notificationId: string;
+}) => {
+  try {
+    await connectMongoDB();
+    // Tìm notification theo id
+    const notification = await Notification.findById(notificationId)
+      .populate("receiver")
+      .select("-password");
+
+    if (!notification) {
+      return {
+        success: false,
+        message: "Notification not found",
+        error: "Notification not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      } as ErrorResponse;
+    }
+    // Kiểm tra quyền của user
+    if (notification.receiver._id.toString() !== user.id) {
+      return {
+        success: false,
+        message: "Unauthorized access",
+        error: "You are not authorized to see this notification",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      } as ErrorResponse;
+    }
+    if (notification.status === "seen") {
+      return {
+        success: false,
+        message: "Notification seen",
+        error: "You can not seen because this notification is already seen",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      } as ErrorResponse;
+    }
+    // Cập nhật trạng thái của notification thành "seen"
+    notification.status = "seen";
+    await notification.save();
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Notification seen successfully",
+      data: notification,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Fail when seen notification",
+      error: "Fail when seen notification: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
 export const handleLogoutService = async ({
   user,
   tokenId,

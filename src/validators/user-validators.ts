@@ -49,6 +49,10 @@ export const updateUserValidator = [
     }),
 ];
 
+export const seenNotificationValidator = [
+  param("notificationId").notEmpty().withMessage("notificationId must be a ID"),
+];
+
 export const likePostValidator = [
   body("postID").notEmpty().withMessage("Post ID is required"),
 ];

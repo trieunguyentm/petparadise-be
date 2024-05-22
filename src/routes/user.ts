@@ -46,6 +46,12 @@ userRoute.post(
 
 userRoute.get("/notification", userControllers.handleGetNotification);
 
+userRoute.put(
+  "/notification/:notificationId",
+  validators.seenNotificationValidator,
+  userControllers.handleSeenNotification
+);
+
 userRoute.get("/logout", userControllers.handleLogout);
 
 userRoute.get("/logout-all-device", userControllers.handleLogoutAllDevice);
