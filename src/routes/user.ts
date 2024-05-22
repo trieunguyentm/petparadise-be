@@ -15,7 +15,12 @@ userRoute.post(
   userControllers.handleChangePassword
 );
 
-userRoute.post("/update", upload.single("photo"), userControllers.handleUpdate);
+userRoute.put(
+  "/update",
+  upload.single("photo"),
+  validators.updateUserValidator,
+  userControllers.handleUpdate
+);
 
 userRoute.post(
   "/like",
@@ -31,7 +36,7 @@ userRoute.post(
 
 userRoute.get("/other", userControllers.handleGetOtherUser);
 
-userRoute.get("/other/:search", userControllers.handleGetOtherUserBySearch)
+userRoute.get("/other/:search", userControllers.handleGetOtherUserBySearch);
 
 userRoute.post(
   "/follow",
@@ -39,7 +44,7 @@ userRoute.post(
   userControllers.handleFollow
 );
 
-userRoute.get("/notification", userControllers.handleGetNotification)
+userRoute.get("/notification", userControllers.handleGetNotification);
 
 userRoute.get("/logout", userControllers.handleLogout);
 

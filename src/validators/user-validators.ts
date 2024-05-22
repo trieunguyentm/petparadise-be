@@ -13,6 +13,42 @@ export const changePasswordValidator = [
     .withMessage("New password is required"),
 ];
 
+export const updateUserValidator = [
+  body("location")
+    .optional() // Make location optional
+    .isString()
+    .withMessage("Location must be a string")
+    .custom((value) => {
+      // Check if the value matches the pattern "city-district-ward"
+      const locationPattern = /^[^\s].*-[^\s].*-[^\s].*$/;
+      if (!locationPattern.test(value)) {
+        throw new Error("Location must be formatted as 'city-district-ward'");
+      }
+      return true;
+    }),
+  body("typePet")
+    .optional() // Make typePet optional
+    .isArray()
+    .withMessage("TypePet must be an array")
+    .custom((value) => {
+      const allowedValues = [
+        "dog",
+        "cat",
+        "bird",
+        "rabbit",
+        "fish",
+        "rodents",
+        "reptile",
+        "other",
+      ];
+      const isValid = value.every((pet: string) => allowedValues.includes(pet));
+      if (!isValid) {
+        throw new Error("TypePet array contains invalid values");
+      }
+      return true;
+    }),
+];
+
 export const likePostValidator = [
   body("postID").notEmpty().withMessage("Post ID is required"),
 ];

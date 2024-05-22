@@ -1,6 +1,6 @@
 import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
-import { ErrorResponse, SuccessResponse } from "../types";
+import { ErrorResponse, SuccessResponse, TypePet } from "../types";
 import User, { IUserDocument } from "../models/user";
 import bcrypt from "bcryptjs";
 import cloudinary from "../utils/cloudinary-config";
@@ -10,6 +10,30 @@ import { normalizeQuery } from "../utils/normalize";
 import CommentModel from "../models/comment";
 import Notification from "../models/notification";
 import { pusherServer } from "../utils/pusher";
+import { Stream } from "stream";
+
+const uploadImage = async (file: Express.Multer.File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    // Tạo một stream upload từ Cloudinary
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "avatar" },
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else if (!result) {
+          reject(new Error("Upload failed without a specific error."));
+        } else {
+          resolve(result.url); // Khi upload thành công, trả về URL của ảnh
+        }
+      }
+    );
+
+    // Tạo một stream từ buffer của file và pipe nó vào stream upload của Cloudinary
+    const bufferStream = new Stream.PassThrough();
+    bufferStream.end(file.buffer);
+    bufferStream.pipe(uploadStream);
+  });
+};
 
 export const handleGetUserService = async ({
   user,
@@ -141,55 +165,72 @@ export const handleChangePasswordService = async ({
 export const handleUpdateService = async ({
   user,
   file,
+  location,
+  typePet,
 }: {
   user: { id: string; username: string; email: string };
-  file: Express.Multer.File;
+  file: Express.Multer.File | undefined;
+  location: string | undefined;
+  typePet: TypePet[];
 }) => {
   try {
-    // Cần một cách để chuyển đổi file.buffer sang stream
-    const uploadResponse: any = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "user_avatar" },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
-      stream.write(file.buffer);
-      stream.end();
-    });
-
-    // Cập nhật URL avatar trong cơ sở dữ liệu
     await connectMongoDB();
-    const updatedUser = await User.findByIdAndUpdate(
-      user.id,
-      { profileImage: uploadResponse.url }, // Sử dụng URL nhận được từ Cloudinary
-      { new: true }
-    );
-    if (!updatedUser) {
-      let dataResponse: ErrorResponse = {
+    const updates: Partial<IUserDocument> = {};
+    // Handle profile image update
+    if (file !== undefined) {
+      const imageUrl = await uploadImage(file);
+      updates.profileImage = imageUrl;
+    }
+    // Handle location update
+    if (location) {
+      const [cityName, districtName, wardName] = location.split("-");
+      if (cityName && districtName && wardName) {
+        updates.address = location;
+      }
+    }
+    // Handle pet type update
+    if (typePet.length > 0) {
+      updates.petTypeFavorites = typePet;
+    }
+    // Perform update if there are any changes
+    if (Object.keys(updates).length > 0) {
+      const userUpdated = await User.findByIdAndUpdate(user.id, updates, {
+        new: true,
+      })
+        .select("-password")
+        .exec();
+
+      if (userUpdated) {
+        return {
+          success: true,
+          message: "User profile updated successfully",
+          data: userUpdated,
+          statusCode: 200,
+          type: SUCCESS,
+        };
+      } else {
+        return {
+          success: false,
+          message: "User not found",
+          error: "Fail when to update user",
+          statusCode: 404,
+          type: ERROR_CLIENT,
+        };
+      }
+    } else {
+      return {
         success: false,
-        message: "Update fail",
-        error: "Update fail",
-        statusCode: 500,
+        message: "Please provide information to update",
+        error: "No update data provided",
+        statusCode: 400,
         type: ERROR_CLIENT,
       };
-      return dataResponse;
     }
-    const { password, ...userWithOutPassword } = updatedUser.toObject();
-    let dataResponse: SuccessResponse = {
-      success: true,
-      message: "User profile updated successfully",
-      data: userWithOutPassword,
-      statusCode: 200,
-      type: SUCCESS,
-    };
-    return dataResponse;
-  } catch (error) {
+  } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
       message: "Fail when to update user",
-      error: "Fail when to update user",
+      error: "Fail when to update user" + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

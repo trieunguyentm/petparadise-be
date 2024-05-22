@@ -81,6 +81,18 @@ export const handleChangePassword = async (
 };
 
 export const handleUpdate = async (req: RequestCustom, res: Response) => {
+  // Kiểm tra kết quả validation
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Invalid data: ${errors.array()[0].msg}`,
+      error: errors.array()[0].msg,
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
   const { user } = req;
   if (!user) {
     let dataResponse: ErrorResponse = {
@@ -91,25 +103,15 @@ export const handleUpdate = async (req: RequestCustom, res: Response) => {
       type: ERROR_CLIENT,
     };
     return res.status(400).json(dataResponse);
+  }
+
+  const file = req.file;
+  const { typePet, location } = req.body;
+  const result = await handleUpdateService({ user, file, location, typePet });
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
   } else {
-    if (!req.file) {
-      let dataResponse: ErrorResponse = {
-        success: false,
-        message: "Please provide an image",
-        error: "Please provide an image",
-        statusCode: 400,
-        type: ERROR_CLIENT,
-      };
-      return res.status(400).json(dataResponse);
-    } else {
-      const file = req.file;
-      const result = await handleUpdateService({ user, file });
-      if (!result.success) {
-        return res.status(result.statusCode).json(result);
-      } else {
-        return res.status(result.statusCode).json(result);
-      }
-    }
+    return res.status(result.statusCode).json(result);
   }
 };
 

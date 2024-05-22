@@ -2,6 +2,7 @@ import mongoose, { Model } from "mongoose";
 import { IPostDocument } from "./post";
 import { ILostPetPostDocument } from "./lostPetPost";
 import { IPetAdoptionPostDocument } from "./petAdoptionPost";
+import { TypePet } from "../types";
 
 export interface IUserDocument extends mongoose.Document {
   username: string;
@@ -9,6 +10,7 @@ export interface IUserDocument extends mongoose.Document {
   password: string;
   profileImage?: string;
   address?: string;
+  petTypeFavorites?: TypePet[];
   dateOfBirth?: Date;
   posts: IPostDocument[];
   findPetPosts: ILostPetPostDocument[];
@@ -28,6 +30,22 @@ const userSchema = new mongoose.Schema<IUserDocument>({
   password: { type: String, required: true },
   profileImage: { type: String, default: "" },
   address: { type: String, default: "" },
+  petTypeFavorites: [
+    {
+      type: String,
+      enum: [
+        "dog",
+        "cat",
+        "bird",
+        "rabbit",
+        "fish",
+        "rodents",
+        "reptile",
+        "other",
+      ],
+      default: [],
+    },
+  ],
   dateOfBirth: { type: Date },
   posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] }],
   findPetPosts: [
