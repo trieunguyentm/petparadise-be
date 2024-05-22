@@ -19,6 +19,7 @@ export const createPetAdoptioPostValidator = [
       "Reason create post is required and must be one of the specified values"
     ),
   body("sizePet")
+    .optional()
     .isIn(["small", "medium", "big"])
     .withMessage(
       "Size pet is required and must be one of the specified values"

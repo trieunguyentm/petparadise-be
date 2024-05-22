@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/index.js",
-    "dev": "nodemon src/index.ts"
+    "dev": "concurrently \"nodemon src/index.ts\" \"nodemon --exec ts-node src/workers/notification-queue.ts\""
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "@types/node": "^20.11.30",
     "@types/nodemailer": "^6.4.14",
     "@types/uuid": "^9.0.8",
+    "concurrently": "^8.2.2",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",
@@ -32,12 +33,14 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
+    "bull": "^4.12.8",
     "cloudinary": "^2.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-validator": "^7.0.1",
+    "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
     "mailgen": "^2.0.28",
     "mongoose": "^8.2.3",

@@ -16,6 +16,7 @@ import User from "../models/user";
 import PetAdoptionCommentModel from "../models/petAdoptionComment";
 import { pusherServer } from "../utils/pusher";
 import Notification from "../models/notification";
+import notificationQueue from "../workers/notification-queue";
 
 // Helper function to escape regex characters
 function escapeRegex(text: string) {
@@ -90,6 +91,17 @@ export const handleCreatePetAdoptionPostService = async ({
     const userInfo = await User.findById(user.id);
     userInfo?.petAdoptionPosts.push(newPetAdoptionPost);
     await userInfo?.save();
+
+    // Thêm nhiệm vụ gửi thông báo vào hàng đợi
+    await notificationQueue.add({
+      type: "PET_ADOPTION",
+      data: {
+        location,
+        typePet,
+        user,
+        newPetAdoptionPost,
+      },
+    });
 
     const dataResponse: SuccessResponse = {
       success: true,

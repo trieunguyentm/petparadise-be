@@ -404,6 +404,7 @@ export const handleGetOtherUserService = async ({
     const otherUsers = await User.find({ _id: { $ne: user.id } }) // Sử dụng $ne để loại trừ người dùng hiện tại
       .skip(offset)
       .limit(limit)
+      .sort({ createdAt: -1 })
       .select("-password -chats -email -savedPosts -likedPosts") // Loại bỏ các trường nhạy cảm
       .exec();
     // Return

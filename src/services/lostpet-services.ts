@@ -14,6 +14,7 @@ import User from "../models/user";
 import FindPetCommentModel from "../models/findPetComment";
 import { pusherServer } from "../utils/pusher";
 import Notification from "../models/notification";
+import notificationQueue from "../workers/notification-queue";
 
 // Helper function to escape regex characters
 function escapeRegex(text: string) {
@@ -87,6 +88,17 @@ export const handleCreateFindPetPostService = async ({
     const userInfo = await User.findById(user.id);
     userInfo?.findPetPosts.push(newFindPetPost);
     await userInfo?.save();
+
+    // Thêm nhiệm vụ gửi thông báo vào hàng đợi
+    await notificationQueue.add({
+      type: "FIND_PET",
+      data: {
+        location: lastSeenLocation,
+        typePet,
+        user,
+        newFindPetPost,
+      },
+    });
 
     const dataResponse: SuccessResponse = {
       success: true,
