@@ -285,7 +285,10 @@ export const handleLikePostService = async ({
     await userInfo.save();
     await postInfo.save();
 
-    if (!isLiked) {
+    if (
+      !isLiked &&
+      userInfo._id.toString() !== postInfo.poster._id.toString()
+    ) {
       const notification = new Notification({
         receiver: postInfo.poster._id,
         status: "unseen",

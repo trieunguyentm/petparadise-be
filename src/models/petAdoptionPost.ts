@@ -1,5 +1,6 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { IUserDocument } from "./user";
+import { IAdoptionRequestDocument } from "./adoptionRequest";
 
 export interface IPetAdoptionPostDocument extends mongoose.Document {
   poster: IUserDocument; // Người đăng bài
@@ -26,6 +27,7 @@ export interface IPetAdoptionPostDocument extends mongoose.Document {
   contactInfo: string; // Thông tin liên lạc để liên hệ
   status: "available" | "adopted"; // Trạng thái của bài đăng
   reason: "lost-pet" | "your-pet"; // Lí do cần tìm chủ mới
+  adoptionRequests: IAdoptionRequestDocument[];
   createdAt: Date; // Ngày tạo bài đăng
   updatedAt: Date; // Ngày cập nhật bài đăng
 }
@@ -86,6 +88,13 @@ const petAdoptionPostSchema = new Schema<IPetAdoptionPostDocument>(
       enum: ["lost-pet", "your-pet"],
       required: true,
     },
+    adoptionRequests: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "AdoptionRequest",
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,
