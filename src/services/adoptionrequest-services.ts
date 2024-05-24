@@ -6,6 +6,7 @@ import { connectMongoDB } from "../db/mongodb";
 import AdoptionRequest from "../models/adoptionRequest";
 import PetAdoptionPost from "../models/petAdoptionPost";
 import Notification from "../models/notification";
+import { pusherServer } from "../utils/pusher";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -117,8 +118,17 @@ export const handleCreateAdoptionRequestService = async ({
       status: "unseen",
       title: "New request for adopt pet",
       subtitle: `${user.username} has requested adopt pet`,
-      moreInfo: `/pet-adoption/${petAdoptionPost}`,
+      moreInfo: `/pet-adoption/request/${petAdoptionPost}`,
     });
+
+    await notification.save();
+
+    // Pusher: Send the notification
+    await pusherServer.trigger(
+      `user-${postInfo.poster._id.toString()}-notifications`,
+      `new-notification`,
+      notification
+    );
 
     // Return
     const dataResponse: SuccessResponse = {

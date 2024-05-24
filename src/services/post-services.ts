@@ -305,6 +305,7 @@ export const handleAddCommentService = async ({
           subtitle: `${user.username} commented in your post`,
           moreInfo: `/post/${postId}`,
         });
+        
         await notification.save();
 
         // Pusher: Send the notification

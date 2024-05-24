@@ -442,6 +442,8 @@ export const handleAddCommentService = async ({
           moreInfo: `/find-pet/${postId}`,
         });
 
+        await notification.save();
+
         // Pusher: Send the notification
         await pusherServer.trigger(
           `user-${postInfo.poster._id.toString()}-notifications`,
