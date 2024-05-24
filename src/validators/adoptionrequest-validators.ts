@@ -20,4 +20,11 @@ export const createAdoptionRequest = [
 
 export const handleGetAdoptionRequestValidator = [
   param("postId").notEmpty().withMessage("postId must be a ID"),
-]
+];
+
+export const handleSetAdoptionRequestValidator = [
+  body("status")
+    .isIn(["approved", "rejected"])
+    .withMessage("Status of request must be one of the specified value"),
+  param("requestId").notEmpty().withMessage("requestId must be a ID"),
+];

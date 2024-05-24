@@ -234,3 +234,110 @@ export const handleGetAdoptionRequestByPostService = async ({
     return dataResponse;
   }
 };
+
+export const handleSetAdoptionRequestService = async ({
+  user,
+  requestId,
+  status,
+}: {
+  user: { username: string; email: string; id: string };
+  requestId: string;
+  status: "approved" | "rejected";
+}) => {
+  try {
+    await connectMongoDB();
+    /** Lấy ra request và kiểm tra tồn tại */
+    const request = await AdoptionRequest.findById(requestId)
+      .populate({
+        path: "petAdoptionPost",
+        model: PetAdoptionPost,
+        select: "-likes -comments -adoptionRequests",
+      })
+      .populate({
+        path: "requester",
+        model: User,
+        select: "username email profileImage",
+      })
+      .exec();
+
+    if (!request) {
+      return {
+        success: false,
+        message: "Adoption request not found",
+        error: "Adoption request not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      } as ErrorResponse;
+    }
+
+    const petAdoptionPost = request.petAdoptionPost;
+
+    /** Kiểm tra quyền thực hiện */
+    if (petAdoptionPost.poster.toString() !== user.id) {
+      return {
+        success: false,
+        message: "Unauthorized access",
+        error: "You are not authorized to handle this adoption request",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      } as ErrorResponse;
+    }
+
+    /** Nếu chuyển từ "approved" sang "rejected" */
+    if (request.status === "approved" && status === "rejected") {
+      petAdoptionPost.status = "available";
+      await petAdoptionPost.save();
+    }
+
+    /** Nếu đồng ý */
+    if (status === "approved") {
+      // Kiểm tra nếu đã có yêu cầu nào được đồng ý trước đó
+      const existingApprovedRequest = await AdoptionRequest.findOne({
+        petAdoptionPost: petAdoptionPost._id,
+        status: "approved",
+      });
+
+      if (existingApprovedRequest) {
+        return {
+          success: false,
+          message: "This pet adoption post already has an approved request",
+          error: "This pet adoption post already has an approved request",
+          statusCode: 400,
+          type: ERROR_CLIENT,
+        } as ErrorResponse;
+      }
+
+      // Cập nhật trạng thái bài đăng nhận nuôi thú cưng
+      petAdoptionPost.status = "adopted";
+      await petAdoptionPost.save();
+    }
+    // Cập nhật trạng thái của request
+    request.status = status;
+    await request.save();
+
+    // Pusher
+    await pusherServer.trigger(
+      `adopt-pet-${petAdoptionPost._id.toString()}`,
+      `new-status`,
+      request
+    );
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: `Adoption request ${status} successfully`,
+      data: request,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: `Failed to ${status} adoption request`,
+      error: `Failed to ${status} adoption request: ` + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};

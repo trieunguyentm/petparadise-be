@@ -20,4 +20,10 @@ adoptionRequestRoute.get(
   adoptionRequestControllers.handleGetAdoptionRequestByPost
 );
 
+adoptionRequestRoute.post(
+  "/handle/:requestId",
+  validators.handleSetAdoptionRequestValidator,
+  adoptionRequestControllers.handleSetAdoptionRequest
+);
+
 export default adoptionRequestRoute;
