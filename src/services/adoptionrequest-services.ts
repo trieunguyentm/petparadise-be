@@ -7,6 +7,7 @@ import AdoptionRequest from "../models/adoptionRequest";
 import PetAdoptionPost from "../models/petAdoptionPost";
 import Notification from "../models/notification";
 import { pusherServer } from "../utils/pusher";
+import User from "../models/user";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -145,6 +146,88 @@ export const handleCreateAdoptionRequestService = async ({
       success: false,
       message: "Failed to create adoption request",
       error: "Failed to create adoption request: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetAdoptionRequestByPostService = async ({
+  user,
+  postId,
+  limit,
+  offset,
+}: {
+  user: { id: string; username: string; email: string };
+  postId: string;
+  offset: number;
+  limit: number;
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Tìm bài đăng nhận nuôi thú cưng theo postId
+    const post = await PetAdoptionPost.findById(postId)
+      .populate("poster")
+      .select("-password")
+      .exec();
+
+    if (!post) {
+      return {
+        success: false,
+        message: "Pet adoption post not found",
+        error: "Pet adoption post not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      } as ErrorResponse;
+    }
+    // Kiểm tra quyền của user
+    if (post.poster._id.toString() !== user.id) {
+      return {
+        success: false,
+        message: "Unauthorized access",
+        error: "You are not authorized to access these adoption requests",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      } as ErrorResponse;
+    }
+
+    // Lấy các yêu cầu nhận nuôi với phân trang
+    const adoptionRequests = await AdoptionRequest.find({
+      petAdoptionPost: postId,
+    })
+      .populate({
+        path: "requester",
+        model: User,
+        select: "username email profileImage",
+      })
+      .skip(offset)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .exec();
+
+    const totalRequests = await AdoptionRequest.countDocuments({
+      petAdoptionPost: postId,
+    });
+
+    // Trả về danh sách adoption requests của bài đăng với thông tin phân trang
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Adoption requests retrieved successfully",
+      data: {
+        adoptionRequests,
+        totalRequests,
+      },
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to retrieve adoption requests",
+      error: "Failed to retrieve adoption requests: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

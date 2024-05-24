@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 export const createAdoptionRequest = [
   body("petAdoptionPost").notEmpty().withMessage("petAdoptionPost is required"),
@@ -17,3 +17,7 @@ export const createAdoptionRequest = [
     .isString()
     .withMessage("Contact information must be a string"),
 ];
+
+export const handleGetAdoptionRequestValidator = [
+  param("postId").notEmpty().withMessage("postId must be a ID"),
+]
