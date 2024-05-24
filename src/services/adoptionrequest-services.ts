@@ -8,6 +8,8 @@ import PetAdoptionPost from "../models/petAdoptionPost";
 import Notification from "../models/notification";
 import { pusherServer } from "../utils/pusher";
 import User from "../models/user";
+import { generateAdoptionResponseMail } from "../utils/mailgenerate";
+import { sendEmail } from "../utils/mailer";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -320,6 +322,48 @@ export const handleSetAdoptionRequestService = async ({
       `adopt-pet-${petAdoptionPost._id.toString()}`,
       `new-status`,
       request
+    );
+
+    // Notification
+    const notification = new Notification({
+      receiver: request.requester._id,
+      status: "unseen",
+      title: "Response about adopt pet",
+      subtitle: `${user.username} has ${status} your request`,
+      moreInfo: `/pet-adoption/request/${petAdoptionPost._id.toString()}`,
+    });
+
+    // Send email
+    const typePet = {
+      dog: "Chó",
+      cat: "Mèo",
+      bird: "Chim",
+      rabbit: "Thỏ",
+      fish: "Cá",
+      rodents: "Loài gặm nhấm",
+      reptile: "Loài bò sát",
+      other: "Khác",
+    };
+
+    if (status === "approved") {
+      const emailBody = generateAdoptionResponseMail(
+        request.requester.email,
+        status,
+        petAdoptionPost._id.toString(),
+        petAdoptionPost.petName || "Chưa cung cấp",
+        typePet[petAdoptionPost.petType],
+        petAdoptionPost.contactInfo
+      );
+      const subject = "Thông báo về yêu cầu nhận nuôi thú cưng";
+      await sendEmail(request.requester.email, subject, emailBody);
+    }
+
+    await notification.save();
+    // Pusher: Send the notification
+    await pusherServer.trigger(
+      `user-${request.requester._id.toString()}-notifications`,
+      `new-notification`,
+      notification
     );
 
     const dataResponse: SuccessResponse = {

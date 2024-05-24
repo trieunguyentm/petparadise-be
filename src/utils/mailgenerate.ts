@@ -36,3 +36,53 @@ export const generateRecoveryPasswordMail = (
   /** Return HTML email */
   return emailBody;
 };
+
+export const generateAdoptionResponseMail = (
+  to: string,
+  status: "approved" | "rejected",
+  id: string,
+  petName: string,
+  petType: string,
+  contactInfo: string
+) => {
+  const statusText = status === "approved" ? "approved" : "rejected";
+  const email = {
+    body: {
+      name: to,
+      intro: `Yêu cầu nhận nuôi thú cưng (${petType}) của bạn đã ${
+        statusText === "approved" ? "được chấp nhận" : "bị từ chối"
+      }.`,
+      table: {
+        data: [
+          {
+            item: "Tên thú cưng",
+            description: petName,
+          },
+          {
+            item: "Loại thú cưng",
+            description: petType,
+          },
+          {
+            item: "Thông tin liên hệ",
+            description: contactInfo,
+          },
+        ],
+      },
+      action: {
+        instructions: "Bạn có thể xem chi tiết hơn tại đây",
+        button: {
+          color: "#22BC66",
+          text: "Xem chi tiết",
+          link: `http://localhost:3001/pet-adoption/${id}`,
+        },
+      },
+      outro:
+        "Cảm ơn bạn đã sử dụng Pet Paradise. Chúng tôi hy vọng bạn tận hưởng thời gian vui vẻ với thú cưng mới của mình!",
+    },
+  };
+
+  const emailBody = mailGenerator.generate(email);
+
+  /** Return HTML email */
+  return emailBody;
+};
