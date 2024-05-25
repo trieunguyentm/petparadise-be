@@ -17,6 +17,7 @@ import PetAdoptionCommentModel from "../models/petAdoptionComment";
 import { pusherServer } from "../utils/pusher";
 import Notification from "../models/notification";
 import notificationQueue from "../workers/notification-queue";
+import { error } from "console";
 
 // Helper function to escape regex characters
 function escapeRegex(text: string) {
@@ -456,6 +457,90 @@ export const handleGetPetAdoptionPostBySearchService = async ({
       success: false,
       message: "Failed to get pet adoption post",
       error: "Failed to get pet adoption post: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetAdoptedPetOwnerService = async ({
+  postId,
+}: {
+  postId: string;
+}) => {
+  try {
+    await connectMongoDB();
+    // Lấy ra thông tin của pet adoption post
+    const petAdoptionPost = await PetAdoptionPost.findById(postId).populate({
+      path: "adoptionRequests",
+      match: { status: "approved" },
+      populate: {
+        path: "requester",
+        select: "username email profileImage",
+      },
+    });
+
+    if (!petAdoptionPost) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Pet adoption post not found",
+        error: "Pet adoption post not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    if (petAdoptionPost.status !== "adopted") {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "This pet has not been adopted yet",
+        error: "This pet has not been adopted yet",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Lấy yêu cầu nhận nuôi được chấp nhận
+    const approvedRequest = petAdoptionPost.adoptionRequests.find(
+      (request: any) => request.status === "approved"
+    );
+
+    if (!approvedRequest) {
+      return {
+        success: false,
+        message: "No approved adoption request found",
+        error: "No approved adoption request found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      } as ErrorResponse;
+    }
+
+    // Lấy thông tin người nhận nuôi
+    const adopter = approvedRequest.requester;
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get adopted pet owner successfully",
+      data: {
+        adopter: {
+          username: adopter.username,
+          email: adopter.email,
+          profileImage: adopter.profileImage,
+        },
+      },
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Error getting adopted pet owner",
+      error: "Error getting adopted pet owner: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

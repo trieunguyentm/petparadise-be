@@ -120,3 +120,7 @@ export const postComment = [
 export const getComment = [
   param("postId").notEmpty().withMessage("postId must be a ID"),
 ];
+
+export const getAdoptedPetOwner = [
+  param("postId").notEmpty().withMessage("postId must be a ID"),
+];

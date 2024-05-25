@@ -51,7 +51,7 @@ export const generateAdoptionResponseMail = (
       name: to,
       intro: `Yêu cầu nhận nuôi thú cưng (${petType}) của bạn đã ${
         statusText === "approved" ? "được chấp nhận" : "bị từ chối"
-      }.`,
+      }. ${statusText === "approved" && "Hãy liên hệ với chủ thú cưng và nhận thú cưng. Khi 2 bên trao đổi thành công các bạn sẽ cần phải xác nhận trên hệ thống. Hãy nhớ xác nhận lại việc giao dịch nhé."}`,
       table: {
         data: [
           {

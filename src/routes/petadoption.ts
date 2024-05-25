@@ -50,4 +50,10 @@ petAdoptionRoute.get(
   petAdoptionControllers.handleGetCommentByPost
 );
 
+petAdoptionRoute.get(
+  "/:postId/adopted-pet-owner",
+  validators.getAdoptedPetOwner,
+  petAdoptionControllers.handleGetAdoptedPetOwner
+);
+
 export default petAdoptionRoute;
