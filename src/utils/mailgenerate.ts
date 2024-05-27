@@ -51,7 +51,10 @@ export const generateAdoptionResponseMail = (
       name: to,
       intro: `Yêu cầu nhận nuôi thú cưng (${petType}) của bạn đã ${
         statusText === "approved" ? "được chấp nhận" : "bị từ chối"
-      }. ${statusText === "approved" && "Hãy liên hệ với chủ thú cưng và nhận thú cưng. Khi 2 bên trao đổi thành công các bạn sẽ cần phải xác nhận trên hệ thống. Hãy nhớ xác nhận lại việc giao dịch nhé."}`,
+      }. ${
+        statusText === "approved" &&
+        "Hãy liên hệ với chủ thú cưng và nhận thú cưng. Khi 2 bên trao đổi thành công các bạn sẽ cần phải xác nhận trên hệ thống. Hãy nhớ xác nhận lại việc giao dịch nhé."
+      }`,
       table: {
         data: [
           {
@@ -69,11 +72,11 @@ export const generateAdoptionResponseMail = (
         ],
       },
       action: {
-        instructions: "Bạn có thể xem chi tiết hơn tại đây",
+        instructions: "Bạn có thể xác nhận nuôi thú cưng tại đây",
         button: {
           color: "#22BC66",
-          text: "Xem chi tiết",
-          link: `http://localhost:3001/pet-adoption/${id}`,
+          text: "Xác nhận đồng ý nuôi",
+          link: `http://localhost:3001/pet-adoption/confirm/${id}`,
         },
       },
       outro:

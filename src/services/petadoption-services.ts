@@ -526,6 +526,7 @@ export const handleGetAdoptedPetOwnerService = async ({
       message: "Get adopted pet owner successfully",
       data: {
         adopter: {
+          _id: adopter._id.toString(),
           username: adopter.username,
           email: adopter.email,
           profileImage: adopter.profileImage,
