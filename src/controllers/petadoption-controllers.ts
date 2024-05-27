@@ -12,10 +12,12 @@ import { validationResult } from "express-validator";
 import { ERROR_CLIENT } from "../constants";
 import {
   handleAddCommentService,
+  handleConfirmAdoptPetService,
   handleCreatePetAdoptionPostService,
   handleDeletePetAdoptionPostByIdService,
   handleGetAdoptedPetOwnerService,
   handleGetCommentByPostService,
+  handleGetConfirmByPostService,
   handleGetPetAdoptionPostByIdService,
   handleGetPetAdoptionPostBySearchService,
   handleGetPetAdoptionPostService,
@@ -303,6 +305,91 @@ export const handleGetAdoptedPetOwner = async (
   // }
   const { postId } = req.params;
   const result = await handleGetAdoptedPetOwnerService({ postId });
+  // Check the result and respond accordingly
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleGetConfirmByPost = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  // Kiểm tra kết quả validation
+  const errors = validationResult(req);
+  // Nếu có lỗi validation, gửi lại lỗi cho client
+  if (!errors.isEmpty()) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Invalid data: ${errors.array()[0].msg}`,
+      error: errors.array()[0].msg,
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  const { postId } = req.params;
+  const user = req.user;
+  if (!user) {
+    const response: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+
+  const result = await handleGetConfirmByPostService({ user, postId });
+
+  // Check the result and respond accordingly
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleConfirmAdoptPet = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  // Kiểm tra kết quả validation
+  const errors = validationResult(req);
+  // Nếu có lỗi validation, gửi lại lỗi cho client
+  if (!errors.isEmpty()) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Invalid data: ${errors.array()[0].msg}`,
+      error: errors.array()[0].msg,
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  const { postId } = req.params;
+  const { confirmed } = req.body;
+  const user = req.user;
+  if (!user) {
+    const response: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+
+  const result = await handleConfirmAdoptPetService({
+    user,
+    postId,
+    confirmed,
+  });
+
   // Check the result and respond accordingly
   if (!result.success) {
     return res.status(result.statusCode).json(result);

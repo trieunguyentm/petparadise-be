@@ -56,4 +56,16 @@ petAdoptionRoute.get(
   petAdoptionControllers.handleGetAdoptedPetOwner
 );
 
+petAdoptionRoute.get(
+  "/:postId/confirm",
+  validators.getConfirmByPostValidator,
+  petAdoptionControllers.handleGetConfirmByPost
+);
+
+petAdoptionRoute.put(
+  "/:postId/confirm",
+  validators.confirmAdoptPet,
+  petAdoptionControllers.handleConfirmAdoptPet
+);
+
 export default petAdoptionRoute;

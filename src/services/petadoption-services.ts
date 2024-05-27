@@ -18,6 +18,7 @@ import { pusherServer } from "../utils/pusher";
 import Notification from "../models/notification";
 import notificationQueue from "../workers/notification-queue";
 import { error } from "console";
+import TransferContract from "../models/transferContract";
 
 // Helper function to escape regex characters
 function escapeRegex(text: string) {
@@ -542,6 +543,224 @@ export const handleGetAdoptedPetOwnerService = async ({
       success: false,
       message: "Error getting adopted pet owner",
       error: "Error getting adopted pet owner: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetConfirmByPostService = async ({
+  user,
+  postId,
+}: {
+  user: { id: string; username: string; email: string };
+  postId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    const contract = await TransferContract.findOne({ petAdoptionPost: postId })
+      .populate("giver", "username email profileImage")
+      .populate("receiver", "username email profileImage")
+      .exec();
+
+    if (!contract) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Transfer contract not found",
+        error: "Transfer contract not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Nếu user.id không phải chủ post hoặc người nhận pet
+    if (
+      user.id !== contract.giver._id.toString() &&
+      user.id !== contract.receiver._id.toString()
+    ) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Unauthorized",
+        error: "You do not have permission to get transfer contract this post",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get transfer contract successfully",
+      data: contract,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to update confirmation status",
+      error: "Failed to update confirmation status: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleConfirmAdoptPetService = async ({
+  user,
+  postId,
+  confirmed,
+}: {
+  user: { id: string; username: string; email: string };
+  postId: string;
+  confirmed: boolean;
+}) => {
+  try {
+    await connectMongoDB();
+
+    const contract = await TransferContract.findOne({
+      petAdoptionPost: postId,
+    })
+      .populate({
+        path: "petAdoptionPost",
+        model: PetAdoptionPost,
+      })
+      .populate({
+        path: "giver",
+        model: User,
+        select: "username email profileImage",
+      })
+      .populate({
+        path: "receiver",
+        model: User,
+        select: "username email profileImage",
+      })
+      .exec();
+
+    if (!contract) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Transfer contract not found",
+        error: "Transfer contract not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Nếu user.id không phải chủ post hoặc người nhận pet
+    if (
+      user.id !== contract.giver._id.toString() &&
+      user.id !== contract.receiver._id.toString()
+    ) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Unauthorized",
+        error: "You do not have permission to get transfer contract this post",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Nếu là người nhận xác nhận
+    if (user.id.toString() === contract.receiver._id.toString()) {
+      // Nếu đã xác nhận trước đó rồi
+      if (contract.receiverConfirmed) {
+        let dataResponse: ErrorResponse = {
+          success: false,
+          message: "Can not update contract because it is already confirmed",
+          error: "Can not update contract because it is already confirmed",
+          statusCode: 403,
+          type: ERROR_CLIENT,
+        };
+        return dataResponse;
+      }
+      contract.receiverConfirmed = confirmed;
+      await contract.save();
+      // Tạo notification
+      const notification = new Notification({
+        receiver: contract.giver._id,
+        status: "unseen",
+        title: "Adoption Confirmation",
+        subtitle: `${user.username} has ${
+          confirmed ? "confirmed" : "rejected"
+        } the adoption`,
+        moreInfo: `/pet-adoption/confirm/${postId}`,
+      });
+      await notification.save();
+      await pusherServer.trigger(
+        `user-${contract.giver._id.toString()}-notifications`,
+        `new-notification`,
+        notification
+      );
+      // Nếu người nhận không dồng ý
+      if (!confirmed) {
+        contract.status = "cancelled";
+        contract.petAdoptionPost.status = "available";
+        await contract.save();
+        await contract.petAdoptionPost.save();
+      }
+      let dataResponse: SuccessResponse = {
+        success: true,
+        message: `You have ${
+          confirmed ? "confirmed" : "rejected"
+        } the adoption`,
+        data: contract,
+        statusCode: 200,
+        type: SUCCESS,
+      };
+      return dataResponse;
+    }
+    // Nếu là người gửi xác nhận
+    else {
+      // Nếu người nhận chưa xác nhận
+      if (!contract.receiverConfirmed) {
+        let dataResponse: ErrorResponse = {
+          success: false,
+          message: `${contract.receiver.username} is not confirmed`,
+          error: `You can not confirm because ${contract.receiver.username} is not confirmed`,
+          statusCode: 400,
+          type: ERROR_CLIENT,
+        };
+        return dataResponse;
+      }
+      // Nếu đã xác nhận trước đó rồi
+      if (contract.giverConfirmed) {
+        let dataResponse: ErrorResponse = {
+          success: false,
+          message: "Can not update contract because it is already confirmed",
+          error: "Can not update contract because it is already confirmed",
+          statusCode: 403,
+          type: ERROR_CLIENT,
+        };
+        return dataResponse;
+      }
+      // Nếu người nhận đã xác nhận
+      contract.giverConfirmed = true;
+      contract.status = "confirmed";
+      await contract.save();
+      // Schedule quarterly reminders
+      // TODO: Implement scheduling logic
+      const dataResponse: SuccessResponse = {
+        success: true,
+        message: "You have confirmed the adoption",
+        data: contract,
+        statusCode: 200,
+        type: SUCCESS,
+      };
+      return dataResponse;
+    }
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to update confirmation status",
+      error: "Failed to update confirmation status: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

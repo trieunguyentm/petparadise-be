@@ -124,3 +124,15 @@ export const getComment = [
 export const getAdoptedPetOwner = [
   param("postId").notEmpty().withMessage("postId must be a ID"),
 ];
+
+export const getConfirmByPostValidator = [
+  param("postId").notEmpty().withMessage("postId must be a ID"),
+];
+
+export const confirmAdoptPet = [
+  param("postId").notEmpty().withMessage("postId must be a ID"),
+  body("confirmed")
+    .notEmpty()
+    .isBoolean()
+    .withMessage("confirmed must be a boolean"),
+];

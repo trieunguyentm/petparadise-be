@@ -10,6 +10,7 @@ import { pusherServer } from "../utils/pusher";
 import User from "../models/user";
 import { generateAdoptionResponseMail } from "../utils/mailgenerate";
 import { sendEmail } from "../utils/mailer";
+import TransferContract from "../models/transferContract";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -289,6 +290,9 @@ export const handleSetAdoptionRequestService = async ({
     if (request.status === "approved" && status === "rejected") {
       petAdoptionPost.status = "available";
       await petAdoptionPost.save();
+
+      // Xóa hợp đồng nếu có
+      await TransferContract.deleteOne({ adoptionRequest: request._id });
     }
 
     /** Nếu đồng ý */
@@ -297,22 +301,40 @@ export const handleSetAdoptionRequestService = async ({
       const existingApprovedRequest = await AdoptionRequest.findOne({
         petAdoptionPost: petAdoptionPost._id,
         status: "approved",
+      }).populate({
+        path: "requester",
+        model: User,
+        select: "username email profileImage",
       });
 
       if (existingApprovedRequest) {
-        return {
-          success: false,
-          message: "This pet adoption post already has an approved request",
-          error: "This pet adoption post already has an approved request",
-          statusCode: 400,
-          type: ERROR_CLIENT,
-        } as ErrorResponse;
+        existingApprovedRequest.status = "rejected";
+        await existingApprovedRequest.save();
+        await TransferContract.deleteOne({
+          adoptionRequest: existingApprovedRequest._id,
+        });
+        await pusherServer.trigger(
+          `adopt-pet-${petAdoptionPost._id.toString()}`,
+          `new-status`,
+          existingApprovedRequest
+        );
       }
 
       // Cập nhật trạng thái bài đăng nhận nuôi thú cưng
       petAdoptionPost.status = "adopted";
       await petAdoptionPost.save();
+
+      // Tạo hợp đồng giao dịch mới
+      const transferContract = new TransferContract({
+        petAdoptionPost: petAdoptionPost._id,
+        adoptionRequest: request._id,
+        giver: petAdoptionPost.poster,
+        receiver: request.requester,
+      });
+
+      await transferContract.save();
     }
+
     // Cập nhật trạng thái của request
     request.status = status;
     await request.save();
