@@ -1,6 +1,6 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { IUserDocument } from "./user";
-import { IAdoptionRequestDocument } from "./adoptionRequest";
+import { IAdoptionRequestDocument } from "./adoption-request";
 
 export interface IPetAdoptionPostDocument extends mongoose.Document {
   poster: IUserDocument; // Người đăng bài

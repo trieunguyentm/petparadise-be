@@ -11,14 +11,14 @@ import {
 } from "../types";
 import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
-import PetAdoptionPost from "../models/petAdoptionPost";
+import PetAdoptionPost from "../models/pet-adoption-post";
 import User from "../models/user";
-import PetAdoptionCommentModel from "../models/petAdoptionComment";
+import PetAdoptionCommentModel from "../models/pet-adoption-comment";
 import { pusherServer } from "../utils/pusher";
 import Notification from "../models/notification";
 import notificationQueue from "../workers/notification-queue";
 import { error } from "console";
-import TransferContract from "../models/transferContract";
+import TransferContract from "../models/transfer-contract";
 
 // Helper function to escape regex characters
 function escapeRegex(text: string) {

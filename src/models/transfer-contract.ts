@@ -1,6 +1,6 @@
 import mongoose, { Model } from "mongoose";
-import { IPetAdoptionPostDocument } from "./petAdoptionPost";
-import { IAdoptionRequestDocument } from "./adoptionRequest";
+import { IPetAdoptionPostDocument } from "./pet-adoption-post";
+import { IAdoptionRequestDocument } from "./adoption-request";
 import { IUserDocument } from "./user";
 
 export interface ITransferContractDocument extends mongoose.Document {

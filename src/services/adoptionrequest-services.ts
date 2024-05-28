@@ -3,14 +3,14 @@ import cloudinary from "../utils/cloudinary-config";
 import { ErrorResponse, SuccessResponse } from "../types";
 import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
-import AdoptionRequest from "../models/adoptionRequest";
-import PetAdoptionPost from "../models/petAdoptionPost";
+import AdoptionRequest from "../models/adoption-request";
+import PetAdoptionPost from "../models/pet-adoption-post";
 import Notification from "../models/notification";
 import { pusherServer } from "../utils/pusher";
 import User from "../models/user";
 import { generateAdoptionResponseMail } from "../utils/mailgenerate";
 import { sendEmail } from "../utils/mailer";
-import TransferContract from "../models/transferContract";
+import TransferContract from "../models/transfer-contract";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {

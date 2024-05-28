@@ -9,9 +9,9 @@ import {
 } from "../types";
 import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
-import LostPetPost from "../models/lostPetPost";
+import LostPetPost from "../models/lost-pet-post";
 import User from "../models/user";
-import FindPetCommentModel from "../models/findPetComment";
+import FindPetCommentModel from "../models/find-pet-comment";
 import { pusherServer } from "../utils/pusher";
 import Notification from "../models/notification";
 import notificationQueue from "../workers/notification-queue";

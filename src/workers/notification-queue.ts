@@ -2,8 +2,8 @@ import Bull from "bull";
 import User from "../models/user";
 import Notification from "../models/notification";
 import { TypePet } from "../types";
-import { IPetAdoptionPostDocument } from "../models/petAdoptionPost";
-import { ILostPetPostDocument } from "../models/lostPetPost";
+import { IPetAdoptionPostDocument } from "../models/pet-adoption-post";
+import { ILostPetPostDocument } from "../models/lost-pet-post";
 import { pusherServer } from "../utils/pusher";
 import { connectMongoDB } from "../db/mongodb";
 

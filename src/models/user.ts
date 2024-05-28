@@ -1,7 +1,7 @@
 import mongoose, { Model } from "mongoose";
 import { IPostDocument } from "./post";
-import { ILostPetPostDocument } from "./lostPetPost";
-import { IPetAdoptionPostDocument } from "./petAdoptionPost";
+import { ILostPetPostDocument } from "./lost-pet-post";
+import { IPetAdoptionPostDocument } from "./pet-adoption-post";
 import { TypePet } from "../types";
 
 export interface IUserDocument extends mongoose.Document {

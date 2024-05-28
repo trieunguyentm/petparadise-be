@@ -1,6 +1,6 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { IUserDocument } from "./user";
-import { ILostPetPostDocument } from "./lostPetPost";
+import { ILostPetPostDocument } from "./lost-pet-post";
 
 export interface IFindPetCommentDocument extends mongoose.Document {
   poster: IUserDocument;
