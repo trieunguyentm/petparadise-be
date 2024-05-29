@@ -11,7 +11,6 @@ export interface IProductDocument extends mongoose.Document {
   discountStartDate?: Date; // Ngày bắt đầu giảm giá
   discountEndDate?: Date; // Ngày kết thúc giảm giá
   images: string[];
-  category: string;
   petType:
     | "dog"
     | "cat"
@@ -26,7 +25,6 @@ export interface IProductDocument extends mongoose.Document {
     | "toys"
     | "medicine"
     | "accessories"
-    | "grooming"
     | "housing"
     | "training"
     | "other";
@@ -46,7 +44,6 @@ const productSchema = new Schema<IProductDocument>(
     discountStartDate: { type: Date },
     discountEndDate: { type: Date },
     images: [{ type: String }],
-    category: { type: String, required: true },
     petType: {
       type: String,
       required: true,
@@ -69,7 +66,6 @@ const productSchema = new Schema<IProductDocument>(
         "toys",
         "medicine",
         "accessories",
-        "grooming",
         "housing",
         "training",
         "other",
