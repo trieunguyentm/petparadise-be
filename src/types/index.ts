@@ -48,3 +48,12 @@ export type SizePet = "small" | "medium" | "big";
 export type StatusPetAdoption = "available" | "adopted";
 
 export type ReasonFindOwner = "lost-pet" | "your-pet";
+
+export type ProductType =
+  | "food"
+  | "toys"
+  | "medicine"
+  | "accessories"
+  | "housing"
+  | "training"
+  | "other";

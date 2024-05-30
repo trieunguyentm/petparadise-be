@@ -7,6 +7,7 @@ import messageRoute from "./message";
 import lostPetRoute from "./lostpet";
 import petAdoptionRoute from "./petadoption";
 import adoptionRequestRoute from "./adoptionrequest";
+import productRoute from "./product";
 
 const router = Router();
 router.use("/auth", authRoute);
@@ -17,5 +18,6 @@ router.use("/message", messageRoute);
 router.use("/lost-pet", lostPetRoute);
 router.use("/pet-adoption", petAdoptionRoute);
 router.use("/adoption-request", adoptionRequestRoute);
+router.use("/product", productRoute);
 
 export default router;
