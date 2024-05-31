@@ -4,6 +4,7 @@ import { ErrorResponse, ProductType, SuccessResponse } from "../types";
 import { ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
 import Product from "../models/product";
+import User from "../models/user";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -26,6 +27,13 @@ const uploadImage = async (file: Express.Multer.File): Promise<string> => {
     bufferStream.end(file.buffer);
     bufferStream.pipe(uploadStream);
   });
+};
+
+const normalizeString = (str: string) => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 };
 
 export const handleCreateProductService = async ({
@@ -95,6 +103,75 @@ export const handleCreateProductService = async ({
       success: false,
       message: "Failed to create product",
       error: "Failed to create product: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetProductService = async ({
+  offset,
+  limit,
+  productType,
+  minPrice,
+  maxPrice,
+  name,
+  seller,
+}: {
+  offset: number;
+  limit: number;
+  productType: ProductType | undefined;
+  minPrice: number | undefined;
+  maxPrice: number | undefined;
+  name: string | undefined;
+  seller: string | undefined;
+}) => {
+  try {
+    // Tạo bộ lọc tìm kiếm
+    const filter: any = {};
+
+    if (productType) filter.productType = productType;
+    if (minPrice) filter.price = { ...filter.price, $gte: Number(minPrice) };
+    if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) };
+    if (name) {
+      const normalizedSearch = normalizeString(name as string);
+      filter.$expr = {
+        $regexMatch: {
+          input: { $toLower: "$name" },
+          regex: new RegExp(normalizedSearch, "i"),
+        },
+      };
+    }
+    if (seller) filter.seller = seller;
+    await connectMongoDB();
+
+    // Lấy danh sách sản phẩm
+    const products = await Product.find(filter)
+      .skip(offset)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "seller",
+        model: User,
+        select: "username emaill profileImage",
+      })
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get product successfully",
+      data: { total: products.length, products },
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get list product",
+      error: "Failed to get list product: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

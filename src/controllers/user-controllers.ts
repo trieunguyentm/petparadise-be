@@ -188,7 +188,7 @@ export const handleSavePost = async (req: RequestCustom, res: Response) => {
 
 export const handleGetOtherUser = async (req: RequestCustom, res: Response) => {
   // Parse the query parameters and provide default values if necessary
-  const limit = parseInt(req.query.limit as string) || 10;
+  const limit = parseInt(req.query.limit as string) || 20;
   const offset = parseInt(req.query.offset as string) || 0;
   const { user } = req;
   if (!user) {
@@ -215,7 +215,7 @@ export const handleGetOtherUserBySearch = async (
   res: Response
 ) => {
   const { search } = req.params;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const limit = parseInt(req.query.limit as string) || 20;
   const offset = parseInt(req.query.offset as string) || 0;
   const { user } = req;
   if (!user) {
@@ -293,7 +293,7 @@ export const handleGetNotification = async (
 ) => {
   const { user } = req;
   // Parse the query parameters and provide default values if necessary
-  const limit = parseInt(req.query.limit as string) || 10;
+  const limit = parseInt(req.query.limit as string) || 20;
   const offset = parseInt(req.query.offset as string) || 0;
   if (!user) {
     let dataResponse: ErrorResponse = {

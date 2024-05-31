@@ -92,7 +92,7 @@ export const handleGetAdoptionRequestByPost = async (
   res: Response
 ) => {
   // Parse the query parameters and provide default values if necessary
-  const limit = parseInt(req.query.limit as string) || 10;
+  const limit = parseInt(req.query.limit as string) || 20;
   const offset = parseInt(req.query.offset as string) || 0;
 
   const { postId } = req.params;

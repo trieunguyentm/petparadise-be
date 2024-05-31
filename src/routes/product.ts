@@ -14,4 +14,10 @@ productRoute.post(
   productControllers.handleCreateProduct
 );
 
+productRoute.get(
+  "/",
+  validator.getProductValidator,
+  productControllers.handleGetProduct
+);
+
 export default productRoute;

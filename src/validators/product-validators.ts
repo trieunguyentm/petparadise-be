@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, query } from "express-validator";
 
 export const createProductValidator = [
   body("name")
@@ -56,4 +56,27 @@ export const createProductValidator = [
     .withMessage("Số lượng sản phẩm phải là số")
     .custom((value) => value >= 0)
     .withMessage("Số lượng sản phẩm phải lớn hơn hoặc bằng 0"),
+];
+
+export const getProductValidator = [
+  query("productType")
+    .optional()
+    .isIn([
+      "food",
+      "toys",
+      "medicine",
+      "accessories",
+      "housing",
+      "training",
+      "other",
+    ])
+    .withMessage("Loại sản phẩm không hợp lệ"),
+  query("minPrice").optional().isNumeric().withMessage("minPrice phải là số"),
+  query("maxPrice").optional().isNumeric().withMessage("maxPrice phải là số"),
+  query("name").optional().isString().withMessage("name phải là chuỗi"),
+  query("seller")
+    .optional()
+    .isMongoId()
+    .withMessage("seller phải là một ID hợp lệ"),
+    
 ];

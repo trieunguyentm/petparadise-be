@@ -66,12 +66,10 @@ productSchema.pre("save", function (next) {
 
 // Indexes for optimizing search and sorting
 productSchema.index({ createdAt: -1 }); // Index for sorting by newest products
-productSchema.index({ category: 1 }); // Index for searching by category
-productSchema.index({ seller: 1 }); // Index for searching by seller
-productSchema.index({ name: 1 }); // Index for searching by name
-productSchema.index({ price: 1 }); // Index for sorting by price
-productSchema.index({ petType: 1 }); // Index for searching by petType
 productSchema.index({ productType: 1 }); // Index for searching by productType
+productSchema.index({ seller: 1 }); // Index for searching by seller
+productSchema.index({ name: 1 }); // Index for full-text search on name
+productSchema.index({ price: 1 }); // Index for sorting by price
 
 const Product: Model<IProductDocument> =
   mongoose.models?.Product ||

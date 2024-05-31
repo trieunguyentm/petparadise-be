@@ -51,7 +51,7 @@ export const handleCreatePost = async (req: RequestCustom, res: Response) => {
 
 export const handleGetPost = async (req: RequestCustom, res: Response) => {
   // Parse the query parameters and provide default values if necessary
-  const limit = parseInt(req.query.limit as string) || 10;
+  const limit = parseInt(req.query.limit as string) || 20;
   const offset = parseInt(req.query.offset as string) || 0;
 
   // Now pass these variables to the service function
