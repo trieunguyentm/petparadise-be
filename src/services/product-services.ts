@@ -1,7 +1,7 @@
 import { Stream } from "stream";
 import cloudinary from "../utils/cloudinary-config";
 import { ErrorResponse, ProductType, SuccessResponse } from "../types";
-import { ERROR_SERVER, SUCCESS } from "../constants";
+import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
 import Product from "../models/product";
 import User from "../models/user";
@@ -172,6 +172,51 @@ export const handleGetProductService = async ({
       success: false,
       message: "Failed to get list product",
       error: "Failed to get list product: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetProductByIdService = async ({
+  productId,
+}: {
+  productId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    const product = await Product.findById(productId).populate({
+      path: "seller",
+      model: User,
+      select: "username email profileImage",
+    });
+
+    if (!product) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Product not found",
+        error: "Product not found ",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get product successfully",
+      data: product,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get this product",
+      error: "Failed to get product: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

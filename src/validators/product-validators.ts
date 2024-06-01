@@ -1,4 +1,4 @@
-import { body, query } from "express-validator";
+import { body, param, query } from "express-validator";
 
 export const createProductValidator = [
   body("name")
@@ -78,5 +78,8 @@ export const getProductValidator = [
     .optional()
     .isMongoId()
     .withMessage("seller phải là một ID hợp lệ"),
-    
+];
+
+export const getProductByIdValidator = [
+  param("productId").notEmpty().withMessage("productId must be a ID"),
 ];

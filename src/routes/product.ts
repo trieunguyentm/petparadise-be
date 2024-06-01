@@ -20,4 +20,10 @@ productRoute.get(
   productControllers.handleGetProduct
 );
 
+productRoute.get(
+  "/:productId",
+  validator.getProductByIdValidator,
+  productControllers.handleGetProductById
+);
+
 export default productRoute;
