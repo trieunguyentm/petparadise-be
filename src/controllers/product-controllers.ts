@@ -5,6 +5,7 @@ import { ERROR_CLIENT } from "../constants";
 import {
   handleAddToCartService,
   handleCreateProductService,
+  handleDeleteProductService,
   handleEditProductService,
   handleGetProductByIdService,
   handleGetProductService,
@@ -316,6 +317,47 @@ export const handleEditProduct = async (req: RequestCustom, res: Response) => {
     stock,
     images: files,
   });
+
+  // Kiểm tra kết quả và phản hồi tương ứng
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleDeleteProduct = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  // Kiểm tra kết quả validation
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Invalid data: ${errors.array()[0].msg}`,
+      error: errors.array()[0].msg,
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+
+  const { user } = req;
+  if (!user) {
+    const response: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+
+  const { productId } = req.params;
+
+  const result = await handleDeleteProductService({ productId, user });
 
   // Kiểm tra kết quả và phản hồi tương ứng
   if (!result.success) {

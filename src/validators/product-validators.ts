@@ -146,3 +146,7 @@ export const editProductValidator = [
     .custom((value) => value >= 0)
     .withMessage("Số lượng sản phẩm phải lớn hơn hoặc bằng 0"),
 ];
+
+export const deleteProductValidator = [
+  param("productId").notEmpty().withMessage("productId must be a ID"),
+];

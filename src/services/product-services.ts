@@ -389,13 +389,72 @@ export const handleEditProductService = async ({
       type: "SUCCESS",
     };
     return dataResponse;
-
   } catch (error: any) {
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
       message: "Failed to edit product",
       error: "Failed to edit product: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleDeleteProductService = async ({
+  productId,
+  user,
+}: {
+  productId: string;
+  user: { id: string; username: string; email: string };
+}) => {
+  try {
+    await connectMongoDB();
+    // Tìm kiếm sản phẩm theo productId
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Product not found",
+        error: "Product not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Kiểm tra quyền sở hữu sản phẩm
+    if (product.seller._id.toString() !== user.id) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Unauthorized access",
+        error: "You are not authorized to delete this product",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Xóa sản phẩm
+    await Product.findByIdAndDelete(productId);
+
+    // Trả về phản hồi thành công
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Product deleted successfully",
+      data: null,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to delete product",
+      error: "Failed to delete product: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

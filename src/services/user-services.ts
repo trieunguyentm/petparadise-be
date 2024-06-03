@@ -818,10 +818,30 @@ export const handleGetCartService = async ({
       },
     });
 
+    if (!userWithCart) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "User not found",
+        error: "User not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Lọc các sản phẩm tồn tại
+    const validCartItems = userWithCart.cart.filter((item) => item.product);
+
+    // Cập nhật giỏ hàng của người dùng nếu có thay đổi
+    if (validCartItems.length !== userWithCart.cart.length) {
+      userWithCart.cart = validCartItems;
+      await userWithCart.save();
+    }
+
     let dataResponse: SuccessResponse = {
       success: true,
       message: "Get Cart Successfully",
-      data: userWithCart?.cart,
+      data: validCartItems,
       statusCode: 200,
       type: SUCCESS,
     };

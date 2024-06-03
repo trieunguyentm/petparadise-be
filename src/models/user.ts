@@ -97,8 +97,11 @@ userSchema.methods.toJSON = function () {
 // Thêm chỉ mục cho trường username để tối ưu cho việc truy vấn
 userSchema.index({ username: 1 });
 
-// Cần sắp xếp theo ngày tạo nên thêm chỉ mục cho trường createdAt
+// Thêm chỉ mục cho trường createdAt để tối ưu cho việc sắp xếp theo ngày tạo
 userSchema.index({ createdAt: -1 });
+
+// Thêm chỉ mục cho giỏ hàng để tối ưu hóa tìm kiếm và cập nhật
+userSchema.index({ "cart.product": 1 });
 
 const User: Model<IUserDocument> =
   mongoose.models?.User || mongoose.model("User", userSchema);

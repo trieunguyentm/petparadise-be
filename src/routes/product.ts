@@ -39,4 +39,10 @@ productRoute.put(
   productControllers.handleEditProduct
 );
 
+productRoute.delete(
+  "/:productId",
+  validator.deleteProductValidator,
+  productControllers.handleDeleteProduct
+);
+
 export default productRoute;
