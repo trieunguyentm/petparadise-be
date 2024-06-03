@@ -26,4 +26,17 @@ productRoute.get(
   productControllers.handleGetProductById
 );
 
+productRoute.post(
+  "/add-cart",
+  validator.addToCartValidator,
+  productControllers.handleAddToCart
+);
+
+productRoute.put(
+  "/:productId/edit",
+  upload.array("images"),
+  validator.editProductValidator,
+  productControllers.handleEditProduct
+);
+
 export default productRoute;

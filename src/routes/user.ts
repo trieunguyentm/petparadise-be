@@ -62,4 +62,6 @@ userRoute.get(
   userControllers.handleSearchUser
 );
 
+userRoute.get("/cart", userControllers.handleGetCart);
+
 export default userRoute;

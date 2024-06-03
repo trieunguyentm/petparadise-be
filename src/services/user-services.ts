@@ -11,6 +11,9 @@ import CommentModel from "../models/comment";
 import Notification from "../models/notification";
 import { pusherServer } from "../utils/pusher";
 import { Stream } from "stream";
+import Product from "../models/product";
+import path from "path";
+import { model } from "mongoose";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -790,6 +793,44 @@ export const handleSearchUserService = async ({ query }: { query: string }) => {
       success: false,
       message: "Failed to search user",
       error: "Failed to search user: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetCartService = async ({
+  user,
+}: {
+  user: { id: string; username: string; email: string };
+}) => {
+  try {
+    await connectMongoDB();
+
+    const userWithCart = await User.findById(user.id).populate({
+      path: "cart.product",
+      model: Product,
+      populate: {
+        path: "seller",
+        model: User,
+        select: "username email profileImage",
+      },
+    });
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get Cart Successfully",
+      data: userWithCart?.cart,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Fail when get item in cart",
+      error: "Fail when get item in cart: " + error?.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

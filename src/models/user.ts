@@ -3,6 +3,12 @@ import { IPostDocument } from "./post";
 import { ILostPetPostDocument } from "./lost-pet-post";
 import { IPetAdoptionPostDocument } from "./pet-adoption-post";
 import { TypePet } from "../types";
+import { IProductDocument } from "./product";
+
+export interface ICartItem {
+  product: IProductDocument;
+  quantity: number;
+}
 
 export interface IUserDocument extends mongoose.Document {
   username: string;
@@ -20,6 +26,7 @@ export interface IUserDocument extends mongoose.Document {
   followers: IUserDocument[];
   following: IUserDocument[];
   chats: mongoose.Schema.Types.ObjectId[];
+  cart: ICartItem[];
   role: "user" | "admin";
   createdAt: Date;
 }
@@ -71,6 +78,12 @@ const userSchema = new mongoose.Schema<IUserDocument>({
     { type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] },
   ],
   chats: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chat", default: [] }],
+  cart: [
+    {
+      product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+      quantity: { type: Number, default: 1 },
+    },
+  ],
   role: { type: String, enum: ["user", "admin"], default: "user" },
   createdAt: { type: Date, default: Date.now },
 });

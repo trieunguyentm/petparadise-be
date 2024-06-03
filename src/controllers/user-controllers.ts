@@ -4,6 +4,7 @@ import { ERROR_CLIENT } from "../constants";
 import {
   handleChangePasswordService,
   handleFollowService,
+  handleGetCartService,
   handleGetNotificationService,
   handleGetOtherUserBySearchService,
   handleGetOtherUserService,
@@ -436,5 +437,27 @@ export const handleSearchUser = async (req: RequestCustom, res: Response) => {
     return res.status(result.statusCode).json(result);
   } else {
     return res.status(200).json(result);
+  }
+};
+
+export const handleGetCart = async (req: RequestCustom, res: Response) => {
+  const { user } = req;
+  if (!user) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(dataResponse);
+  }
+
+  const result = await handleGetCartService({ user });
+
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(result.statusCode).json(result);
   }
 };

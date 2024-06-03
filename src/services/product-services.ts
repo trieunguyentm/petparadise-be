@@ -223,3 +223,182 @@ export const handleGetProductByIdService = async ({
     return dataResponse;
   }
 };
+
+export const handleAddToCartService = async ({
+  user,
+  productId,
+}: {
+  user: { username: string; email: string; id: string };
+  productId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Lấy thông tin người dùng
+    const userInfo = await User.findById(user.id).populate({
+      path: "cart.product",
+      model: Product,
+    });
+
+    if (!userInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "User not found",
+        error: "User not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Lấy thông tin sản phẩm
+    const productInfo = await Product.findById(productId);
+
+    if (!productInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Product not found",
+        error: "Product not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+    const productInCart = userInfo.cart.find(
+      (item) => item.product._id.toString() === productId
+    );
+
+    if (productInCart) {
+      // Nếu sản phẩm đã có trong giỏ hàng, tăng số lượng sản phẩm lên
+      productInCart.quantity += 1;
+    } else {
+      // Nếu sản phẩm chưa có trong giỏ hàng, thêm sản phẩm vào giỏ hàng
+      userInfo.cart.push({ product: productInfo, quantity: 1 });
+    }
+
+    // Lưu lại thông tin người dùng
+    await userInfo.save();
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Product added to cart successfully",
+      data: userInfo.cart,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get list product in cart",
+      error: "Failed to get list product in cart: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleEditProductService = async ({
+  productId,
+  user,
+  name,
+  description,
+  productType,
+  price,
+  discountRate,
+  discountStartDate,
+  discountEndDate,
+  stock,
+  images,
+}: {
+  productId: string;
+  user: { id: string; username: string; email: string };
+  name: string;
+  description: string;
+  productType: ProductType;
+  price: number;
+  discountRate: number;
+  discountStartDate: Date;
+  discountEndDate: Date;
+  stock: number;
+  images: Express.Multer.File[];
+}) => {
+  try {
+    /** Upload các ảnh lên Cloudinary */
+    const imageUrls = await Promise.all(
+      images.map((image) => uploadImage(image))
+    );
+
+    await connectMongoDB();
+
+    // Tìm product hiện tại
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return {
+        success: false,
+        message: "Product not found",
+        error: "Product not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      } as ErrorResponse;
+    }
+
+    // Kiểm tra xem người dùng có phải là người bán sản phẩm không
+    if (product.seller._id.toString() !== user.id) {
+      return {
+        success: false,
+        message: "Unauthorized access",
+        error: "You are not authorized to edit this product",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      } as ErrorResponse;
+    }
+
+    // Cập nhật product
+    product.name = name;
+    product.description = description;
+    product.price = price;
+    product.productType = productType;
+    product.stock = stock;
+    product.images = imageUrls;
+
+    if (discountRate > 0) {
+      product.discountRate = discountRate;
+      product.discountStartDate = discountStartDate;
+      product.discountEndDate = discountEndDate;
+    } else {
+      product.discountRate = undefined;
+      product.discountStartDate = undefined;
+      product.discountEndDate = undefined;
+      product.discountedPrice = undefined;
+    }
+
+    // Lưu product đã cập nhật
+    await product.save();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Product updated successfully",
+      data: product,
+      statusCode: 200,
+      type: "SUCCESS",
+    };
+    return dataResponse;
+
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to edit product",
+      error: "Failed to edit product: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
