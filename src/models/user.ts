@@ -27,6 +27,7 @@ export interface IUserDocument extends mongoose.Document {
   following: IUserDocument[];
   chats: mongoose.Schema.Types.ObjectId[];
   cart: ICartItem[];
+  favoriteProducts: IProductDocument[];
   role: "user" | "admin";
   createdAt: Date;
 }
@@ -84,6 +85,9 @@ const userSchema = new mongoose.Schema<IUserDocument>({
       quantity: { type: Number, default: 1 },
     },
   ],
+  favoriteProducts: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Product", default: [] },
+  ],
   role: { type: String, enum: ["user", "admin"], default: "user" },
   createdAt: { type: Date, default: Date.now },
 });
@@ -102,6 +106,9 @@ userSchema.index({ createdAt: -1 });
 
 // Thêm chỉ mục cho giỏ hàng để tối ưu hóa tìm kiếm và cập nhật
 userSchema.index({ "cart.product": 1 });
+
+// Thêm chỉ mục cho danh sách sản phẩm yêu thích
+userSchema.index({ favoriteProducts: 1 });
 
 const User: Model<IUserDocument> =
   mongoose.models?.User || mongoose.model("User", userSchema);

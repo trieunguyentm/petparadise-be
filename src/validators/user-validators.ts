@@ -68,3 +68,7 @@ export const followValidator = [
 export const searchValidator = [
   query("query").notEmpty().withMessage("Query is required"),
 ];
+
+export const addFavoriteProductValidator = [
+  param("productId").notEmpty().withMessage("productId must be a ID"),
+];

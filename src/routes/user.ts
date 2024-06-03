@@ -64,4 +64,12 @@ userRoute.get(
 
 userRoute.get("/cart", userControllers.handleGetCart);
 
+userRoute.post(
+  "/:productId/add-favorite-product",
+  validators.addFavoriteProductValidator,
+  userControllers.handleAddFavoriteProduct
+);
+
+userRoute.get("/favorite-product", userControllers.handleGetFavoriteProduct);
+
 export default userRoute;

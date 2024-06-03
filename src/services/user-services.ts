@@ -849,8 +849,122 @@ export const handleGetCartService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when get item in cart",
-      error: "Fail when get item in cart: " + error?.message,
+      message: "Fail when get favorite product",
+      error: "Fail when get favorite product: " + error?.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleAddFavoriteProductService = async ({
+  user,
+  productId,
+}: {
+  user: { id: string; username: string; email: string };
+  productId: string;
+}) => {
+  try {
+    await connectMongoDB();
+    // Kiểm tra xem sản phẩm có tồn tại không
+    const product = await Product.findById(productId);
+    if (!product) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Product not found",
+        error: "Product not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Lấy thông tin người dùng
+    const userInfo = await User.findById(user.id);
+    if (!userInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "User not found",
+        error: "User not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Kiểm tra xem sản phẩm đã có trong danh sách yêu thích chưa
+    const isFavorite = userInfo.favoriteProducts.some(
+      (favoriteProductId) => favoriteProductId.toString() === productId
+    );
+
+    if (isFavorite) {
+      // Xóa sản phẩm khỏi danh sách yêu thích
+      userInfo.favoriteProducts = userInfo.favoriteProducts.filter(
+        (favoriteProductId) => favoriteProductId.toString() !== productId
+      );
+    } else {
+      // Thêm sản phẩm vào danh sách yêu thích
+      userInfo.favoriteProducts.push(product._id);
+    }
+
+    await userInfo.save();
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: isFavorite
+        ? "Product removed from favorite list successfully"
+        : "Product added to favorite list successfully",
+      data: userInfo,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to add product to favorite list",
+      error: "Failed to add product to favorite list: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetFavoriteProductService = async ({
+  user,
+}: {
+  user: { id: string; username: string; email: string };
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Lấy thông tin người dùng
+
+    const userInfo = await User.findById(user.id)
+      .populate({
+        path: "favoriteProducts",
+        model: Product,
+      })
+      .exec();
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get Favorite Products Successfully",
+      data: {
+        count: userInfo?.favoriteProducts.length,
+        products: userInfo?.favoriteProducts,
+      },
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Fail when get favorite product",
+      error: "Fail when get favorite product: " + error?.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
