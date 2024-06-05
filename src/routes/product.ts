@@ -32,6 +32,12 @@ productRoute.post(
   productControllers.handleAddToCart
 );
 
+productRoute.delete(
+  "/delete-cart",
+  validator.deleteCartValidator,
+  productControllers.handleDeleteCart
+);
+
 productRoute.put(
   "/:productId/edit",
   upload.array("images"),

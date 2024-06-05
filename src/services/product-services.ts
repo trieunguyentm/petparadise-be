@@ -272,7 +272,14 @@ export const handleAddToCartService = async ({
 
     if (productInCart) {
       // Nếu sản phẩm đã có trong giỏ hàng, tăng số lượng sản phẩm lên
-      productInCart.quantity += 1;
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Sản phẩm đã có trong giỏ hàng rồi",
+        error: "Sản phẩm đã tồn tại trong giỏ hàng",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
     } else {
       // Nếu sản phẩm chưa có trong giỏ hàng, thêm sản phẩm vào giỏ hàng
       userInfo.cart.push({ product: productInfo, quantity: 1 });
@@ -293,8 +300,76 @@ export const handleAddToCartService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get list product in cart",
-      error: "Failed to get list product in cart: " + error.message,
+      message: "Failed to add product in cart",
+      error: "Failed to add product in cart: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleDeleteCartService = async ({
+  user,
+  productId,
+}: {
+  user: { username: string; email: string; id: string };
+  productId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Lấy thông tin người dùng
+    const userInfo = await User.findById(user.id).populate({
+      path: "cart.product",
+      model: Product,
+    });
+
+    if (!userInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "User not found",
+        error: "User not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Kiểm tra xem sản phẩm có tồn tại trong giỏ hàng không
+    const cartItemIndex = userInfo.cart.findIndex(
+      (item) => item.product._id.toString() === productId
+    );
+
+    if (cartItemIndex === -1) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Product not found in cart",
+        error: "Product not found in cart",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Xóa sản phẩm khỏi giỏ hàng
+    userInfo.cart.splice(cartItemIndex, 1);
+    await userInfo.save();
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Product removed from cart successfully",
+      data: userInfo.cart,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to delete product in cart",
+      error: "Failed to delete product in cart: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

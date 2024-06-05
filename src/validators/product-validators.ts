@@ -88,6 +88,10 @@ export const addToCartValidator = [
   body("productId").notEmpty().withMessage("productId must be a ID"),
 ];
 
+export const deleteCartValidator = [
+  body("productId").notEmpty().withMessage("productId must be a ID"),
+];
+
 export const editProductValidator = [
   param("productId").notEmpty().withMessage("productId must be a ID"),
   body("name")
