@@ -32,40 +32,35 @@ export const createPaymentLinkValidator = [
     .optional()
     .isString()
     .withMessage("Signature must be a string"),
-  body("checkoutData.items")
-    .optional()
-    .isArray()
-    .withMessage("Items must be an array"),
+  body("checkoutData.items").isArray().withMessage("Items must be an array"),
   body("checkoutData.items.*.name")
-    .optional()
     .isString()
     .withMessage("Item name must be a string"),
   body("checkoutData.items.*.quantity")
-    .optional()
     .isInt({ min: 1 })
     .withMessage("Item quantity must be a positive integer"),
   body("checkoutData.items.*.price")
-    .optional()
     .isFloat({ gt: 0 })
     .withMessage("Item price must be a positive number"),
   body("checkoutData.buyerName")
-    .optional()
     .isString()
     .withMessage("Buyer name must be a string"),
   body("checkoutData.buyerEmail")
-    .optional()
     .isEmail()
     .withMessage("Buyer email must be a valid email address"),
   body("checkoutData.buyerPhone")
-    .optional()
     .matches(/^(0[3|5|7|8|9])+([0-9]{8})$/)
     .withMessage("Buyer phone must be a valid phone number"),
   body("checkoutData.buyerAddress")
-    .optional()
     .isString()
     .withMessage("Buyer address must be a string"),
   body("checkoutData.expiredAt")
     .optional()
     .isInt({ min: 0 })
     .withMessage("ExpiredAt must be a positive integer"),
+  body("listItem")
+    .notEmpty()
+    .withMessage("listItem is required")
+    .isObject()
+    .withMessage("listItem must be a object"),
 ];

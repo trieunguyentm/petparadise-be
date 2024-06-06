@@ -2,7 +2,8 @@ import mongoose, { Model, Schema } from "mongoose";
 import { IProductDocument } from "./product";
 import { IUserDocument } from "./user";
 
-export interface IOrderDocument extends Document {
+export interface IOrderDocument extends mongoose.Document {
+  orderCode: number;
   buyer: IUserDocument;
   seller: IUserDocument;
   products: {
@@ -10,6 +11,7 @@ export interface IOrderDocument extends Document {
     quantity: number;
   }[];
   totalAmount: number;
+  buyerNote: string;
   status: "pending" | "processed" | "shipped" | "delivered" | "cancelled";
   createdAt: Date;
   updatedAt: Date;
@@ -17,6 +19,10 @@ export interface IOrderDocument extends Document {
 
 const orderSchema = new Schema<IOrderDocument>(
   {
+    orderCode: {
+      type: Number,
+      required: true,
+    },
     buyer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -34,6 +40,7 @@ const orderSchema = new Schema<IOrderDocument>(
       },
     ],
     totalAmount: { type: Number, required: true },
+    buyerNote: { type: String, default: "" },
     status: {
       type: String,
       enum: ["pending", "processed", "shipped", "delivered", "cancelled"],

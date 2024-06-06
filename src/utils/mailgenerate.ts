@@ -89,3 +89,55 @@ export const generateAdoptionResponseMail = (
   /** Return HTML email */
   return emailBody;
 };
+
+export const generateOrderNotificationMail = (
+  sellerName: string,
+  orderCode: number,
+  buyerName: string,
+  items: { name: string; quantity: number; price: number }[],
+  totalAmount: number
+) => {
+  const itemTableData = items.map((item) => ({
+    item: item.name,
+    quantity: item.quantity,
+    price: `${item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}đ`,
+  }));
+
+  const email = {
+    body: {
+      name: sellerName,
+      intro: `You have received a new order #${orderCode}.`,
+      table: {
+        data: itemTableData,
+        columns: {
+          // Optionally, customize the columns.
+          customWidth: {
+            item: "20%",
+            quantity: "10%",
+            price: "20%",
+          },
+          customAlignment: {
+            price: "right",
+          },
+        },
+      },
+      action: {
+        instructions:
+          "Please check the details and prepare the items for shipment.",
+        button: {
+          color: "#22BC66",
+          text: "View Order",
+          link: `http://localhost:3001/store/order`,
+        },
+      },
+      outro: `Total amount: ${totalAmount
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}đ`,
+    },
+  };
+
+  const emailBody = mailGenerator.generate(email);
+
+  /** Return HTML email */
+  return emailBody;
+};

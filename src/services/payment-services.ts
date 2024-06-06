@@ -1,8 +1,11 @@
-import { CheckoutRequestType } from "@payos/node/lib/type";
-import { ErrorResponse, SuccessResponse } from "../types";
+import { CheckoutRequestType, WebhookDataType } from "@payos/node/lib/type";
+import { ErrorResponse, RequestCustom, SuccessResponse } from "../types";
 import { ERROR_SERVER, SUCCESS } from "../constants";
 import dotenv from "dotenv";
 import PayOS from "@payos/node";
+import { IProductDocument } from "../models/product";
+import Order from "../models/order";
+import { connectMongoDB } from "../db/mongodb";
 
 dotenv.config();
 
@@ -13,14 +16,37 @@ const payos = new PayOS(
 );
 
 export const handleCreatePaymentLinkService = async ({
+  user,
+  sellerId,
+  products,
   buyerNote,
   checkoutData,
 }: {
+  user: { id: string; username: string; email: string };
+  sellerId: string;
+  products: { product: IProductDocument[]; quantity: number }[];
   buyerNote: string | undefined;
   checkoutData: CheckoutRequestType;
 }) => {
   try {
+    /** Tạo Link thanh toán */
     const paymentLink = await payos.createPaymentLink(checkoutData);
+
+    /** Tạo đơn hàng */
+    await connectMongoDB();
+    const newOrder = new Order({
+      orderCode: checkoutData.orderCode,
+      buyer: user.id, // Id người mua
+      seller: sellerId, // Id người bán
+      products: products, // Danh sách {sản phẩm, số lượng}
+      totalAmount: checkoutData.amount, // Tổng tiền
+      buyerNote: buyerNote, // Note của người mua
+      status: "pending", // Tình trạng đơn hàng
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    await newOrder.save();
 
     const dataResponse: SuccessResponse = {
       success: true,
@@ -41,4 +67,9 @@ export const handleCreatePaymentLinkService = async ({
     };
     return dataResponse;
   }
+};
+
+export const handleVerifyPaymentWebhook = async (req: RequestCustom) => {
+  const webhookData = payos.verifyPaymentWebhookData(req.body);
+  return webhookData
 };

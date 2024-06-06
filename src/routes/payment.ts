@@ -5,10 +5,7 @@ import { authenticate } from "../validators/middleware";
 
 const paymentRoute = Router();
 
-paymentRoute.post("/receive-hook", (req, res) => {
-  console.log(req.body);
-  return res.json();
-});
+paymentRoute.post("/receive-hook", paymentControllers.handleReceiveHook);
 
 paymentRoute.use(authenticate);
 
