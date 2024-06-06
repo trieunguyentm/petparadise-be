@@ -8,6 +8,7 @@ import lostPetRoute from "./lostpet";
 import petAdoptionRoute from "./petadoption";
 import adoptionRequestRoute from "./adoptionrequest";
 import productRoute from "./product";
+import paymentRoute from "./payment";
 
 const router = Router();
 router.use("/auth", authRoute);
@@ -19,5 +20,6 @@ router.use("/lost-pet", lostPetRoute);
 router.use("/pet-adoption", petAdoptionRoute);
 router.use("/adoption-request", adoptionRequestRoute);
 router.use("/product", productRoute);
+router.use("/payment", paymentRoute);
 
 export default router;
