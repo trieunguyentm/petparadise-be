@@ -12,7 +12,13 @@ export interface IOrderDocument extends mongoose.Document {
   }[];
   totalAmount: number;
   buyerNote: string;
-  status: "pending" | "processed" | "shipped" | "delivered" | "cancelled";
+  status:
+    | "pending"
+    | "processed"
+    | "shipped"
+    | "delivered"
+    | "cancelled"
+    | "success";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,7 +49,14 @@ const orderSchema = new Schema<IOrderDocument>(
     buyerNote: { type: String, default: "" },
     status: {
       type: String,
-      enum: ["pending", "processed", "shipped", "delivered", "cancelled"],
+      enum: [
+        "pending",
+        "processed",
+        "shipped",
+        "delivered",
+        "cancelled",
+        "success",
+      ],
       default: "pending",
     },
   },

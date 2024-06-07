@@ -21,6 +21,11 @@ productRoute.get(
 );
 
 productRoute.get(
+  "/purchased-order",
+  productControllers.handleGetPurchasedOrder
+);
+
+productRoute.get(
   "/:productId",
   validator.getProductByIdValidator,
   productControllers.handleGetProductById

@@ -10,6 +10,7 @@ import {
   handleEditProductService,
   handleGetProductByIdService,
   handleGetProductService,
+  handleGetPurchasedOrderService,
 } from "../services/product-services";
 
 export const handleCreateProduct = async (
@@ -407,6 +408,31 @@ export const handleDeleteProduct = async (
   const { productId } = req.params;
 
   const result = await handleDeleteProductService({ productId, user });
+
+  // Kiểm tra kết quả và phản hồi tương ứng
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleGetPurchasedOrder = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  const { user } = req;
+  if (!user) {
+    const response: ErrorResponse = {
+      success: false,
+      message: "Not provide user",
+      error: "Not provide user",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  const result = await handleGetPurchasedOrderService({ user });
 
   // Kiểm tra kết quả và phản hồi tương ứng
   if (!result.success) {

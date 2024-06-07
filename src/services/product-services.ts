@@ -5,6 +5,7 @@ import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
 import Product from "../models/product";
 import User from "../models/user";
+import Order from "../models/order";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -530,6 +531,52 @@ export const handleDeleteProductService = async ({
       success: false,
       message: "Failed to delete product",
       error: "Failed to delete product: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetPurchasedOrderService = async ({
+  user,
+}: {
+  user: { username: string; email: string; id: string };
+}) => {
+  try {
+    await connectMongoDB();
+
+    const orders = await Order.find({
+      buyer: user.id,
+      status: { $ne: "pending" },
+    })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "products.product",
+        model: "Product",
+      })
+      .populate({
+        path: "seller",
+        model: "User",
+        select: "username email profileImage",
+      })
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get purchased orders successfully",
+      data: orders,
+      statusCode: 200,
+      type: "SUCCESS",
+    };
+
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get purchased order",
+      error: "Failed to get purchased order: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
