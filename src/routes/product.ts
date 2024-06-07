@@ -25,6 +25,8 @@ productRoute.get(
   productControllers.handleGetPurchasedOrder
 );
 
+productRoute.get("/my-order", productControllers.handleGetMyOrder);
+
 productRoute.get(
   "/:productId",
   validator.getProductByIdValidator,
@@ -54,6 +56,12 @@ productRoute.delete(
   "/:productId",
   validator.deleteProductValidator,
   productControllers.handleDeleteProduct
+);
+
+productRoute.put(
+  "/:orderId/set-order",
+  validator.setOrderValidator,
+  productControllers.handleSetOrder
 );
 
 export default productRoute;

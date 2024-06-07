@@ -40,6 +40,11 @@ export const handleCreatePaymentLinkService = async ({
       seller: sellerId, // Id người bán
       products: products, // Danh sách {sản phẩm, số lượng}
       totalAmount: checkoutData.amount, // Tổng tiền
+      description: checkoutData.description, // Mô tả
+      buyerName: checkoutData.buyerName, // Tên người mua
+      buyerEmail: checkoutData.buyerEmail, // Email người mua
+      buyerPhone: checkoutData.buyerPhone, // Sđt người mua
+      buyerAddress: checkoutData.buyerAddress, // Địa chỉ người mua
       buyerNote: buyerNote, // Note của người mua
       status: "pending", // Tình trạng đơn hàng
       createdAt: new Date(),
@@ -71,5 +76,5 @@ export const handleCreatePaymentLinkService = async ({
 
 export const handleVerifyPaymentWebhook = async (req: RequestCustom) => {
   const webhookData = payos.verifyPaymentWebhookData(req.body);
-  return webhookData
+  return webhookData;
 };

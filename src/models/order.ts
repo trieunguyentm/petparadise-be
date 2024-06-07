@@ -11,7 +11,12 @@ export interface IOrderDocument extends mongoose.Document {
     quantity: number;
   }[];
   totalAmount: number;
-  buyerNote: string;
+  description: string;
+  buyerName?: string;
+  buyerEmail?: string;
+  buyerPhone?: string;
+  buyerAddress?: string;
+  buyerNote?: string;
   status:
     | "pending"
     | "processed"
@@ -46,6 +51,11 @@ const orderSchema = new Schema<IOrderDocument>(
       },
     ],
     totalAmount: { type: Number, required: true },
+    description: { type: String, default: "" },
+    buyerName: { type: String, default: "" },
+    buyerEmail: { type: String, default: "" },
+    buyerPhone: { type: String, default: "" },
+    buyerAddress: { type: String, default: "" },
     buyerNote: { type: String, default: "" },
     status: {
       type: String,

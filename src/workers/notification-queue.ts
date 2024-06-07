@@ -145,7 +145,7 @@ const handleOrderProcessedNotification = async (data: {
       title: "New Order",
       subtitle: `You have received a new order #${order.orderCode}.`,
       content: `A new order has been placed. Please check the details and prepare the items for shipment.`,
-      moreInfo: `/store/order`,
+      moreInfo: `/store/manage-order`,
     };
 
     /** Lưu notification */

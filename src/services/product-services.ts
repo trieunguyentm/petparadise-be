@@ -6,6 +6,13 @@ import { connectMongoDB } from "../db/mongodb";
 import Product from "../models/product";
 import User from "../models/user";
 import Order from "../models/order";
+import { pusherServer } from "../utils/pusher";
+import Notification from "../models/notification";
+import {
+  generateOrderCancelledMail,
+  generateOrderDeliveredMail,
+} from "../utils/mailgenerate";
+import { sendEmail } from "../utils/mailer";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -567,7 +574,7 @@ export const handleGetPurchasedOrderService = async ({
       message: "Get purchased orders successfully",
       data: orders,
       statusCode: 200,
-      type: "SUCCESS",
+      type: SUCCESS,
     };
 
     return dataResponse;
@@ -577,6 +584,198 @@ export const handleGetPurchasedOrderService = async ({
       success: false,
       message: "Failed to get purchased order",
       error: "Failed to get purchased order: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetMyOrderService = async ({
+  user,
+}: {
+  user: { username: string; email: string; id: string };
+}) => {
+  try {
+    await connectMongoDB();
+
+    const orders = await Order.find({
+      seller: user.id,
+      status: { $ne: "pending" },
+    })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "products.product",
+        model: Product,
+      })
+      .populate({
+        path: "seller",
+        model: User,
+        select: "username email profileImage",
+      })
+      .populate({
+        path: "buyer",
+        model: User,
+        select: "username email profileImage",
+      })
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Get orders successfully",
+      data: orders,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed to get order",
+      error: "Failed to get order: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleSetOrderService = async ({
+  user,
+  orderId,
+  status,
+}: {
+  user: { username: string; email: string; id: string };
+  orderId: string;
+  status: "processed" | "shipped" | "delivered" | "cancelled" | "success";
+}) => {
+  try {
+    await connectMongoDB();
+
+    const order = await Order.findById(orderId)
+      .populate({
+        path: "seller",
+        model: User,
+        select: "username email profileImage",
+      })
+      .populate({
+        path: "buyer",
+        model: User,
+        select: "username email profileImage",
+      })
+      .populate({
+        path: "products.product",
+        model: Product,
+      })
+      .exec();
+
+    if (!order) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Order not found",
+        error: "Order not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    /** Kiểm tra quyền */
+    if (order.seller._id.toString() !== user.id) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "You are not authorized to update this order",
+        error: "Unauthorized",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    /** Kiểm tra tình trạng đơn hàng xem đã thành công hoặc từ chối thì không được đổi */
+    if (order.status === "pending") {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "You are not authorized to update this order",
+        error: "Unauthorized",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    if (order.status === "cancelled" || order.status === "success") {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "You can not update this order",
+        error: "You can not update this order",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    /** Lưu trạng thái đơn hàng */
+    order.status = status;
+    await order.save();
+
+    /** Tạo và lưu Notification */
+    const buyerNotification = new Notification({
+      receiver: order.buyer._id.toString(),
+      status: "unseen",
+      title: `Order ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+      subtitle: `Your order #${order.orderCode} has been ${status}.`,
+      content: `Your order has been successfully ${status} and is now being processed.`,
+      moreInfo: `/store/purchased-order`,
+    });
+
+    await buyerNotification.save();
+
+    // Gửi thông báo thời gian thực cho người mua
+    await pusherServer.trigger(
+      `user-${order.buyer._id.toString()}-notifications`,
+      "new-notification",
+      buyerNotification
+    );
+
+    // Gửi email
+    let emailBody;
+    if (status === "delivered") {
+      emailBody = generateOrderDeliveredMail(
+        order.buyer.username,
+        order.orderCode,
+        order.products.map((product) => ({
+          name: product.product.name,
+          quantity: product.quantity,
+          price: product.product.price,
+        }))
+      );
+    } else if (status === "cancelled") {
+      emailBody = generateOrderCancelledMail(
+        order.buyer.username,
+        order.orderCode
+      );
+    }
+
+    if (emailBody) {
+      const subject =
+        status === "delivered" ? "Order Delivered" : "Order Cancelled";
+      await sendEmail(order.buyer.email, subject, emailBody);
+    }
+
+    // Return
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Order status updated successfully",
+      data: order,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed when set status of order",
+      error: "Failed when set status of order: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

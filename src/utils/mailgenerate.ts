@@ -127,7 +127,7 @@ export const generateOrderNotificationMail = (
         button: {
           color: "#22BC66",
           text: "View Order",
-          link: `http://localhost:3001/store/order`,
+          link: `http://localhost:3001/store/manage-order`,
         },
       },
       outro: `Total amount: ${totalAmount
@@ -140,4 +140,60 @@ export const generateOrderNotificationMail = (
 
   /** Return HTML email */
   return emailBody;
+};
+
+export const generateOrderCancelledMail = (
+  buyerName: string,
+  orderCode: number
+) => {
+  const email = {
+    body: {
+      name: buyerName,
+      intro: `Your order #${orderCode} has been cancelled.`,
+      outro:
+        "We apologize for any inconvenience caused. If you have any questions, please contact our support team.",
+    },
+  };
+  return mailGenerator.generate(email);
+};
+
+export const generateOrderDeliveredMail = (
+  buyerName: string,
+  orderCode: number,
+  products: { name: string; quantity: number; price: number }[]
+) => {
+  const email = {
+    body: {
+      name: buyerName,
+      intro: `Your order #${orderCode} has been delivered. Please confirm the receipt.`,
+      table: {
+        data: products.map((product) => ({
+          item: product.name,
+          quantity: product.quantity,
+          price: product.price,
+        })),
+        columns: {
+          // Optionally, customize the columns in the table
+          customWidth: {
+            item: "20%",
+            quantity: "10%",
+            price: "10%",
+          },
+          customAlignment: {
+            price: "right",
+          },
+        },
+      },
+      action: {
+        instructions: "To confirm receipt, please click the following button:",
+        button: {
+          color: "#22BC66",
+          text: "Confirm Receipt",
+          link: `http://localhost:3000/store/purchased-order`,
+        },
+      },
+      outro: "Thank you for shopping with Pet Paradise!",
+    },
+  };
+  return mailGenerator.generate(email);
 };

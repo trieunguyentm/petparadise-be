@@ -152,5 +152,14 @@ export const editProductValidator = [
 ];
 
 export const deleteProductValidator = [
-  param("productId").notEmpty().withMessage("productId must be a ID"),
+  param("productId").notEmpty().withMessage("ID sản phẩm không hợp lệ"),
+];
+
+export const setOrderValidator = [
+  param("orderId").notEmpty().withMessage("ID đơn hàng không hợp lệ"),
+  body("status")
+    .notEmpty()
+    .withMessage("Trạng thái đơn hàng là bắt buộc")
+    .isIn(["processed", "shipped", "delivered", "cancelled", "success"])
+    .withMessage("Trạng thái đơn hàng không hợp lệ"),
 ];
