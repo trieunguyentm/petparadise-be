@@ -649,7 +649,7 @@ export const handleSetOrderService = async ({
 }: {
   user: { username: string; email: string; id: string };
   orderId: string;
-  status: "processed" | "shipped" | "delivered" | "cancelled" | "success";
+  status: "processed" | "shipped" | "delivered" | "cancelled";
 }) => {
   try {
     await connectMongoDB();

@@ -160,6 +160,6 @@ export const setOrderValidator = [
   body("status")
     .notEmpty()
     .withMessage("Trạng thái đơn hàng là bắt buộc")
-    .isIn(["processed", "shipped", "delivered", "cancelled", "success"])
+    .isIn(["processed", "shipped", "delivered", "cancelled"])
     .withMessage("Trạng thái đơn hàng không hợp lệ"),
 ];
