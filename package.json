@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/index.js",
-    "dev": "concurrently \"nodemon src/index.ts\" \"nodemon --exec ts-node src/workers/notification-queue.ts\""
+    "dev": "concurrently \"nodemon src/index.ts\" \"nodemon --exec ts-node src/workers/notification-queue.ts\" \"nodemon --exec ts-node src/workers/order-queue.ts\""
   },
   "keywords": [],
   "author": "",
@@ -34,7 +34,7 @@
     "@payos/node": "^1.0.6",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
-    "bull": "^4.12.8",
+    "bull": "^4.12.9",
     "cloudinary": "^2.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -46,6 +46,7 @@
     "mailgen": "^2.0.28",
     "mongoose": "^8.2.3",
     "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.9.13",
     "pusher": "^5.2.0",
     "redis": "^4.6.13",

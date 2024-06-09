@@ -197,3 +197,55 @@ export const generateOrderDeliveredMail = (
   };
   return mailGenerator.generate(email);
 };
+
+export const generateOrderSuccessMail = (
+  buyerName: string,
+  orderCode: number,
+  items: { name: string; quantity: number; price: number }[]
+) => {
+  const email = {
+    body: {
+      name: buyerName,
+      intro: `Your order #${orderCode} has been successfully completed! Thank you for shopping with us.`,
+      table: {
+        data: items.map((item) => ({
+          "Product Name": item.name,
+          Quantity: item.quantity,
+          Price:
+            item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ",
+        })),
+        columns: {
+          // Optionally, customize the column widths
+          customWidth: {
+            "Product Name": "50%",
+            Quantity: "25%",
+            Price: "25%",
+          },
+          // Optionally, change column text alignment
+          customAlignment: {
+            Price: "right",
+          },
+        },
+      },
+      action: {
+        instructions:
+          "You can view your order details and track the shipment here:",
+        button: {
+          color: "#22BC66", // Optional action button color
+          text: "View Order",
+          link: `http://localhost:3000/store/purchased-order/${orderCode}`,
+        },
+      },
+      outro:
+        "If you have any questions, just reply to this email—we're always happy to help.",
+    },
+  };
+
+  // Generate an HTML email with the provided contents
+  const emailBody = mailGenerator.generate(email);
+
+  // Generate the plaintext version of the email
+  const emailText = mailGenerator.generatePlaintext(email);
+
+  return emailBody;
+};

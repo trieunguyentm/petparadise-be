@@ -13,6 +13,7 @@ import {
   generateOrderDeliveredMail,
 } from "../utils/mailgenerate";
 import { sendEmail } from "../utils/mailer";
+import orderQueue from "../workers/order-queue";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -716,6 +717,11 @@ export const handleSetOrderService = async ({
     /** Lưu trạng thái đơn hàng */
     order.status = status;
     await order.save();
+
+    if (status === "delivered") {
+      const delay = 7 * 24 * 60 * 60 * 1000; // 7 ngày
+      orderQueue.add({ type: "UPDATE_STATUS", data: { orderId } }, { delay });
+    }
 
     /** Tạo và lưu Notification */
     const buyerNotification = new Notification({
