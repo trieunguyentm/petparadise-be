@@ -6,7 +6,7 @@ import {
   handleCreateAdoptionRequestService,
   handleGetAdoptionRequestByPostService,
   handleSetAdoptionRequestService,
-} from "../services/adoptionrequest-services";
+} from "../services/adoption-request-services";
 
 export const handleCreateAdoptionRequest = async (
   req: RequestCustom,

@@ -1,5 +1,5 @@
-import * as validators from "../validators/adoptionrequest-validators";
-import * as adoptionRequestControllers from "../controllers/adoptionrequest-controllers";
+import * as validators from "../validators/adoption-request-validators";
+import * as adoptionRequestControllers from "../controllers/adoption-request-controllers";
 import { Router } from "express";
 import { authenticate, upload } from "../validators/middleware";
 

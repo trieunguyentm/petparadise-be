@@ -24,6 +24,7 @@ export interface IOrderDocument extends mongoose.Document {
     | "delivered"
     | "cancelled"
     | "success";
+  refund?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -69,6 +70,7 @@ const orderSchema = new Schema<IOrderDocument>(
       ],
       default: "pending",
     },
+    refund: { type: Number, default: 0 },
   },
   {
     timestamps: true,
