@@ -9,8 +9,10 @@ import Order from "../models/order";
 import { pusherServer } from "../utils/pusher";
 import Notification from "../models/notification";
 import {
+  generateNotificationCancelOrderMail,
   generateOrderCancelledMail,
   generateOrderDeliveredMail,
+  generateOrderSuccessMail,
 } from "../utils/mailgenerate";
 import { sendEmail } from "../utils/mailer";
 import orderQueue from "../workers/order-queue";
@@ -782,6 +784,163 @@ export const handleSetOrderService = async ({
       success: false,
       message: "Failed when set status of order",
       error: "Failed when set status of order: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleConfirmOrderService = async ({
+  user,
+  typeConfirm,
+  orderId,
+}: {
+  user: { username: string; email: string; id: string };
+  typeConfirm: "cancel" | "accept";
+  orderId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    const order = await Order.findById(orderId)
+      .populate({
+        path: "seller",
+        model: User,
+        select: "username email profileImage",
+      })
+      .populate({
+        path: "buyer",
+        model: User,
+        select: "username email profileImage",
+      })
+      .populate({
+        path: "products.product",
+        model: Product,
+      })
+      .exec();
+
+    if (!order) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Order not found",
+        error: "Order not found",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    if (order.status !== "delivered") {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Order is not in delivered status",
+        error: "Order is not in delivered status",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    if (order.buyer._id.toString() !== user.id) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "You are not authorized to confirm this order",
+        error: "Unauthorized",
+        statusCode: 403,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    let emailBody;
+    if (typeConfirm === "accept") {
+      order.status = "success";
+      await order.save();
+
+      // Update the seller's account balance
+      const seller = await User.findById(order.seller._id);
+      if (!seller) {
+        let dataResponse: ErrorResponse = {
+          success: false,
+          message: "Seller not found",
+          error: "Seller not found",
+          statusCode: 404,
+          type: ERROR_CLIENT,
+        };
+        return dataResponse;
+      }
+      // Cập nhật số dư tài khoản của người bán
+      seller.accountBalance = (seller.accountBalance || 0) + order.totalAmount;
+
+      await seller.save();
+
+      // Gửi email thông báo đơn hàng thành công
+      emailBody = generateOrderSuccessMail(
+        order.buyer.username,
+        order.orderCode,
+        order.products.map((product) => ({
+          name: product.product.name,
+          quantity: product.quantity,
+          price: product.product.price,
+        }))
+      );
+      await sendEmail(order.buyer.email, "Order Success", emailBody);
+    } else if (typeConfirm === "cancel") {
+      order.status = "processed";
+      await order.save();
+
+      // Gửi email thông báo cho người bán kiểm tra đơn hàng
+      emailBody = generateNotificationCancelOrderMail(
+        order.seller.username,
+        order.orderCode,
+        order.buyer.username,
+        order.buyer.email,
+        order.products.map((product) => ({
+          name: product.product.name,
+          quantity: product.quantity,
+          price: product.product.price,
+        }))
+      );
+      await sendEmail(
+        order.seller.email,
+        "Order Cancellation Notification",
+        emailBody
+      );
+      // Tạo và lưu Notification
+      const sellerNotification = new Notification({
+        receiver: order.seller._id.toString(),
+        status: "unseen",
+        title: `Order ${order.orderCode} cancellation`,
+        subtitle: `Order #${order.orderCode} has been reported as not received.`,
+        content: `The buyer has reported that they have not received the order. Please check the order status and update accordingly.`,
+        moreInfo: `/store/manage-order`,
+      });
+
+      await sellerNotification.save();
+
+      // Gửi thông báo thời gian thực cho người bán
+      await pusherServer.trigger(
+        `user-${order.seller._id.toString()}-notifications`,
+        "new-notification",
+        sellerNotification
+      );
+    }
+
+    // Return
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: `Order status updated to ${order.status} successfully`,
+      data: order,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Failed when confirm order",
+      error: "Failed when confirm order: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

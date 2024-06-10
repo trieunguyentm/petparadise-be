@@ -64,4 +64,10 @@ productRoute.put(
   productControllers.handleSetOrder
 );
 
+productRoute.post(
+  "/:orderId/confirm-order",
+  validator.confirmOrderValidator,
+  productControllers.handleConfirmOrder
+);
+
 export default productRoute;

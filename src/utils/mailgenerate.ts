@@ -249,3 +249,28 @@ export const generateOrderSuccessMail = (
 
   return emailBody;
 };
+
+export const generateNotificationCancelOrderMail = (
+  sellerName: string,
+  orderCode: number,
+  buyerName: string,
+  buyerEmail: string,
+  products: { name: string; quantity: number; price: number }[]
+) => {
+  const email = {
+    body: {
+      name: sellerName,
+      intro: `Người mua ${buyerName} (${buyerEmail}) đã xác nhận chưa hoàn thành đơn hàng #${orderCode}. Vui lòng kiểm tra lại và cập nhật trạng thái đơn hàng.`,
+      table: {
+        data: products.map((product) => ({
+          item: product.name,
+          description: `${product.quantity} x ${product.price}đ`,
+        })),
+      },
+      outro: "Cảm ơn bạn đã sử dụng Pet Paradise.",
+    },
+  };
+
+  const emailBody = mailGenerator.generate(email);
+  return emailBody;
+};

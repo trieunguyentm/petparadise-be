@@ -163,3 +163,12 @@ export const setOrderValidator = [
     .isIn(["processed", "shipped", "delivered", "cancelled"])
     .withMessage("Trạng thái đơn hàng không hợp lệ"),
 ];
+
+export const confirmOrderValidator = [
+  body("typeConfirm")
+    .notEmpty()
+    .withMessage("Kiểu xác nhận là bắt buộc")
+    .isIn(["accept", "cancel"])
+    .withMessage("Kiểu xác nhận không hợp lệ"),
+  param("orderId").notEmpty().withMessage("Cần cung cấp orderId"),
+];

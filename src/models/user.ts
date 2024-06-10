@@ -29,68 +29,75 @@ export interface IUserDocument extends mongoose.Document {
   cart: ICartItem[];
   favoriteProducts: IProductDocument[];
   role: "user" | "admin";
+  accountBalance: number;
+  updatedAt: Date;
   createdAt: Date;
 }
 
-const userSchema = new mongoose.Schema<IUserDocument>({
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  profileImage: { type: String, default: "" },
-  address: { type: String, default: "" },
-  petTypeFavorites: [
-    {
-      type: String,
-      enum: [
-        "dog",
-        "cat",
-        "bird",
-        "rabbit",
-        "fish",
-        "rodents",
-        "reptile",
-        "other",
-      ],
-      default: [],
-    },
-  ],
-  dateOfBirth: { type: Date },
-  posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] }],
-  findPetPosts: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "LostPetPost", default: [] },
-  ],
-  petAdoptionPosts: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "PetAdoptionPost",
-      default: [],
-    },
-  ],
-  savedPosts: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] },
-  ],
-  likedPosts: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] },
-  ],
-  followers: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] },
-  ],
-  following: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] },
-  ],
-  chats: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chat", default: [] }],
-  cart: [
-    {
-      product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-      quantity: { type: Number, default: 1 },
-    },
-  ],
-  favoriteProducts: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Product", default: [] },
-  ],
-  role: { type: String, enum: ["user", "admin"], default: "user" },
-  createdAt: { type: Date, default: Date.now },
-});
+const userSchema = new mongoose.Schema<IUserDocument>(
+  {
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    profileImage: { type: String, default: "" },
+    address: { type: String, default: "" },
+    petTypeFavorites: [
+      {
+        type: String,
+        enum: [
+          "dog",
+          "cat",
+          "bird",
+          "rabbit",
+          "fish",
+          "rodents",
+          "reptile",
+          "other",
+        ],
+        default: [],
+      },
+    ],
+    dateOfBirth: { type: Date },
+    posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] }],
+    findPetPosts: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "LostPetPost", default: [] },
+    ],
+    petAdoptionPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PetAdoptionPost",
+        default: [],
+      },
+    ],
+    savedPosts: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] },
+    ],
+    likedPosts: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Post", default: [] },
+    ],
+    followers: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] },
+    ],
+    following: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] },
+    ],
+    chats: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chat", default: [] }],
+    cart: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        quantity: { type: Number, default: 1 },
+      },
+    ],
+    favoriteProducts: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Product", default: [] },
+    ],
+    role: { type: String, enum: ["user", "admin"], default: "user" },
+    accountBalance: { type: Number, default: 0 },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
