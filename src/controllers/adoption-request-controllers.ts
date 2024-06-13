@@ -17,7 +17,7 @@ export const handleCreateAdoptionRequest = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -28,8 +28,8 @@ export const handleCreateAdoptionRequest = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -48,8 +48,9 @@ export const handleCreateAdoptionRequest = async (
     if (!descriptionForPet || !files || files.length === 0) {
       const response: ErrorResponse = {
         success: false,
-        message: "Please provide a description for pet and upload image pet",
-        error: "Not provide image or description for pet",
+        message:
+          "Vui lòng cung cấp mô tả về thú cưng và tải lên hình ảnh thú cưng",
+        error: "Chưa cung cấp hình ảnh hoặc mô tả về thú cưng",
         statusCode: 400,
         type: ERROR_CLIENT,
       };
@@ -60,8 +61,8 @@ export const handleCreateAdoptionRequest = async (
     if (!descriptionForUser) {
       const response: ErrorResponse = {
         success: false,
-        message: "Please provide a description",
-        error: "Not provide description",
+        message: "Cung cấp mô tả về kinh nghiệm nuôi thú cưng của bản thân",
+        error: "Cung cấp mô tả về kinh nghiệm nuôi thú cưng của bản thân",
         statusCode: 400,
         type: ERROR_CLIENT,
       };
@@ -99,8 +100,8 @@ export const handleGetAdoptionRequestByPost = async (
   if (!postId) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide post Id",
-      error: "Not provide post Id",
+      message: "Chưa cung cấp ID bài viết",
+      error: "Chưa cung cấp ID bài viết",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -111,8 +112,8 @@ export const handleGetAdoptionRequestByPost = async (
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -143,7 +144,7 @@ export const handleSetAdoptionRequest = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -154,8 +155,8 @@ export const handleSetAdoptionRequest = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };

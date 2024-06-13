@@ -26,7 +26,7 @@ const uploadImage = async (file: Express.Multer.File): Promise<string> => {
         if (error) {
           reject(error);
         } else if (!result) {
-          reject(new Error("Upload failed without a specific error."));
+          reject(new Error("Tải ảnh không thành công"));
         } else {
           resolve(result.url); // Khi upload thành công, trả về URL của ảnh
         }
@@ -102,7 +102,7 @@ export const handleCreateProductService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Post created successfully",
+      message: "Tạo bài viết thành công",
       data: newProduct,
       statusCode: 200,
       type: SUCCESS,
@@ -112,8 +112,8 @@ export const handleCreateProductService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to create product",
-      error: "Failed to create product: " + error.message,
+      message: "Xảy ra lỗi khi tạo sản phẩm",
+      error: "Xảy ra lỗi khi tạo sản phẩm: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -171,7 +171,7 @@ export const handleGetProductService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get product successfully",
+      message: "Lấy thông tin sản phẩm thành công",
       data: { total: products.length, products },
       statusCode: 200,
       type: SUCCESS,
@@ -181,8 +181,8 @@ export const handleGetProductService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get list product",
-      error: "Failed to get list product: " + error.message,
+      message: "Xảy ra lỗi khi lấy danh sách sản phẩm",
+      error: "Xảy ra lỗi khi lấy danh sách sản phẩm: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -207,8 +207,8 @@ export const handleGetProductByIdService = async ({
     if (!product) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Product not found",
-        error: "Product not found ",
+        message: "Không tìm thấy sản phẩm",
+        error: "Không tìm thấy sản phẩm ",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -216,7 +216,7 @@ export const handleGetProductByIdService = async ({
     }
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get product successfully",
+      message: "Lấy thông tin sản phẩm thành công",
       data: product,
       statusCode: 200,
       type: SUCCESS,
@@ -226,8 +226,8 @@ export const handleGetProductByIdService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get this product",
-      error: "Failed to get product: " + error.message,
+      message: "Xảy ra lỗi khi lấy thông tin sản phẩm",
+      error: "Xảy ra lỗi khi lấy thông tin sản phẩm: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -254,8 +254,8 @@ export const handleAddToCartService = async ({
     if (!userInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "User not found",
-        error: "User not found",
+        message: "Không tìm thấy người dùng",
+        error: "Không tìm thấy người dùng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -268,8 +268,8 @@ export const handleAddToCartService = async ({
     if (!productInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Product not found",
-        error: "Product not found",
+        message: "Không tìm thấy sản phẩm",
+        error: "Không tìm thấy sản phẩm",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -301,7 +301,7 @@ export const handleAddToCartService = async ({
 
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Product added to cart successfully",
+      message: "Sản phẩm đã được thêm vào giỏ hàng thành công",
       data: userInfo.cart,
       statusCode: 200,
       type: SUCCESS,
@@ -311,8 +311,8 @@ export const handleAddToCartService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to add product in cart",
-      error: "Failed to add product in cart: " + error.message,
+      message: "Xảy ra lỗi khi thêm sản phẩm vào giỏ hàng",
+      error: "Xảy ra lỗi khi thêm sản phẩm vào giỏ hàng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -339,8 +339,8 @@ export const handleDeleteCartService = async ({
     if (!userInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "User not found",
-        error: "User not found",
+        message: "Không tìm thấy người dùng",
+        error: "Không tìm thấy người dùng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -355,8 +355,8 @@ export const handleDeleteCartService = async ({
     if (cartItemIndex === -1) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Product not found in cart",
-        error: "Product not found in cart",
+        message: "Không tìm thấy sản phẩm trong giỏ hàng",
+        error: "Không tìm thấy sản phẩm trong giỏ hàng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -369,7 +369,7 @@ export const handleDeleteCartService = async ({
 
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Product removed from cart successfully",
+      message: "Đã xóa sản phẩm khỏi giỏ hàng",
       data: userInfo.cart,
       statusCode: 200,
       type: SUCCESS,
@@ -379,8 +379,8 @@ export const handleDeleteCartService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to delete product in cart",
-      error: "Failed to delete product in cart: " + error.message,
+      message: "Xảy ra lỗi khi xóa sản phẩm trong giỏ hàng",
+      error: "Xảy ra lỗi khi xóa sản phẩm trong giỏ hàng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -427,8 +427,8 @@ export const handleEditProductService = async ({
     if (!product) {
       return {
         success: false,
-        message: "Product not found",
-        error: "Product not found",
+        message: "Không tìm thấy sản phẩm",
+        error: "Không tìm thấy sản phẩm",
         statusCode: 404,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -438,8 +438,8 @@ export const handleEditProductService = async ({
     if (product.seller._id.toString() !== user.id) {
       return {
         success: false,
-        message: "Unauthorized access",
-        error: "You are not authorized to edit this product",
+        message: "Không có quyền truy cập",
+        error: "Không có quyền truy cập",
         statusCode: 403,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -469,18 +469,18 @@ export const handleEditProductService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Product updated successfully",
+      message: "Sản phẩm được cập nhật thành công",
       data: product,
       statusCode: 200,
-      type: "SUCCESS",
+      type: SUCCESS,
     };
     return dataResponse;
   } catch (error: any) {
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to edit product",
-      error: "Failed to edit product: " + error.message,
+      message: "Xảy ra lỗi khi chỉnh sửa thông tin sản phẩm",
+      error: "Xảy ra lỗi khi chỉnh sửa thông tin sản phẩm: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -503,8 +503,8 @@ export const handleDeleteProductService = async ({
     if (!product) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Product not found",
-        error: "Product not found",
+        message: "Không tìm thấy sản phẩm",
+        error: "Không tìm thấy sản phẩm",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -515,8 +515,8 @@ export const handleDeleteProductService = async ({
     if (product.seller._id.toString() !== user.id) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Unauthorized access",
-        error: "You are not authorized to delete this product",
+        message: "Không có quyền truy cập",
+        error: "Không có quyền truy cập",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -529,7 +529,7 @@ export const handleDeleteProductService = async ({
     // Trả về phản hồi thành công
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Product deleted successfully",
+      message: "Xóa sản phẩm thành công",
       data: null,
       statusCode: 200,
       type: SUCCESS,
@@ -539,8 +539,8 @@ export const handleDeleteProductService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to delete product",
-      error: "Failed to delete product: " + error.message,
+      message: "Xảy ra lỗi khi xóa sản phẩm",
+      error: "Xảy ra lỗi khi xóa sản phẩm: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -574,7 +574,7 @@ export const handleGetPurchasedOrderService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get purchased orders successfully",
+      message: "Đã lấy các đơn hàng đã thanh toán",
       data: orders,
       statusCode: 200,
       type: SUCCESS,
@@ -585,8 +585,8 @@ export const handleGetPurchasedOrderService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get purchased order",
-      error: "Failed to get purchased order: " + error.message,
+      message: "Xảy ra lỗi khi lấy các đơn hàng đã thanh toán",
+      error: "Xảy ra lỗi khi lấy các đơn hàng đã thanh toán: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -625,7 +625,7 @@ export const handleGetMyOrderService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get orders successfully",
+      message: "Lấy danh sách đơn hàng thành công",
       data: orders,
       statusCode: 200,
       type: SUCCESS,
@@ -636,8 +636,8 @@ export const handleGetMyOrderService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get order",
-      error: "Failed to get order: " + error.message,
+      message: "Xảy ra lỗi khi lấy danh sách đơn hàng",
+      error: "Xảy ra lỗi khi lấy danh sách đơn hàng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -677,8 +677,8 @@ export const handleSetOrderService = async ({
     if (!order) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Order not found",
-        error: "Order not found",
+        message: "Không tìm thấy đơn hàng",
+        error: "Không tìm thấy đơn hàng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -688,8 +688,8 @@ export const handleSetOrderService = async ({
     if (order.seller._id.toString() !== user.id) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "You are not authorized to update this order",
-        error: "Unauthorized",
+        message: "Không thể thực hiện",
+        error: "Không thể thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -699,8 +699,8 @@ export const handleSetOrderService = async ({
     if (order.status === "pending") {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "You are not authorized to update this order",
-        error: "Unauthorized",
+        message: "Không thể thực hiện",
+        error: "Không thể thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -709,8 +709,8 @@ export const handleSetOrderService = async ({
     if (order.status === "cancelled" || order.status === "success") {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "You can not update this order",
-        error: "You can not update this order",
+        message: "Không thể cập nhật trạng thái đơn hàng",
+        error: "Không thể cập nhật trạng thái đơn hàng",
         statusCode: 400,
         type: ERROR_CLIENT,
       };
@@ -725,13 +725,20 @@ export const handleSetOrderService = async ({
       orderQueue.add({ type: "UPDATE_STATUS", data: { orderId } }, { delay });
     }
 
+    const converStatusToText = {
+      cancelled: "bị hủy",
+      processed: "đã được thanh toán",
+      shipped: "đang được giao",
+      delivered: "đã được giao tới",
+    };
+
     /** Tạo và lưu Notification */
     const buyerNotification = new Notification({
       receiver: order.buyer._id.toString(),
       status: "unseen",
-      title: `Order ${status.charAt(0).toUpperCase() + status.slice(1)}`,
-      subtitle: `Your order #${order.orderCode} has been ${status}.`,
-      content: `Your order has been successfully ${status} and is now being processed.`,
+      title: `Đơn hàng ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+      subtitle: `Đơn hàng của bạn #${order.orderCode} ${converStatusToText[status]}.`,
+      content: `Đơn hàng của bạn #${order.orderCode} ${converStatusToText[status]}.`,
       moreInfo: `/store/purchased-order`,
     });
 
@@ -765,14 +772,16 @@ export const handleSetOrderService = async ({
 
     if (emailBody) {
       const subject =
-        status === "delivered" ? "Order Delivered" : "Order Cancelled";
+        status === "delivered"
+          ? "Đơn hàng đã được giao tới"
+          : "Đơn hàng đã bị hủy";
       await sendEmail(order.buyer.email, subject, emailBody);
     }
 
     // Return
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Order status updated successfully",
+      message: "Cập nhật trạng thái đơn hàng thành công",
       data: order,
       statusCode: 200,
       type: SUCCESS,
@@ -782,8 +791,8 @@ export const handleSetOrderService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed when set status of order",
-      error: "Failed when set status of order: " + error.message,
+      message: "Xảy ra lỗi khi cập nhật trạng thái đơn hàng",
+      error: "Xảy ra lỗi khi cập nhật trạng thái đơn hàng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -823,8 +832,8 @@ export const handleConfirmOrderService = async ({
     if (!order) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Order not found",
-        error: "Order not found",
+        message: "Không tìm thấy đơn hàng",
+        error: "Không tìm thấy đơn hàng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -834,8 +843,8 @@ export const handleConfirmOrderService = async ({
     if (order.status !== "delivered") {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Order is not in delivered status",
-        error: "Order is not in delivered status",
+        message: "Đơn hàng chưa giao hàng tới",
+        error: "Đơn hàng chưa giao hàng tới",
         statusCode: 400,
         type: ERROR_CLIENT,
       };
@@ -845,8 +854,8 @@ export const handleConfirmOrderService = async ({
     if (order.buyer._id.toString() !== user.id) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "You are not authorized to confirm this order",
-        error: "Unauthorized",
+        message: "Không thể thực hiện",
+        error: "Không thể thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -862,8 +871,8 @@ export const handleConfirmOrderService = async ({
       if (!seller) {
         let dataResponse: ErrorResponse = {
           success: false,
-          message: "Seller not found",
-          error: "Seller not found",
+          message: "Không tìm thấy người bán",
+          error: "Không tìm thấy người bán",
           statusCode: 404,
           type: ERROR_CLIENT,
         };
@@ -884,7 +893,7 @@ export const handleConfirmOrderService = async ({
           price: product.product.price,
         }))
       );
-      await sendEmail(order.buyer.email, "Order Success", emailBody);
+      await sendEmail(order.buyer.email, "Đơn hàng thành công", emailBody);
     } else if (typeConfirm === "cancel") {
       order.status = "processed";
       await order.save();
@@ -903,16 +912,16 @@ export const handleConfirmOrderService = async ({
       );
       await sendEmail(
         order.seller.email,
-        "Order Cancellation Notification",
+        "Thông báo người mua từ chối đơn hàng",
         emailBody
       );
       // Tạo và lưu Notification
       const sellerNotification = new Notification({
         receiver: order.seller._id.toString(),
         status: "unseen",
-        title: `Order ${order.orderCode} cancellation`,
-        subtitle: `Order #${order.orderCode} has been reported as not received.`,
-        content: `The buyer has reported that they have not received the order. Please check the order status and update accordingly.`,
+        title: `Đơn hàng ${order.orderCode} đã bị từ chối`,
+        subtitle: `Đơn hàng #${order.orderCode} đã được báo cáo là chưa nhận được sản phẩm.`,
+        content: `Người mua đã báo cáo rằng họ chưa nhận được đơn đặt hàng. Vui lòng kiểm tra trạng thái đơn hàng và cập nhật cho phù hợp.`,
         moreInfo: `/store/manage-order`,
       });
 
@@ -929,7 +938,8 @@ export const handleConfirmOrderService = async ({
     // Return
     let dataResponse: SuccessResponse = {
       success: true,
-      message: `Order status updated to ${order.status} successfully`,
+      // message: `Order status updated to ${order.status} successfully`,
+      message: "Cập nhật trạng thái thành công",
       data: order,
       statusCode: 200,
       type: SUCCESS,
@@ -939,8 +949,8 @@ export const handleConfirmOrderService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed when confirm order",
-      error: "Failed when confirm order: " + error.message,
+      message: "Xảy ra lỗi khi xác nhận đơn hàng",
+      error: "Xảy ra lỗi khi xác nhận đơn hàng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

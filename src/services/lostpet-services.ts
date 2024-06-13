@@ -30,7 +30,7 @@ const uploadImage = async (file: Express.Multer.File): Promise<string> => {
         if (error) {
           reject(error);
         } else if (!result) {
-          reject(new Error("Upload failed without a specific error."));
+          reject(new Error("Tải ảnh không thành công"));
         } else {
           resolve(result.url); // Khi upload thành công, trả về URL của ảnh
         }
@@ -102,7 +102,7 @@ export const handleCreateFindPetPostService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Post created successfully",
+      message: "Tạo bài viết thành công",
       data: newFindPetPost,
       statusCode: 200,
       type: SUCCESS,
@@ -112,8 +112,8 @@ export const handleCreateFindPetPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to create post find pet",
-      error: "Failed to create post find pet: " + error.message,
+      message: "Xảy ra lỗi khi tạo bài viết tìm thú cưng",
+      error: "Xảy ra lỗi khi tạo bài viết tìm thú cưng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -142,7 +142,7 @@ export const handleGetFindPetPostService = async ({
       .exec();
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get find pet post successfully",
+      message: "Lấy bài viết tìm thú cưng thành công",
       data: findPetPosts,
       statusCode: 200,
       type: SUCCESS,
@@ -152,8 +152,8 @@ export const handleGetFindPetPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get post",
-      error: "Failed to get post: " + error.message,
+      message: "Xảy ra lỗi khi tải bài viết",
+      error: "Xảy ra lỗi khi tải bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -210,7 +210,7 @@ export const handleGetFindPetPostBySearchService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get post successfully",
+      message: "Lấy thông tin bài viết thành công",
       data: posts,
       statusCode: 200,
       type: SUCCESS,
@@ -220,8 +220,8 @@ export const handleGetFindPetPostBySearchService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get post find pet",
-      error: "Failed to get post find pet: " + error.message,
+      message: "Xảy ra lỗi khi tải bài viết tìm thú cưng",
+      error: "Xảy ra lỗi khi tải bài viết tìm thú cưng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -246,7 +246,7 @@ export const handleGetFindPetPostByIdService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get find pet post successfully",
+      message: "Lấy bài viết tìm thú cưng thành công",
       data: findPetPost,
       statusCode: 200,
       type: SUCCESS,
@@ -256,8 +256,8 @@ export const handleGetFindPetPostByIdService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get post",
-      error: "Failed to get post: " + error.message,
+      message: "Xảy ra lỗi khi tải bài viết",
+      error: "Xảy ra lỗi khi tải bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -279,8 +279,8 @@ export const handleUpdateFindPetPostByIdService = async ({
     if (!post) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Post not found",
-        error: "Post not found",
+        message: "Không tìm thấy bài viết",
+        error: "Không tìm thấy bài viết",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -290,8 +290,8 @@ export const handleUpdateFindPetPostByIdService = async ({
     if (post.poster.toString() !== user.id) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Unauthorized",
-        error: "You do not have permission to update this post",
+        message: "Không có quyền thực hiện",
+        error: "Không có quyền thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -304,7 +304,7 @@ export const handleUpdateFindPetPostByIdService = async ({
     await post.save();
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Update find pet post successfully",
+      message: "Cập nhật bài viết tìm thú cưng thành công",
       data: post,
       statusCode: 200,
       type: SUCCESS,
@@ -314,8 +314,8 @@ export const handleUpdateFindPetPostByIdService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to update post",
-      error: "Failed to update post: " + error.message,
+      message: "Xảy ra lỗi khi cập nhật bài viết",
+      error: "Xảy ra lỗi khi cập nhật bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -337,8 +337,8 @@ export const handleDeleteFindPetPostByIdService = async ({
     if (!post) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Post not found",
-        error: "Post not found",
+        message: "Không tìm thấy bài viết",
+        error: "Không tìm thấy bài viết",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -348,8 +348,8 @@ export const handleDeleteFindPetPostByIdService = async ({
     if (post.poster.toString() !== user.id) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Unauthorized",
-        error: "You do not have permission to delete this post",
+        message: "Không có quyền thực hiện",
+        error: "Không có quyền thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -361,8 +361,8 @@ export const handleDeleteFindPetPostByIdService = async ({
     await User.updateOne({ _id: user.id }, { $pull: { findPetPosts: postId } });
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Delete find pet post successfully",
-      data: "Delete successfully",
+      message: "Xóa bài viết tìm thú cưng thành công",
+      data: "Xóa bài viết tìm thú cưng thành công",
       statusCode: 200,
       type: SUCCESS,
     };
@@ -371,8 +371,8 @@ export const handleDeleteFindPetPostByIdService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to delete post",
-      error: "Failed to delete post: " + error.message,
+      message: "Xảy ra lỗi khi xóa bài viết",
+      error: "Xảy ra lỗi khi xóa bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -400,8 +400,8 @@ export const handleAddCommentService = async ({
     if (!userInfo || !postInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Not found user or post",
-        error: "Not found user or post",
+        message: "Không tìm thấy người dùng hoặc bài viết",
+        error: "Không tìm thấy người dùng hoặc bài viết",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -437,8 +437,8 @@ export const handleAddCommentService = async ({
         const notification = new Notification({
           receiver: postInfo.poster._id,
           status: "unseen",
-          title: "New activity",
-          subtitle: `${user.username} has commented on your lost pet search post`,
+          title: "Bình luận mới",
+          subtitle: `${user.username} đã bình luận trong bài viết tìm thú cưng của bạn`,
           moreInfo: `/find-pet/${postId}`,
         });
 
@@ -454,7 +454,7 @@ export const handleAddCommentService = async ({
       /** Return */
       const dataResponse: SuccessResponse = {
         success: true,
-        message: "Add comment successfully",
+        message: "Tạo bình luận thành công",
         data: newComment,
         statusCode: 200,
         type: SUCCESS,
@@ -465,8 +465,8 @@ export const handleAddCommentService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed when add comment",
-      error: "Failed when add comment: " + error.message,
+      message: "Xảy ra lỗi khi thêm bình luận",
+      error: "Xảy ra lỗi khi thêm bình luận: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -494,7 +494,7 @@ export const handleGetCommentByPostService = async ({
     // Return the comments
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Comments retrieved successfully",
+      message: "Lấy danh sách bình luận thành công",
       data: comments,
       statusCode: 200,
       type: SUCCESS,
@@ -505,8 +505,8 @@ export const handleGetCommentByPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get comment",
-      error: "Failed to get comment: " + error.message,
+      message: "Xảy ra lỗi khi lấy danh sách bình luận",
+      error: "Xảy ra lỗi khi lấy danh sách bình luận: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

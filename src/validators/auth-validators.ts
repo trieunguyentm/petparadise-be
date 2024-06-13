@@ -3,62 +3,62 @@ import { body, param } from "express-validator";
 export const registerValidator = [
   body("username")
     .isLength({ min: 6 })
-    .withMessage("Username must be at least 6 characters long")
+    .withMessage("Tên người dùng phải có ít nhất 6 ký tự")
     .isAlphanumeric()
-    .withMessage("Username must contain only letters and numbers")
+    .withMessage("Tên người dùng không được chứa ký tự đặc biệt")
     .notEmpty()
-    .withMessage("Username is required"),
+    .withMessage("Cần cung cấp tên người dùng"),
   body("email")
     .isEmail()
-    .withMessage("Must be a valid email")
+    .withMessage("Địa chỉ email không hợp lệ")
     .notEmpty()
-    .withMessage("Email is required"),
+    .withMessage("Cần cung cấp địa chỉ email"),
   body("password")
     .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long")
+    .withMessage("Mật khẩu phải có ít nhất 6 ký tự")
     .notEmpty()
-    .withMessage("Password is required"),
+    .withMessage("Cần cung cấp mật khẩu"),
 ];
 
 export const verifyOTPValidator = [
   body("otpCode")
     .notEmpty()
-    .withMessage("OTP code is required")
+    .withMessage("Cần cung cấp mã OTP")
     .isLength({ min: 6, max: 6 })
-    .withMessage("OTP code must be 6 characters long")
+    .withMessage("Mã OTP phải có 6 ký tự")
     .isNumeric()
-    .withMessage("OTP code must contain only numbers"),
+    .withMessage("Mã OTP chỉ được chứa số"),
 ];
 
 export const recoveryPasswordValidator = [
   body("email")
     .isEmail()
-    .withMessage("Must be a valid email")
+    .withMessage("Địa chỉ email phải chính xác")
     .notEmpty()
-    .withMessage("Email is required"),
+    .withMessage("Cần cung cấp địa chỉ email"),
 ];
 
 export const confirmPasswordValidator = [
   body("password")
     .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long")
+    .withMessage("Mật khẩu phải có ít nhất 6 ký tự")
     .notEmpty()
-    .withMessage("Password is required"),
+    .withMessage("Cần cung cấp mật khẩu"),
 ];
 
 export const loginValidator = [
   body("email")
     .isEmail()
-    .withMessage("Must be a valid email")
+    .withMessage("Địa chỉ email không hợp lệ")
     .notEmpty()
-    .withMessage("Email is required"),
+    .withMessage("Cần cung cấp địa chỉ email"),
   body("password")
     .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long")
+    .withMessage("Mật khẩu phải có ít nhất 6 ký tự")
     .notEmpty()
-    .withMessage("Password is required"),
+    .withMessage("Cần cung cấp mật khẩu"),
 ];
 
 export const verifyValidator = [
-  body("cookieName").notEmpty().withMessage("Cookie name is required"),
+  body("cookieName").notEmpty().withMessage("Chưa cung cấp CookieName"),
 ];

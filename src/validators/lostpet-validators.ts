@@ -12,60 +12,60 @@ export const createFindPetPostValidator = [
       "reptile",
       "other",
     ])
-    .withMessage("typePet is required and must be one of the specified values"),
+    .withMessage(
+      "Kiểu thú cưng là bắt buộc và phải là một trong các giá trị được chỉ định"
+    ),
   body("genderPet")
     .optional()
     .isIn(["male", "female"])
-    .withMessage("genderPet, if provided, must be either 'male' or 'female'"),
+    .withMessage("Giới tính thú cưng không phù hợp"),
   body("sizePet")
     .optional()
     .isIn(["small", "medium", "big"])
-    .withMessage(
-      "sizePet, if provided, must be either 'small', 'medium' or 'big'"
-    ),
+    .withMessage("Kích thước thú cưng không hợp lệ"),
   body("lastSeenLocation")
     .notEmpty()
-    .withMessage("lastSeenLocation is required")
+    .withMessage("Chưa cung cấp vị trí lần cuối thấy thú cưng")
     .isString()
-    .withMessage("lastSeenLocation must be a string")
+    .withMessage("Vị trí lần cuối thấy thú cưng không hợp lệ")
     .custom((value) => {
       // Check if the value matches the pattern "city-district-ward"
       const locationPattern = /^[^\s].*-[^\s].*-[^\s].*$/;
       if (!locationPattern.test(value)) {
         throw new Error(
-          "lastSeenLocation must be formatted as 'city-district-ward'"
+          "Vị trị lần cuối thấy thú cưng phải có định dạng 'city-district-ward'"
         );
       }
       return true;
     }),
   body("lastSeenDate")
     .notEmpty()
-    .withMessage("lastSeenDate is required")
+    .withMessage("Cần cung cấp thời gian lần cuối nhìn thấy thú cưng")
     .isISO8601()
-    .withMessage("lastSeenDate must be a valid date"),
+    .withMessage("Thời gian lần cuối nhìn thấy thú cưng không hợp lệ"),
   body("description")
     .notEmpty()
-    .withMessage("description is required")
+    .withMessage("Chưa cung cấp mô tả")
     .isString()
-    .withMessage("description must be a string"),
+    .withMessage("Mô tả không phù hợp"),
   // contactInfo: bắt buộc, kiểu dữ liệu string
   body("contactInfo")
     .notEmpty()
-    .withMessage("contactInfo is required")
+    .withMessage("Chưa cung cấp thông tin liên hệ")
     .isString()
-    .withMessage("contactInfo must be a string"),
+    .withMessage("Thông tin liên hệ không phù hợp"),
 ];
 
 export const getFindPetPostByIdValidator = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("ID bài viết không hợp lệ"),
 ];
 
 export const updateFindPetPostByIdValidator = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("ID bài viết không hợp lệ"),
 ];
 
 export const deleteFindPetPostByIdValidator = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("ID bài viết không hợp lệ"),
 ];
 
 export const getFindPetPostBySearchValidator = [
@@ -82,26 +82,24 @@ export const getFindPetPostBySearchValidator = [
       "reptile",
       "other",
     ])
-    .withMessage(
-      "petType must be one of 'all', 'dog', 'cat', 'bird', 'rabbit', 'fish', 'rodents', 'reptile', 'other'"
-    ),
+    .withMessage("Kiểu thú cưng không hợp lệ"),
   query("gender")
     .optional()
     .isIn(["all", "male", "female"])
-    .withMessage("gender must be one of 'all', 'male', or 'female'"),
+    .withMessage("Giới tính thú cưng không hợp lệ"),
   query("size")
     .optional()
     .isIn(["all", "small", "medium", "big"])
-    .withMessage("size must be one of 'all', 'small', 'medium', or 'big'"),
+    .withMessage("Kích thước thú cưng không hợp lệ"),
   query("lastSeenLocation")
     .optional()
     .isString()
-    .withMessage("lastSeenLocation must be a string")
+    .withMessage("Vị trí lần cuối thấy thú cưng không hợp lệ")
     .custom((value) => {
       const locationPattern = /^[^\s]+-[^\s]+-[^\s]+$/;
       if (!locationPattern.test(value)) {
         throw new Error(
-          "lastSeenLocation must be formatted as 'city-district-ward'"
+          "Vị trí lần cuối thấy thú cưng phải có định dạng 'city-district-ward'"
         );
       }
       return true;
@@ -109,14 +107,14 @@ export const getFindPetPostBySearchValidator = [
   query("lastSeenDate")
     .optional()
     .isISO8601()
-    .withMessage("lastSeenDate must be a valid date"),
+    .withMessage("Thời gian lần cuối thấy thú cưng không hợp lệ"),
 ];
 
 export const postComment = [
-  body("content").notEmpty().withMessage("Content is required"),
-  body("postId").notEmpty().withMessage("Post Id is required"),
+  body("content").notEmpty().withMessage("Chưa điền nội dung bình luận"),
+  body("postId").notEmpty().withMessage("Chưa cung cấp ID bài viết"),
 ];
 
 export const getComment = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("ID bài viết không hợp lệ"),
 ];

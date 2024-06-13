@@ -72,7 +72,7 @@ export const handleRegister = async (req: Request, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data:${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ:${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -99,8 +99,8 @@ export const handleResendVerifyOTP = async (req: Request, res: Response) => {
   if (!verifyOtpCookie) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Session expired",
-      error: "Session expired",
+      message: "Phiên hết hạn",
+      error: "Phiên hết hạn",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -127,7 +127,7 @@ export const handleVerifyOTP = async (req: Request, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -140,8 +140,8 @@ export const handleVerifyOTP = async (req: Request, res: Response) => {
   if (!verifyOtpCookie) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Session expired",
-      error: "Session expired",
+      message: "Phiên hết hạn",
+      error: "Phiên hết hạn",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -168,7 +168,7 @@ export const handleRecoveryPassword = async (req: Request, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data:${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ:${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -198,8 +198,8 @@ export const handleResendVerifyOTPRecovery = async (
   if (!verifyOtpRecoveryCookie) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Session expired",
-      error: "Session expired",
+      message: "Phiên hết hạn",
+      error: "Phiên hết hạn",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -228,7 +228,7 @@ export const handleVerifyOTPRecovery = async (req: Request, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -241,8 +241,8 @@ export const handleVerifyOTPRecovery = async (req: Request, res: Response) => {
   if (!verifyOtpCookie) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Session expired",
-      error: "Session expired",
+      message: "Phiên hết hạn",
+      error: "Phiên hết hạn",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -278,7 +278,7 @@ export const handleConfirmPassword = async (req: Request, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -291,8 +291,8 @@ export const handleConfirmPassword = async (req: Request, res: Response) => {
   if (!confirmPasswordCookie) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Session expired",
-      error: "Session expired",
+      message: "Phiên hết hạn",
+      error: "Phiên hết hạn",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -317,7 +317,7 @@ export const handleLogin = async (req: Request, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data:${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ:${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,

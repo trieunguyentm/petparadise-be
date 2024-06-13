@@ -22,7 +22,7 @@ export const handleCreatePaymentLink = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -34,8 +34,8 @@ export const handleCreatePaymentLink = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -112,7 +112,7 @@ export const handleReceiveHook = async (req: RequestCustom, res: Response) => {
           },
         });
         /** Return */
-        return res.status(200).json({ message: "Order status updated" });
+        return res.status(200).json({ message: "Đơn hàng đã được cập nhập" });
       } catch (error: any) {
         console.log("Error when update order:", error.message);
         return res.json();

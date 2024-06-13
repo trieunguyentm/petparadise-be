@@ -32,8 +32,8 @@ export const handleRegisterService = async ({
   if (existingEmail) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Email already exists",
-      error: "Email already exists",
+      message: "Địa chỉ gmail đã tồn tại",
+      error: "Địa chỉ gmail đã tồn tại",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -43,8 +43,8 @@ export const handleRegisterService = async ({
   if (existingUser) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Username already exists",
-      error: "Username already exists",
+      message: "Tên người dùng đã tồn tại",
+      error: "Tên người dùng đã tồn tại",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -73,12 +73,12 @@ export const handleRegisterService = async ({
     // Send HTML Content
     const emailBody = await generateRegisterMail(email, randomCode);
     // Send Email
-    const subject = "Verify OTP for register";
+    const subject = "Xác minh mã OTP đăng ký tài khoản PetParadise";
     await sendEmail(email, subject, emailBody);
     // Response
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Verify OTP for register",
+      message: "Xác minh mã OTP đăng ký tài khoản PetParadise",
       data: { id },
       statusCode: 200,
       type: SUCCESS,
@@ -88,7 +88,7 @@ export const handleRegisterService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Error when sending email",
+      message: "Xảy ra lỗi khi gửi thư đến gmail đăng ký",
       error: error as string,
       statusCode: 500,
       type: ERROR_SERVER,
@@ -107,8 +107,8 @@ export const handleResendVerifyOTPService = async ({
   if (!data) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Session expired",
-      error: "Session expired",
+      message: "Phiên hết hạn",
+      error: "Phiên hết hạn",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -126,8 +126,8 @@ export const handleResendVerifyOTPService = async ({
   if (!userData.username) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Invalid Session",
-      error: "Invalid Session",
+      message: "Phiên không hợp lệ",
+      error: "Phiên không hợp lệ",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -137,8 +137,8 @@ export const handleResendVerifyOTPService = async ({
   if (userData.count >= 5) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: `Maximum number of OTP sent times has been reached`,
-      error: "Maximum number of OTP sent times has been reached",
+      message: `Đã đạt đến số lần gửi OTP tối đa`,
+      error: "Đã đạt đến số lần gửi OTP tối đa",
       statusCode: 403,
       type: ERROR_SESSION,
     };
@@ -150,8 +150,8 @@ export const handleResendVerifyOTPService = async ({
   if (ttl > 240) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: `You can request a new verify OTP after ${ttl - 240} seconds`,
-      error: "Not can request a new verify OTP",
+      message: `Bạn có thể gửi yêu cầu nhận OTP mới sau ${ttl - 240} giây`,
+      error: "Hiện tại chưa thể nhận OTP mới",
       statusCode: 403,
       type: ERROR_CLIENT,
     };
@@ -181,12 +181,12 @@ export const handleResendVerifyOTPService = async ({
     // Send HTML Content
     const emailBody = await generateRegisterMail(userData.email, newRandomCode);
     // Send Email
-    const subject = "Verify OTP for register";
+    const subject = "Xác minh mã OTP đăng ký tài khoản PetParadise";
     await sendEmail(userData.email, subject, emailBody);
     // Response
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Verify OTP for register",
+      message: "Xác minh mã OTP đăng ký tài khoản PetParadise",
       data: { newKey },
       statusCode: 200,
       type: SUCCESS,
@@ -196,7 +196,7 @@ export const handleResendVerifyOTPService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Error when resend new verify OTP",
+      message: "Xảy ra lỗi khi gửi lại mã OTP mới",
       error: error as string,
       statusCode: 500,
       type: ERROR_SERVER,
@@ -217,8 +217,8 @@ export const handleVerifyOTPService = async ({
   if (!data) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Session expired",
-      error: "Session expired",
+      message: "Phiên hết hạn",
+      error: "Phiên hết hạn",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -236,8 +236,8 @@ export const handleVerifyOTPService = async ({
   if (!userData.username) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Invalid Session",
-      error: "Invalid Session",
+      message: "Phiên không hợp lệ",
+      error: "Phiên không hợp lệ",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -247,8 +247,8 @@ export const handleVerifyOTPService = async ({
     if (userData.fail >= 5) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "The number of incorrect OTP entries has exceeded 5 times",
-        error: "Incorrect OTP",
+        message: "Số lần nhập OTP sai đã vượt quá 5 lần",
+        error: "Mã OTP không chính xác",
         statusCode: 403,
         type: ERROR_SESSION,
       };
@@ -272,8 +272,8 @@ export const handleVerifyOTPService = async ({
     );
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Invalid OTP Code",
-      error: "Invalid OTP Code",
+      message: "Mã OTP không chính xác",
+      error: "Mã OTP không chính xác",
       statusCode: 401,
       type: ERROR_CLIENT,
     };
@@ -295,7 +295,7 @@ export const handleVerifyOTPService = async ({
 
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "User saved successfully",
+      message: "Người dùng đã được tạo thành công",
       data: newUser,
       statusCode: 200,
       type: SUCCESS,
@@ -305,7 +305,7 @@ export const handleVerifyOTPService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Error when create user",
+      message: "Xảy ra lỗi khi tạo người dùng",
       error: error as string,
       statusCode: 500,
       type: ERROR_SESSION,
@@ -325,8 +325,8 @@ export const handleRecoveryPasswordService = async ({
   if (!existingEmail) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Email not found",
-      error: "Email not found",
+      message: "Không tìm thấy địa chỉ gmail này",
+      error: "Không tìm thấy địa chỉ gmail này",
       statusCode: 404,
       type: ERROR_CLIENT,
     };
@@ -344,12 +344,12 @@ export const handleRecoveryPasswordService = async ({
     // Send HTML Content
     const emailBody = await generateRecoveryPasswordMail(email, randomCode);
     // Send Email
-    const subject = "Recovery Password in Pet Paradise";
+    const subject = "Khôi phục mật khẩu trên PetParadise";
     await sendEmail(email, subject, emailBody);
     // Response
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Verify OTP for recovery password of account",
+      message: "Xác minh mã OTP cho việc khôi phục tài khoản",
       data: { id },
       statusCode: 200,
       type: SUCCESS,
@@ -359,7 +359,7 @@ export const handleRecoveryPasswordService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Error when sending email for recovery password",
+      message: "Xảy ra lỗi khi gửi thư đến gmail đăng ký",
       error: error as string,
       statusCode: 500,
       type: ERROR_SERVER,
@@ -378,8 +378,8 @@ export const handleResendVerifyOTPRecoveryService = async ({
   if (!data) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Session expired",
-      error: "Session expired",
+      message: "Phiên hết hạn",
+      error: "Phiên hết hạn",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -395,8 +395,8 @@ export const handleResendVerifyOTPRecoveryService = async ({
   if (!userData.email) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Invalid Session",
-      error: "Invalid Session",
+      message: "Phiên không hợp lệ",
+      error: "Phiên không hợp lệ",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -406,8 +406,8 @@ export const handleResendVerifyOTPRecoveryService = async ({
   if (userData.count >= 5) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: `Maximum number of OTP sent times has been reached`,
-      error: "Maximum number of OTP sent times has been reached",
+      message: `Đã đạt đến số lần gửi OTP tối đa`,
+      error: "Đã đạt đến số lần gửi OTP tối đa",
       statusCode: 403,
       type: ERROR_SESSION,
     };
@@ -419,8 +419,8 @@ export const handleResendVerifyOTPRecoveryService = async ({
   if (ttl > 240) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: `You can request a new verify OTP after ${ttl - 240} seconds`,
-      error: "Not can request a new verify OTP",
+      message: `Chỉ có thể yêu cầu mã OTP mới sau ${ttl - 240} giây`,
+      error: "Không thể yêu cầu tạo OTP mới",
       statusCode: 403,
       type: ERROR_CLIENT,
     };
@@ -451,12 +451,12 @@ export const handleResendVerifyOTPRecoveryService = async ({
       newRandomCode
     );
     // Send Email
-    const subject = "Recovery Password in Pet Paradise";
+    const subject = "Khôi phục mật khẩu trên PetParadise";
     await sendEmail(userData.email, subject, emailBody);
     // Response
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Verify OTP for recovery password of account",
+      message: "Xác minh mã OTP cho việc khôi phục tài khoản",
       data: { newKey },
       statusCode: 200,
       type: SUCCESS,
@@ -466,7 +466,7 @@ export const handleResendVerifyOTPRecoveryService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Error when resend new verify OTP for recovery password",
+      message: "Xảy ra lỗi khi gửi lại mã OTP mới",
       error: error as string,
       statusCode: 500,
       type: ERROR_SERVER,
@@ -487,8 +487,8 @@ export const handleVerifyOTPRecoveryService = async ({
   if (!data) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Session expired",
-      error: "Session expired",
+      message: "Phiên hết hạn",
+      error: "Phiên hết hạn",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -504,8 +504,8 @@ export const handleVerifyOTPRecoveryService = async ({
   if (!infoEmail.email) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Invalid Session",
-      error: "Invalid Session",
+      message: "Phiên không hợp lệ",
+      error: "Phiên không hợp lệ",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -515,8 +515,8 @@ export const handleVerifyOTPRecoveryService = async ({
     if (infoEmail.fail >= 5) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "The number of incorrect OTP entries has exceeded 5 times",
-        error: "Incorrect OTP",
+        message: "Số lần nhập OTP sai đã vượt quá 5 lần",
+        error: "Số lần nhập OTP sai đã vượt quá 5 lần",
         statusCode: 403,
         type: ERROR_SESSION,
       };
@@ -538,8 +538,8 @@ export const handleVerifyOTPRecoveryService = async ({
     );
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Invalid OTP Code",
-      error: "Invalid OTP Code",
+      message: "Mã OTP không chính xác",
+      error: "Mã OTP không chính xác",
       statusCode: 401,
       type: ERROR_CLIENT,
     };
@@ -558,7 +558,7 @@ export const handleVerifyOTPRecoveryService = async ({
     // Response to Controllers
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Check otp code successfully",
+      message: "OTP chính xác",
       data: { id: confirmPasswordID },
       statusCode: 200,
       type: SUCCESS,
@@ -568,7 +568,7 @@ export const handleVerifyOTPRecoveryService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Error when checking otp code",
+      message: "Xảy ra lỗi khi kiểm tra mã OTP",
       error: error as string,
       statusCode: 500,
       type: ERROR_SESSION,
@@ -589,8 +589,8 @@ export const handleConfirmPasswordService = async ({
   if (!data) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Session expired",
-      error: "Session expired",
+      message: "Phiên hết hạn",
+      error: "Phiên hết hạn",
       statusCode: 401,
       type: ERROR_SESSION,
     };
@@ -612,8 +612,8 @@ export const handleConfirmPasswordService = async ({
   if (!updatedUser) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "User not found or update failed",
-      error: "User not found or update failed",
+      message: "Không tìm thấy người dùng hoặc việc cập nhật thất bại",
+      error: "Không tìm thấy người dùng hoặc việc cập nhật thất bại",
       statusCode: 404,
       type: ERROR_CLIENT,
     };
@@ -625,7 +625,7 @@ export const handleConfirmPasswordService = async ({
   // Trả về kết quả thành công
   let dataResponse: SuccessResponse = {
     success: true,
-    message: "Password updated successfully",
+    message: "Cập nhật mật khẩu mới thành công",
     data: null, // Không cần gửi thông tin người dùng trong phản hồi này
     statusCode: 200,
     type: SUCCESS,
@@ -648,8 +648,8 @@ export const handleLoginService = async ({
     if (!user) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "User not found",
-        error: "User with the given email does not exist",
+        message: "Người dùng không tồn tại",
+        error: "Người dùng không tồn tại",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -661,8 +661,8 @@ export const handleLoginService = async ({
     if (!isMatch) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Invalid credentials: incorrect password",
-        error: "Password does not match",
+        message: "Mật khẩu không chính xác",
+        error: "Mật khẩu không chính xác",
         statusCode: 401,
         type: ERROR_CLIENT,
       };
@@ -688,7 +688,7 @@ export const handleLoginService = async ({
     // Trả về thông tin
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Login successful",
+      message: "Đăng nhập thành công",
       data: { user: userWithoutPassword, jti, token },
       statusCode: 200,
       type: SUCCESS,
@@ -698,7 +698,7 @@ export const handleLoginService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Error when login, please try again",
+      message: "Xảy ra lỗi khi đăng nhập, vui lòng thử lại",
       error: error as string,
       statusCode: 500,
       type: ERROR_SERVER,

@@ -16,7 +16,7 @@ export const handleCreateRefundRequest = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -28,8 +28,8 @@ export const handleCreateRefundRequest = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -63,7 +63,7 @@ export const handleGetRefundRequestByOrder = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -75,8 +75,8 @@ export const handleGetRefundRequestByOrder = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };

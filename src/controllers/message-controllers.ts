@@ -14,7 +14,7 @@ export const handleCreateMessage = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -25,8 +25,8 @@ export const handleCreateMessage = async (
   if (!user) {
     return res.status(400).json({
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     });
@@ -36,8 +36,8 @@ export const handleCreateMessage = async (
   if (!text && !file) {
     const response: ErrorResponse = {
       success: false,
-      message: `Please provide text or photo of message`,
-      error: `Please provide text or photo of message`,
+      message: `Vui lòng cung cấp nội dung tin nhắn`,
+      error: `Vui lòng cung cấp nội dung tin nhắn`,
       statusCode: 400,
       type: ERROR_CLIENT,
     };

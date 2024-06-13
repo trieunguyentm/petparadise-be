@@ -26,8 +26,8 @@ export const handleGetUser = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -52,7 +52,7 @@ export const handleChangePassword = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -64,8 +64,8 @@ export const handleChangePassword = async (
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -90,7 +90,7 @@ export const handleUpdate = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -101,8 +101,8 @@ export const handleUpdate = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -126,7 +126,7 @@ export const handleLikePost = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -138,8 +138,8 @@ export const handleLikePost = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -161,7 +161,7 @@ export const handleSavePost = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -173,8 +173,8 @@ export const handleSavePost = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -197,8 +197,8 @@ export const handleGetOtherUser = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -224,8 +224,8 @@ export const handleGetOtherUserBySearch = async (
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -252,7 +252,7 @@ export const handleFollow = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -264,8 +264,8 @@ export const handleFollow = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -274,8 +274,8 @@ export const handleFollow = async (req: RequestCustom, res: Response) => {
     if (user.id === peopleID) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Cannot follow self",
-        error: "Cannot follow self",
+        message: "Không thể theo dõi bản thân",
+        error: "Không thể theo dõi bản thân",
         statusCode: 400,
         type: ERROR_CLIENT,
       };
@@ -301,8 +301,8 @@ export const handleGetNotification = async (
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -327,7 +327,7 @@ export const handleSeenNotification = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -339,8 +339,8 @@ export const handleSeenNotification = async (
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -364,8 +364,8 @@ export const handleLogout = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -390,8 +390,8 @@ export const handleLogoutAllDevice = async (
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -414,7 +414,7 @@ export const handleSearchUser = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -426,8 +426,8 @@ export const handleSearchUser = async (req: RequestCustom, res: Response) => {
   if (typeof query !== "string") {
     const response: ErrorResponse = {
       success: false,
-      message: "Query must be a string.",
-      error: "Invalid query parameter",
+      message: "Truy vấn không hợp lệ",
+      error: "Truy vấn không hợp lệ",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -447,8 +447,8 @@ export const handleGetCart = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -474,7 +474,7 @@ export const handleAddFavoriteProduct = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -486,8 +486,8 @@ export const handleAddFavoriteProduct = async (
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -511,8 +511,8 @@ export const handleGetFavoriteProduct = async (
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };

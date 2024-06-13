@@ -34,7 +34,7 @@ const uploadImage = async (file: Express.Multer.File): Promise<string> => {
         if (error) {
           reject(error);
         } else if (!result) {
-          reject(new Error("Upload failed without a specific error."));
+          reject(new Error("Tải ảnh không thành công"));
         } else {
           resolve(result.url); // Khi upload thành công, trả về URL của ảnh
         }
@@ -107,7 +107,7 @@ export const handleCreatePetAdoptionPostService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Post created successfully",
+      message: "Tạo bài viết thành công",
       data: newPetAdoptionPost,
       statusCode: 200,
       type: SUCCESS,
@@ -117,8 +117,10 @@ export const handleCreatePetAdoptionPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to create pet adoption post",
-      error: "Failed to create pet adoption post: " + error.message,
+      message: "Xảy ra lỗi khi tạo bài viết tìm chủ nhân cho thú cưng",
+      error:
+        "Xảy ra lỗi khi tạo bài viết tìm chủ nhân cho thú cưng: " +
+        error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -147,7 +149,7 @@ export const handleGetPetAdoptionPostService = async ({
       .exec();
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get pet adoption post successfully",
+      message: "Lấy thông tin bài viết tìm chủ nhân cho thú cưng thành công",
       data: petAdoptionPosts,
       statusCode: 200,
       type: SUCCESS,
@@ -157,8 +159,10 @@ export const handleGetPetAdoptionPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get pet adoption post",
-      error: "Failed to get pet adoption post: " + error.message,
+      message: "Xảy ra lỗi khi lấy bài đăng tìm chủ nhân cho thú cưng",
+      error:
+        "Xảy ra lỗi khi lấy bài đăng tìm chủ nhân cho thú cưng: " +
+        error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -183,7 +187,7 @@ export const handleGetPetAdoptionPostByIdService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get pet adoption post successfully",
+      message: "Lấy thông tin bài viết tìm chủ nhân cho thú cưng thành công",
       data: petAdoptionPost,
       statusCode: 200,
       type: SUCCESS,
@@ -193,8 +197,8 @@ export const handleGetPetAdoptionPostByIdService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get post",
-      error: "Failed to get post: " + error.message,
+      message: "Xảy ra lỗi khi tải bài viết",
+      error: "Xảy ra lỗi khi tải bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -222,8 +226,8 @@ export const handleAddCommentService = async ({
     if (!userInfo || !postInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Not found user or post",
-        error: "Not found user or post",
+        message: "Không tìm thấy người dùng hoặc bài viết",
+        error: "Không tìm thấy người dùng hoặc bài viết",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -259,8 +263,8 @@ export const handleAddCommentService = async ({
         const notification = new Notification({
           receiver: postInfo.poster._id,
           status: "unseen",
-          title: "New activity",
-          subtitle: `${user.username} has commented on your pet adoption post`,
+          title: "Bình luận mới",
+          subtitle: `${user.username} đã bình luận trong bài viết tìm chủ nhân cho thú cưng của bạn`,
           moreInfo: `/pet-adoption/${postId}`,
         });
 
@@ -276,7 +280,7 @@ export const handleAddCommentService = async ({
       /** Return */
       const dataResponse: SuccessResponse = {
         success: true,
-        message: "Add comment successfully",
+        message: "Tạo bình luận thành công",
         data: newComment,
         statusCode: 200,
         type: SUCCESS,
@@ -287,8 +291,8 @@ export const handleAddCommentService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed when add comment",
-      error: "Failed when add comment: " + error.message,
+      message: "Xảy ra lỗi khi thêm bình luận",
+      error: "Xảy ra lỗi khi thêm bình luận: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -318,7 +322,7 @@ export const handleGetCommentByPostService = async ({
     // Return the comments
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Comments retrieved successfully",
+      message: "Lấy danh sách bình luận thành công",
       data: comments,
       statusCode: 200,
       type: SUCCESS,
@@ -329,8 +333,8 @@ export const handleGetCommentByPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get comment",
-      error: "Failed to get comment: " + error.message,
+      message: "Xảy ra lỗi khi lấy danh sách bình luận",
+      error: "Xảy ra lỗi khi lấy danh sách bình luận: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -352,8 +356,8 @@ export const handleDeletePetAdoptionPostByIdService = async ({
     if (!post) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Post not found",
-        error: "Post not found",
+        message: "Không tìm thấy bài viết",
+        error: "Không tìm thấy bài viết",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -363,8 +367,8 @@ export const handleDeletePetAdoptionPostByIdService = async ({
     if (post.poster.toString() !== user.id) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Unauthorized",
-        error: "You do not have permission to delete this post",
+        message: "Không thể thực hiện",
+        error: "Không thể thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -379,8 +383,8 @@ export const handleDeletePetAdoptionPostByIdService = async ({
     );
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Delete pet adoption post successfully",
-      data: "Delete successfully",
+      message: "Xóa bài viết thành công",
+      data: "Xóa bài viết thành công",
       statusCode: 200,
       type: SUCCESS,
     };
@@ -389,8 +393,8 @@ export const handleDeletePetAdoptionPostByIdService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to delete post",
-      error: "Failed to delete post: " + error.message,
+      message: "Xảy ra lỗi khi xóa bài viết",
+      error: "Xảy ra lỗi khi xóa bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -446,7 +450,7 @@ export const handleGetPetAdoptionPostBySearchService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get post successfully",
+      message: "Lấy thông tin bài viết thành công",
       data: posts,
       statusCode: 200,
       type: SUCCESS,
@@ -456,8 +460,10 @@ export const handleGetPetAdoptionPostBySearchService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get pet adoption post",
-      error: "Failed to get pet adoption post: " + error.message,
+      message: "Xảy ra lỗi khi lấy bài đăng tìm chủ nhân cho thú cưng",
+      error:
+        "Xảy ra lỗi khi lấy bài đăng tìm chủ nhân cho thú cưng: " +
+        error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -485,8 +491,8 @@ export const handleGetAdoptedPetOwnerService = async ({
     if (!petAdoptionPost) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Pet adoption post not found",
-        error: "Pet adoption post not found",
+        message: "Không tìm thấy bài viết nhận thú cưng",
+        error: "Không tìm thấy bài viết nhận thú cưng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -496,8 +502,8 @@ export const handleGetAdoptedPetOwnerService = async ({
     if (petAdoptionPost.status !== "adopted") {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "This pet has not been adopted yet",
-        error: "This pet has not been adopted yet",
+        message: "Thú cưng này vẫn chưa được nhận nuôi",
+        error: "Thú cưng này vẫn chưa được nhận nuôi",
         statusCode: 400,
         type: ERROR_CLIENT,
       };
@@ -512,8 +518,8 @@ export const handleGetAdoptedPetOwnerService = async ({
     if (!approvedRequest) {
       return {
         success: false,
-        message: "No approved adoption request found",
-        error: "No approved adoption request found",
+        message: "Không tìm thấy yêu cầu nhận thú cưng đã được phê duyệt",
+        error: "Không tìm thấy yêu cầu nhận thú cưng đã được phê duyệt",
         statusCode: 404,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -524,7 +530,7 @@ export const handleGetAdoptedPetOwnerService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get adopted pet owner successfully",
+      message: "Lấy thông tin người nhận nuôi thú cưng thành công",
       data: {
         adopter: {
           _id: adopter._id.toString(),
@@ -541,8 +547,10 @@ export const handleGetAdoptedPetOwnerService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Error getting adopted pet owner",
-      error: "Error getting adopted pet owner: " + error.message,
+      message: "Xảy ra lỗi khi lấy thông tin người nhận nuôi thú cưng",
+      error:
+        "Xảy ra lỗi khi lấy thông tin người nhận nuôi thú cưng: " +
+        error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -568,8 +576,8 @@ export const handleGetConfirmByPostService = async ({
     if (!contract) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Transfer contract not found",
-        error: "Transfer contract not found",
+        message: "Không tìm thấy hợp đồng giao dịch thú cưng",
+        error: "Không tìm thấy hợp đồng giao dịch thú cưng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -582,8 +590,8 @@ export const handleGetConfirmByPostService = async ({
     ) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Unauthorized",
-        error: "You do not have permission to get transfer contract this post",
+        message: "Không thể thực hiện",
+        error: "Không thể thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -592,7 +600,7 @@ export const handleGetConfirmByPostService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get transfer contract successfully",
+      message: "Lấy thông tin giao dịch thú cưng thành công",
       data: contract,
       statusCode: 200,
       type: SUCCESS,
@@ -602,8 +610,8 @@ export const handleGetConfirmByPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to update confirmation status",
-      error: "Failed to update confirmation status: " + error.message,
+      message: "Xảy ra lỗi khi lấy thông tin giao dịch",
+      error: "Xảy ra lỗi khi lấy thông tin giao dịch: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -645,8 +653,8 @@ export const handleConfirmAdoptPetService = async ({
     if (!contract) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Transfer contract not found",
-        error: "Transfer contract not found",
+        message: "Không tìm thấy hợp đồng giao dịch thú cưng",
+        error: "Không tìm thấy hợp đồng giao dịch thú cưng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -660,8 +668,8 @@ export const handleConfirmAdoptPetService = async ({
     ) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Unauthorized",
-        error: "You do not have permission to get transfer contract this post",
+        message: "Không thể thực hiện",
+        error: "Không thể thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -673,8 +681,8 @@ export const handleConfirmAdoptPetService = async ({
       if (contract.receiverConfirmed) {
         let dataResponse: ErrorResponse = {
           success: false,
-          message: "Can not update contract because it is already confirmed",
-          error: "Can not update contract because it is already confirmed",
+          message: "Không thể cập nhật hợp đồng vì nó đã được xác nhận",
+          error: "Không thể cập nhật hợp đồng vì nó đã được xác nhận",
           statusCode: 403,
           type: ERROR_CLIENT,
         };
@@ -686,10 +694,10 @@ export const handleConfirmAdoptPetService = async ({
       const notification = new Notification({
         receiver: contract.giver._id,
         status: "unseen",
-        title: "Adoption Confirmation",
-        subtitle: `${user.username} has ${
-          confirmed ? "confirmed" : "rejected"
-        } the adoption`,
+        title: "Xác nhận nhận nuôi thú cưng",
+        subtitle: `${user.username} đã ${
+          confirmed ? "đồng ý" : "từ chối"
+        } nhận nuôi thú cưng`,
         moreInfo: `/pet-adoption/confirm/${postId}`,
       });
       await notification.save();
@@ -707,9 +715,7 @@ export const handleConfirmAdoptPetService = async ({
       }
       let dataResponse: SuccessResponse = {
         success: true,
-        message: `You have ${
-          confirmed ? "confirmed" : "rejected"
-        } the adoption`,
+        message: `Bạn đã ${confirmed ? "đồng ý" : "từ chối"} nhận nuôi`,
         data: contract,
         statusCode: 200,
         type: SUCCESS,
@@ -722,8 +728,8 @@ export const handleConfirmAdoptPetService = async ({
       if (!contract.receiverConfirmed) {
         let dataResponse: ErrorResponse = {
           success: false,
-          message: `${contract.receiver.username} is not confirmed`,
-          error: `You can not confirm because ${contract.receiver.username} is not confirmed`,
+          message: `${contract.receiver.username} vẫn chưa xác nhận đồng ý nuôi`,
+          error: `Bạn chưa thể xác nhận vì ${contract.receiver.username} chưa xác nhận đồng ý nuôi`,
           statusCode: 400,
           type: ERROR_CLIENT,
         };
@@ -733,8 +739,8 @@ export const handleConfirmAdoptPetService = async ({
       if (contract.giverConfirmed) {
         let dataResponse: ErrorResponse = {
           success: false,
-          message: "Can not update contract because it is already confirmed",
-          error: "Can not update contract because it is already confirmed",
+          message: "Không thể cập nhật hợp đồng vì nó đã được xác nhận",
+          error: "Không thể cập nhật hợp đồng vì nó đã được xác nhận",
           statusCode: 403,
           type: ERROR_CLIENT,
         };
@@ -748,7 +754,7 @@ export const handleConfirmAdoptPetService = async ({
       // TODO: Implement scheduling logic
       const dataResponse: SuccessResponse = {
         success: true,
-        message: "You have confirmed the adoption",
+        message: "Bạn đã xác nhận việc giao thú cưng",
         data: contract,
         statusCode: 200,
         type: SUCCESS,
@@ -759,8 +765,8 @@ export const handleConfirmAdoptPetService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to update confirmation status",
-      error: "Failed to update confirmation status: " + error.message,
+      message: "Xảy ra lỗi khi cập nhật trạng thái hợp đồng",
+      error: "Xảy ra lỗi khi cập nhật trạng thái hợp đồng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

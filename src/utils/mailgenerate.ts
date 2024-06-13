@@ -12,7 +12,7 @@ export const generateRegisterMail = (to: string, randomCode: number) => {
   const email = {
     body: {
       name: to,
-      intro: `You have just registered an account on the Pet Paradise system. Below is your confirmation code (this code is valid for 5 minutes): <div style="text-align:center; font-weight:bold;">${randomCode}</div>`,
+      intro: `Bạn vừa đăng ký tài khoản trên hệ thống Pet Paradise. Dưới đây là mã xác nhận của bạn (mã này có hiệu lực trong 5 phút): <div style="text-align:center; font-weight:bold;">${randomCode}</div>`,
     },
   };
   const emailBody = mailGenerator.generate(email);
@@ -28,7 +28,7 @@ export const generateRecoveryPasswordMail = (
   const email = {
     body: {
       name: to,
-      intro: `You have just restored the password on the Pet Paradise system. Below is your confirmation code, valid for 5 minutes: <div style="text-align:center; font-weight:bold;">${randomCode}</div>`,
+      intro: `Bạn vừa khôi phục mật khẩu trên hệ thống Pet Paradise. Dưới đây là mã xác nhận của bạn, có hiệu lực trong 5 phút: <div style="text-align:center; font-weight:bold;">${randomCode}</div>`,
     },
   };
   const emailBody = mailGenerator.generate(email);
@@ -106,11 +106,11 @@ export const generateOrderNotificationMail = (
   const email = {
     body: {
       name: sellerName,
-      intro: `You have received a new order #${orderCode}.`,
+      intro: `Bạn vừa nhận được một đơn hàng mới #${orderCode}.`,
       table: {
         data: itemTableData,
         columns: {
-          // Optionally, customize the columns.
+          // Tùy chọn, tùy chỉnh các cột.
           customWidth: {
             item: "20%",
             quantity: "10%",
@@ -123,14 +123,14 @@ export const generateOrderNotificationMail = (
       },
       action: {
         instructions:
-          "Please check the details and prepare the items for shipment.",
+          "Vui lòng kiểm tra chi tiết và chuẩn bị các mặt hàng để giao hàng.",
         button: {
           color: "#22BC66",
-          text: "View Order",
+          text: "Xem Đơn Hàng",
           link: `http://localhost:3001/store/manage-order`,
         },
       },
-      outro: `Total amount: ${totalAmount
+      outro: `Tổng số tiền: ${totalAmount
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}đ`,
     },
@@ -149,9 +149,9 @@ export const generateOrderCancelledMail = (
   const email = {
     body: {
       name: buyerName,
-      intro: `Your order #${orderCode} has been cancelled.`,
+      intro: `Đơn hàng #${orderCode} của bạn đã bị hủy.`,
       outro:
-        "We apologize for any inconvenience caused. If you have any questions, please contact our support team.",
+        "Chúng tôi xin lỗi vì bất kỳ sự bất tiện nào gây ra. Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.",
     },
   };
   return mailGenerator.generate(email);
@@ -165,7 +165,7 @@ export const generateOrderDeliveredMail = (
   const email = {
     body: {
       name: buyerName,
-      intro: `Your order #${orderCode} has been delivered. Please confirm the receipt.`,
+      intro: `Đơn hàng #${orderCode} của bạn đã được giao. Vui lòng xác nhận đã nhận hàng.`,
       table: {
         data: products.map((product) => ({
           item: product.name,
@@ -173,7 +173,7 @@ export const generateOrderDeliveredMail = (
           price: product.price,
         })),
         columns: {
-          // Optionally, customize the columns in the table
+          // Tùy chọn, tùy chỉnh các cột trong bảng
           customWidth: {
             item: "20%",
             quantity: "10%",
@@ -185,14 +185,14 @@ export const generateOrderDeliveredMail = (
         },
       },
       action: {
-        instructions: "To confirm receipt, please click the following button:",
+        instructions: "Để xác nhận đã nhận hàng, vui lòng nhấn vào nút sau:",
         button: {
           color: "#22BC66",
-          text: "Confirm Receipt",
+          text: "Xác Nhận Đã Nhận Hàng",
           link: `http://localhost:3000/store/purchased-order`,
         },
       },
-      outro: "Thank you for shopping with Pet Paradise!",
+      outro: "Cảm ơn bạn đã mua sắm tại Pet Paradise!",
     },
   };
   return mailGenerator.generate(email);
@@ -206,45 +206,45 @@ export const generateOrderSuccessMail = (
   const email = {
     body: {
       name: buyerName,
-      intro: `Your order #${orderCode} has been successfully completed! Thank you for shopping with us.`,
+      intro: `Đơn hàng #${orderCode} của bạn đã hoàn tất thành công! Cảm ơn bạn đã mua sắm với chúng tôi.`,
       table: {
         data: items.map((item) => ({
-          "Product Name": item.name,
-          Quantity: item.quantity,
-          Price:
+          "Tên Sản Phẩm": item.name,
+          "Số Lượng": item.quantity,
+          Giá:
             item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ",
         })),
         columns: {
-          // Optionally, customize the column widths
+          // Tùy chọn, tùy chỉnh độ rộng của các cột
           customWidth: {
-            "Product Name": "50%",
-            Quantity: "25%",
-            Price: "25%",
+            "Tên Sản Phẩm": "50%",
+            "Số Lượng": "25%",
+            Giá: "25%",
           },
-          // Optionally, change column text alignment
+          // Tùy chọn, thay đổi căn chỉnh văn bản của cột
           customAlignment: {
-            Price: "right",
+            Giá: "right",
           },
         },
       },
       action: {
         instructions:
-          "You can view your order details and track the shipment here:",
+          "Bạn có thể xem chi tiết đơn hàng và theo dõi vận chuyển tại đây:",
         button: {
-          color: "#22BC66", // Optional action button color
-          text: "View Order",
+          color: "#22BC66", // Màu tùy chọn của nút hành động
+          text: "Xem Đơn Hàng",
           link: `http://localhost:3000/store/purchased-order/${orderCode}`,
         },
       },
       outro:
-        "If you have any questions, just reply to this email—we're always happy to help.",
+        "Nếu bạn có bất kỳ câu hỏi nào, chỉ cần trả lời email này - chúng tôi luôn sẵn lòng giúp đỡ.",
     },
   };
 
-  // Generate an HTML email with the provided contents
+  // Tạo một email HTML với nội dung được cung cấp
   const emailBody = mailGenerator.generate(email);
 
-  // Generate the plaintext version of the email
+  // Tạo phiên bản văn bản thuần của email
   const emailText = mailGenerator.generatePlaintext(email);
 
   return emailBody;

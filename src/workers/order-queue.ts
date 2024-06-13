@@ -4,7 +4,7 @@ import Product, { IProductDocument } from "../models/product";
 import Order from "../models/order";
 import { generateOrderSuccessMail } from "../utils/mailgenerate";
 import { sendEmail } from "../utils/mailer";
-import User from "../models/user";
+import User, { IUserDocument } from "../models/user";
 
 // Kết nối Redis
 const redisOptions = {
@@ -47,7 +47,7 @@ const handleUpdateStatusOrder = async (data: { orderId: string }) => {
       .exec();
 
     if (!order) {
-      console.log("Order not found");
+      console.log("Không tìm thấy đơn hàng");
       return;
     }
 
@@ -60,6 +60,14 @@ const handleUpdateStatusOrder = async (data: { orderId: string }) => {
       order.status = "success";
       await order.save();
 
+      // Update the seller's account balance
+      const seller = (await User.findById(order.seller._id)) as IUserDocument;
+
+      // Cập nhật số dư tài khoản của người bán
+      seller.accountBalance = (seller.accountBalance || 0) + order.totalAmount;
+
+      await seller.save();
+
       // Gửi email thông báo đơn hàng thành công
       const emailBody = generateOrderSuccessMail(
         order.buyer.username,
@@ -71,7 +79,7 @@ const handleUpdateStatusOrder = async (data: { orderId: string }) => {
         }))
       );
 
-      await sendEmail(order.buyer.email, "Order Success", emailBody);
+      await sendEmail(order.buyer.email, "Đơn hàng thành công", emailBody);
 
       console.log(`Order ${order.orderCode} status updated to success.`);
     } else {

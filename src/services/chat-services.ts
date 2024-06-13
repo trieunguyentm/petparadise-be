@@ -17,7 +17,7 @@ const uploadImage = async (file: Express.Multer.File): Promise<string> => {
         if (error) {
           reject(error);
         } else if (!result) {
-          reject(new Error("Upload failed without a specific error."));
+          reject(new Error("Tải ảnh không thành công"));
         } else {
           resolve(result.url); // Khi upload thành công, trả về URL của ảnh
         }
@@ -52,10 +52,10 @@ export const handleCreateChatService = async ({
     if (count !== members.length) {
       return {
         success: false,
-        message: "One or more member IDs are invalid",
-        error: "Invalid member IDs",
+        message: "Một hoặc nhiều ID thành viên không hợp lệ",
+        error: "Một hoặc nhiều ID thành viên không hợp lệ",
         statusCode: 400,
-        type: "ERROR_CLIENT",
+        type: ERROR_CLIENT,
       };
     }
 
@@ -88,7 +88,7 @@ export const handleCreateChatService = async ({
         isGroup,
         name: isGroup ? name || "" : "",
         groupPhoto: isGroup ? groupPhotoUrl || "" : "",
-        lastMessage: `${user.username} started the conversation`,
+        lastMessage: `${user.username} đã bắt đầu cuộc trò chuyện`,
         seenBy: [user.id],
       });
 
@@ -115,7 +115,7 @@ export const handleCreateChatService = async ({
     }
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Chat fetched or created successfully",
+      message: "Thông tin cuộc trò chuyện đã được tạo hoặc lấy thành công",
       data: chat,
       statusCode: 200,
       type: SUCCESS,
@@ -125,8 +125,8 @@ export const handleCreateChatService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed when create chat",
-      error: "Failed when create chat: " + error.message,
+      message: "Xảy ra lỗi khi tạo cuộc trò chuyện",
+      error: "Xảy ra lỗi khi tạo cuộc trò chuyện: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -154,7 +154,7 @@ export const handleGetChatService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "List chat fetched successfully",
+      message: "Lấy danh sách cuộc trò chuyện thành công",
       data: allChats,
       statusCode: 200,
       type: SUCCESS,
@@ -164,8 +164,8 @@ export const handleGetChatService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed when fetch list chat",
-      error: "Failed when fetch list chat: " + error.message,
+      message: "Xảy ra lỗi khi lấy danh sách cuộc trò chuyện",
+      error: "Xảy ra lỗi khi lấy danh sách cuộc trò chuyện: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -239,8 +239,8 @@ export const handleSeenService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Seen successfully",
-      data: "Seen successfully",
+      message: "Đã xem",
+      data: "Đã xem",
       statusCode: 200,
       type: SUCCESS,
     };
@@ -249,8 +249,8 @@ export const handleSeenService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed when seen chat",
-      error: "Failed when seen chat: " + error.message,
+      message: "Lỗi xảy ra khi xem cuộc trò chuyện",
+      error: "Lỗi xảy ra khi xem cuộc trò chuyện: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -280,8 +280,8 @@ export const handleGetMessageChatService = async ({
     if (!chat) {
       const dataResponse: ErrorResponse = {
         success: false,
-        message: "Chat ID not found",
-        error: "Chat ID not found",
+        message: "Không tìm thấy ID cuộc trò chuyện",
+        error: "Không tìm thấy ID cuộc trò chuyện",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -295,8 +295,8 @@ export const handleGetMessageChatService = async ({
     ) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "User is not a member of the chat",
-        error: "Access denied",
+        message: "Người dùng không thể truy cập",
+        error: "Người dùng không thể truy cập",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -317,7 +317,7 @@ export const handleGetMessageChatService = async ({
     // Return
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get message successfully",
+      message: "Lấy tin nhắn thành công",
       data: messages,
       statusCode: 200,
       type: SUCCESS,
@@ -327,8 +327,8 @@ export const handleGetMessageChatService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get message",
-      error: "Failed to get message: " + error.message,
+      message: "Lỗi xảy ra khi tải tin nhắn cuộc trò chuyện",
+      error: "Lỗi xảy ra khi tải tin nhắn cuộc trò chuyện: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

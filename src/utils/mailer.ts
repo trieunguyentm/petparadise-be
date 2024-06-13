@@ -21,7 +21,7 @@ export const sendEmail = (to: string, subject: string, htmlContent: string) => {
     if (error) {
       console.log(error);
     } else {
-      console.log("Email sent: " + info.response);
+      console.log("Đã gửi thư đến gmail: " + to + ":" + info.response);
     }
   });
 };

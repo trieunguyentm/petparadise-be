@@ -32,7 +32,7 @@ export const handleCreatePetAdoptionPost = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -43,8 +43,8 @@ export const handleCreatePetAdoptionPost = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -54,8 +54,8 @@ export const handleCreatePetAdoptionPost = async (
   if (files.length === 0 || !files) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide image of pet",
-      error: "Not provide image of pet",
+      message: "Chưa cung cấp hình ảnh của thú cưng",
+      error: "Chưa cung cấp hình ảnh của thú cưng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -118,8 +118,8 @@ export const handleGetPetAdoptionPostById = async (
   if (!postId) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide post Id",
-      error: "Not provide post Id",
+      message: "Chưa cung cấp ID bài viết",
+      error: "Chưa cung cấp ID bài viết",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -143,7 +143,7 @@ export const handleAddComment = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -154,8 +154,8 @@ export const handleAddComment = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -187,8 +187,8 @@ export const handleGetCommentByPost = async (
   if (!postId) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide post Id",
-      error: "Not provide post Id",
+      message: "Chưa cung cấp ID bài viết",
+      error: "Chưa cung cấp ID bài viết",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -212,8 +212,8 @@ export const handleDeletePetAdoptionPostById = async (
   if (!postId) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide post Id",
-      error: "Not provide post Id",
+      message: "Chưa cung cấp ID bài viết",
+      error: "Chưa cung cấp ID bài viết",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -223,8 +223,8 @@ export const handleDeletePetAdoptionPostById = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -284,7 +284,7 @@ export const handleGetAdoptedPetOwner = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -296,8 +296,8 @@ export const handleGetAdoptedPetOwner = async (
   // if (!user) {
   //   const response: ErrorResponse = {
   //     success: false,
-  //     message: "Not provide user",
-  //     error: "Not provide user",
+  //     message: "Chưa cung cấp người dùng",
+  //     error: "Chưa cung cấp người dùng",
   //     statusCode: 400,
   //     type: ERROR_CLIENT,
   //   };
@@ -323,7 +323,7 @@ export const handleGetConfirmByPost = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -335,8 +335,8 @@ export const handleGetConfirmByPost = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -363,7 +363,7 @@ export const handleConfirmAdoptPet = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -376,8 +376,8 @@ export const handleConfirmAdoptPet = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };

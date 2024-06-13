@@ -12,8 +12,6 @@ import Notification from "../models/notification";
 import { pusherServer } from "../utils/pusher";
 import { Stream } from "stream";
 import Product from "../models/product";
-import path from "path";
-import { model } from "mongoose";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -24,7 +22,7 @@ const uploadImage = async (file: Express.Multer.File): Promise<string> => {
         if (error) {
           reject(error);
         } else if (!result) {
-          reject(new Error("Upload failed without a specific error."));
+          reject(new Error("Tải ảnh không thành công"));
         } else {
           resolve(result.url); // Khi upload thành công, trả về URL của ảnh
         }
@@ -71,8 +69,8 @@ export const handleGetUserService = async ({
     if (!userInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "User not found",
-        error: "User not found",
+        message: "Không tìm thấy người dùng",
+        error: "Không tìm thấy người dùng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -81,7 +79,7 @@ export const handleGetUserService = async ({
       const { password, ...userWithOutPassword } = userInfo.toObject();
       let dataResponse: SuccessResponse = {
         success: true,
-        message: "Get user information successfully",
+        message: "Lấy thông tin người dùng thành công",
         data: userWithOutPassword,
         statusCode: 200,
         type: SUCCESS,
@@ -91,8 +89,8 @@ export const handleGetUserService = async ({
   } catch (error) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when to get info user",
-      error: "Fail when to get info user",
+      message: "Xảy ra lỗi khi lấy thông tin người dùng",
+      error: "Xảy ra lỗi khi lấy thông tin người dùng",
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -115,8 +113,8 @@ export const handleChangePasswordService = async ({
     if (!userInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "User not found",
-        error: "User not found",
+        message: "Không tìm thấy người dùng",
+        error: "Không tìm thấy người dùng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -129,8 +127,8 @@ export const handleChangePasswordService = async ({
       if (!isCorrect) {
         let dataResponse: ErrorResponse = {
           success: false,
-          message: "Password is incorrect",
-          error: "Password is incorrect",
+          message: "Mật khẩu không chính xác",
+          error: "Mật khẩu không chính xác",
           statusCode: 400,
           type: ERROR_CLIENT,
         };
@@ -145,7 +143,7 @@ export const handleChangePasswordService = async ({
         const { password, ...userWithOutPassword } = userInfo.toObject();
         let dataResponse: SuccessResponse = {
           success: true,
-          message: "Change password successfully",
+          message: "Thay đổi mật khẩu thành công",
           data: userWithOutPassword,
           statusCode: 200,
           type: SUCCESS,
@@ -156,8 +154,8 @@ export const handleChangePasswordService = async ({
   } catch (error) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when to change password, please try again",
-      error: "Fail when to change password",
+      message: "Xảy ra lỗi khi thay đổi mật khẩu",
+      error: "Xảy ra lỗi khi thay đổi mật khẩu",
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -206,7 +204,7 @@ export const handleUpdateService = async ({
       if (userUpdated) {
         return {
           success: true,
-          message: "User profile updated successfully",
+          message: "Thông tin người dùng đã được cập nhật",
           data: userUpdated,
           statusCode: 200,
           type: SUCCESS,
@@ -214,8 +212,8 @@ export const handleUpdateService = async ({
       } else {
         return {
           success: false,
-          message: "User not found",
-          error: "Fail when to update user",
+          message: "Không tìm thấy người dùng",
+          error: "Không tìm thấy người dùng",
           statusCode: 404,
           type: ERROR_CLIENT,
         };
@@ -223,8 +221,8 @@ export const handleUpdateService = async ({
     } else {
       return {
         success: false,
-        message: "Please provide information to update",
-        error: "No update data provided",
+        message: "Không có thông tin cập nhật",
+        error: "Không có thông tin cập nhật",
         statusCode: 400,
         type: ERROR_CLIENT,
       };
@@ -232,8 +230,8 @@ export const handleUpdateService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when to update user",
-      error: "Fail when to update user" + error.message,
+      message: "Xảy ra lỗi khi cập nhật thông tin",
+      error: "Xảy ra lỗi khi cập nhật thông tin" + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -263,8 +261,8 @@ export const handleLikePostService = async ({
     if (!postInfo || !userInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Not found",
-        error: "Not found",
+        message: "Không tìm thấy bài đăng",
+        error: "Không tìm thấy bài đăng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -295,8 +293,8 @@ export const handleLikePostService = async ({
       const notification = new Notification({
         receiver: postInfo.poster._id,
         status: "unseen",
-        title: "New activity",
-        subtitle: `${user.username} liked your post`,
+        title: "Hoạt động mới",
+        subtitle: `${user.username} đã thích bài viết của bạn`,
         moreInfo: `/post/${postID}`,
       });
       await notification.save();
@@ -311,7 +309,7 @@ export const handleLikePostService = async ({
 
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Like success",
+      message: "Thích bài viết thành công",
       data: userInfo,
       statusCode: 200,
       type: SUCCESS,
@@ -320,8 +318,8 @@ export const handleLikePostService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when like post",
-      error: "Fail when like post: " + error.message,
+      message: "Xảy ra lỗi khi thích bài viết",
+      error: "Xảy ra lỗi khi thích bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -351,8 +349,8 @@ export const handleSavePostService = async ({
     if (!postInfo || !userInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Not found",
-        error: "Not found",
+        message: "Không tìm thấy bài viết",
+        error: "Không tìm thấy bài viết",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -377,7 +375,7 @@ export const handleSavePostService = async ({
     await postInfo.save();
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Save success",
+      message: "Lưu bài viết thành công",
       data: userInfo,
       statusCode: 200,
       type: SUCCESS,
@@ -386,8 +384,8 @@ export const handleSavePostService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when save post",
-      error: "Fail when save post: " + error.message,
+      message: "Xảy ra lỗi khi lưu bài viết",
+      error: "Xảy ra lỗi khi lưu bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -416,7 +414,7 @@ export const handleGetOtherUserService = async ({
     // Return
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Successfully retrieved other users",
+      message: "Lấy danh sách người dùng khác thành công",
       data: otherUsers,
       statusCode: 200,
       type: SUCCESS,
@@ -426,8 +424,8 @@ export const handleGetOtherUserService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when to get other user",
-      error: "Fail when to get other user: " + error.message,
+      message: "Xảy ra lỗi khi lấy danh sách người dùng",
+      error: "Xảy ra lỗi khi lấy danh sách người dùng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -461,7 +459,7 @@ export const handleGetOtherUserBySearchService = async ({
     // Return
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Successfully retrieved other users based on search",
+      message: "Lấy danh sách người dùng khác thành công",
       data: otherUsers,
       statusCode: 200,
       type: "SUCCESS",
@@ -470,8 +468,8 @@ export const handleGetOtherUserBySearchService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when to get other user",
-      error: "Fail when to get other user: " + error.message,
+      message: "Xảy ra lỗi khi lấy danh sách người dùng",
+      error: "Xảy ra lỗi khi lấy danh sách người dùng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -489,8 +487,8 @@ export const handleFollowService = async ({
   if (user.id === peopleID) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Cannot follow yourself",
-      error: "Cannot follow yourself",
+      message: "Không thể follow bản thân",
+      error: "Không thể follow bản thân",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -511,8 +509,8 @@ export const handleFollowService = async ({
     if (!userInfo || !otherPeopleInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "User not found",
-        error: "User not found",
+        message: "Không tìm thấy người dùng",
+        error: "Không tìm thấy người dùng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -548,8 +546,8 @@ export const handleFollowService = async ({
       const notification = new Notification({
         receiver: otherPeopleInfo._id,
         status: "unseen",
-        title: "New Follower",
-        subtitle: `${user.username} started following you`,
+        title: "Người theo dõi mới",
+        subtitle: `${user.username} đã theo dõi bạn`,
       });
       await notification.save();
 
@@ -563,7 +561,7 @@ export const handleFollowService = async ({
 
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Handle follow success",
+      message: "Xử lý theo dõi người dùng thành công",
       data: action,
       statusCode: 200,
       type: SUCCESS,
@@ -572,8 +570,8 @@ export const handleFollowService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when follow user",
-      error: "Fail when follow user: " + error.message,
+      message: "Xảy ra lỗi khi xử lý theo dõi người dùng",
+      error: "Xảy ra lỗi khi xử lý theo dõi người dùng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -605,7 +603,7 @@ export const handleGetNotificationService = async ({
 
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Fetched notifications successfully",
+      message: "Lấy danh sách thông báo thành công",
       data: {
         notifications,
         total: totalNotifications,
@@ -620,8 +618,8 @@ export const handleGetNotificationService = async ({
     console.error(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to fetch notifications",
-      error: "Failed to fetch notifications: " + error.message,
+      message: "Xảy ra lỗi khi lấy thông báo",
+      error: "Xảy ra lỗi khi lấy thông báo: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -646,8 +644,8 @@ export const handleSeenNotificationService = async ({
     if (!notification) {
       return {
         success: false,
-        message: "Notification not found",
-        error: "Notification not found",
+        message: "Không tìm thấy thông báo",
+        error: "Không tìm thấy thông báo",
         statusCode: 404,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -656,8 +654,8 @@ export const handleSeenNotificationService = async ({
     if (notification.receiver._id.toString() !== user.id) {
       return {
         success: false,
-        message: "Unauthorized access",
-        error: "You are not authorized to see this notification",
+        message: "Không có quyền truy cập",
+        error: "Không có quyền truy cập",
         statusCode: 403,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -665,8 +663,8 @@ export const handleSeenNotificationService = async ({
     if (notification.status === "seen") {
       return {
         success: false,
-        message: "Notification seen",
-        error: "You can not seen because this notification is already seen",
+        message: "Thông báo đã được xem",
+        error: "Thông báo đã được xem",
         statusCode: 400,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -676,7 +674,7 @@ export const handleSeenNotificationService = async ({
     await notification.save();
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Notification seen successfully",
+      message: "Thông báo đã được xem",
       data: notification,
       statusCode: 200,
       type: SUCCESS,
@@ -685,8 +683,8 @@ export const handleSeenNotificationService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when seen notification",
-      error: "Fail when seen notification: " + error.message,
+      message: "Xảy ra lỗi khi xem thông báo",
+      error: "Xảy ra lỗi khi xem thông báo: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -709,8 +707,8 @@ export const handleLogoutService = async ({
     await client.sRem(`${user.id.toString()}`, tokenId.toString());
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Logout success",
-      data: "Logout success",
+      message: "Đăng xuất thành công",
+      data: "Đăng xuất thành công",
       statusCode: 200,
       type: SUCCESS,
     };
@@ -718,8 +716,8 @@ export const handleLogoutService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when logout, please try again",
-      error: "Fail when logout: " + error?.message,
+      message: "Xảy ra lỗi khi đăng xuất, vui lòng thử lại",
+      error: "Xảy ra lỗi khi đăng xuất, vui lòng thử lại: " + error?.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -747,8 +745,8 @@ export const handleLogoutAllDeviceService = async ({
 
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Logout all device success",
-      data: "Logout all device success",
+      message: "Đăng xuất khỏi tất cả thiết bị thành công",
+      data: "Đăng xuất khỏi tất cả thiết bị thành công",
       statusCode: 200,
       type: SUCCESS,
     };
@@ -756,8 +754,11 @@ export const handleLogoutAllDeviceService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when logout all device, please try again",
-      error: "Fail when logout all device: " + error?.message,
+      message:
+        "Xảy ra lỗi khi đăng xuất khỏi tất cả các thiết bị, vui lòng thử lại",
+      error:
+        "Xảy ra lỗi khi đăng xuất khỏi tất cả các thiết bị, vui lòng thử lại: " +
+        error?.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -781,7 +782,7 @@ export const handleSearchUserService = async ({ query }: { query: string }) => {
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Search user successfully",
+      message: "Tìm kiếm người dùng thành công",
       data: searchedUser,
       statusCode: 200,
       type: SUCCESS,
@@ -791,8 +792,8 @@ export const handleSearchUserService = async ({ query }: { query: string }) => {
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to search user",
-      error: "Failed to search user: " + error.message,
+      message: "Xảy ra lỗi khi tìm kiếm người dùng",
+      error: "Xảy ra lỗi khi tìm kiếm người dùng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -821,8 +822,8 @@ export const handleGetCartService = async ({
     if (!userWithCart) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "User not found",
-        error: "User not found",
+        message: "Không tìm thấy người dùng",
+        error: "Không tìm thấy người dùng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -840,7 +841,7 @@ export const handleGetCartService = async ({
 
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Get Cart Successfully",
+      message: "Lấy thông tin giỏ hàng thành công",
       data: validCartItems,
       statusCode: 200,
       type: SUCCESS,
@@ -849,8 +850,8 @@ export const handleGetCartService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when get favorite product",
-      error: "Fail when get favorite product: " + error?.message,
+      message: "Xảy ra lỗi khi lấy thông tin giỏ hàng",
+      error: "Xảy ra lỗi khi lấy thông tin giỏ hàng: " + error?.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -872,8 +873,8 @@ export const handleAddFavoriteProductService = async ({
     if (!product) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Product not found",
-        error: "Product not found",
+        message: "Không tìm thấy sản phẩm",
+        error: "Không tìm thấy sản phẩm",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -884,8 +885,8 @@ export const handleAddFavoriteProductService = async ({
     if (!userInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "User not found",
-        error: "User not found",
+        message: "Không tìm thấy người dùng",
+        error: "Không tìm thấy người dùng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -912,8 +913,8 @@ export const handleAddFavoriteProductService = async ({
     let dataResponse: SuccessResponse = {
       success: true,
       message: isFavorite
-        ? "Product removed from favorite list successfully"
-        : "Product added to favorite list successfully",
+        ? "Sản phẩm đã bị xóa khỏi danh sách sản phẩm yêu thích"
+        : "Sản phẩm đã được thêm vào danh sách sản phẩm yêu thích",
       data: userInfo,
       statusCode: 200,
       type: SUCCESS,
@@ -923,8 +924,8 @@ export const handleAddFavoriteProductService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to add product to favorite list",
-      error: "Failed to add product to favorite list: " + error.message,
+      message: "Đã xảy ra lỗi khi thêm/xóa sản phẩm",
+      error: "Đã xảy ra lỗi khi thêm/xóa sản phẩm: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -951,7 +952,7 @@ export const handleGetFavoriteProductService = async ({
 
     let dataResponse: SuccessResponse = {
       success: true,
-      message: "Get Favorite Products Successfully",
+      message: "Lấy danh sách sản phẩm yêu thích thành công",
       data: {
         count: userInfo?.favoriteProducts.length,
         products: userInfo?.favoriteProducts,
@@ -963,8 +964,9 @@ export const handleGetFavoriteProductService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Fail when get favorite product",
-      error: "Fail when get favorite product: " + error?.message,
+      message: "Xảy ra lỗi khi lấy danh sách sản phẩm yêu thích",
+      error:
+        "Xảy ra lỗi khi lấy danh sách sản phẩm yêu thích: " + error?.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

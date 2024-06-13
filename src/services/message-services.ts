@@ -17,7 +17,7 @@ const uploadImage = async (file: Express.Multer.File): Promise<string> => {
         if (error) {
           reject(error);
         } else if (!result) {
-          reject(new Error("Upload failed without a specific error."));
+          reject(new Error("Tải ảnh không thành công"));
         } else {
           resolve(result.url); // Khi upload thành công, trả về URL của ảnh
         }
@@ -52,8 +52,8 @@ export const handleCreateMessageService = async ({
     if (!chat) {
       const dataResponse: ErrorResponse = {
         success: false,
-        message: "Chat ID not found",
-        error: "Chat ID not found",
+        message: "Không tìm thấy ID cuộc trò chuyện",
+        error: "Không tìm thấy ID cuộc trò chuyện",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -67,8 +67,8 @@ export const handleCreateMessageService = async ({
     ) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "User is not a member of the chat",
-        error: "Access denied",
+        message: "Không thể thực hiện",
+        error: "Không thể thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -94,7 +94,7 @@ export const handleCreateMessageService = async ({
     // Update the chat
     chat.messages.push(newMessage);
     chat.lastMessage = text;
-    if (imageUrl !== "") chat.lastMessage = `${user.username} sent a photo`;
+    if (imageUrl !== "") chat.lastMessage = `${user.username} đã gửi hình ảnh`;
     chat.lastMessageAt = newMessage.createdAt;
     const userInfo = (await User.findById(user.id).select(
       "_id username email profileImage"
@@ -117,7 +117,7 @@ export const handleCreateMessageService = async ({
     // Return
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Message sent successfully",
+      message: "Gửi tin nhắn thành công",
       data: newMessage,
       statusCode: 200,
       type: SUCCESS,
@@ -127,8 +127,8 @@ export const handleCreateMessageService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to send message",
-      error: "Failed to send message" + error.message,
+      message: "Xảy ra lỗi khi gửi tin nhắn",
+      error: "Xảy ra lỗi khi gửi tin nhắn" + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

@@ -20,7 +20,7 @@ const uploadImage = async (file: Express.Multer.File): Promise<string> => {
         if (error) {
           reject(error);
         } else if (!result) {
-          reject(new Error("Upload failed without a specific error."));
+          reject(new Error("Tải ảnh không thành công"));
         } else {
           resolve(result.url); // Khi upload thành công, trả về URL của ảnh
         }
@@ -65,7 +65,7 @@ export const handleCreatePostService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Post created successfully",
+      message: "Tạo bài viết thành công",
       data: newPost,
       statusCode: 200,
       type: SUCCESS,
@@ -75,8 +75,8 @@ export const handleCreatePostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to create post",
-      error: "Failed to create post",
+      message: "Xảy ra lỗi khi tạo bài viết",
+      error: "Xảy ra lỗi khi tạo bài viết",
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -115,7 +115,7 @@ export const handleGetPostService = async ({
       .exec();
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get post successfully",
+      message: "Lấy thông tin bài viết thành công",
       data: posts,
       statusCode: 200,
       type: SUCCESS,
@@ -125,8 +125,8 @@ export const handleGetPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to create post",
-      error: "Failed to create post: " + error.message,
+      message: "Xảy ra lỗi khi tạo bài viết",
+      error: "Xảy ra lỗi khi tạo bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -158,7 +158,7 @@ export const handleSearchPostService = async ({ query }: { query: string }) => {
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get post successfully",
+      message: "Lấy thông tin bài viết thành công",
       data: searchedPosts,
       statusCode: 200,
       type: SUCCESS,
@@ -168,8 +168,8 @@ export const handleSearchPostService = async ({ query }: { query: string }) => {
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get post",
-      error: "Failed to get post: " + error.message,
+      message: "Xảy ra lỗi khi tải bài viết",
+      error: "Xảy ra lỗi khi tải bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -203,8 +203,8 @@ export const handleGetDetailPostService = async ({
     if (!post) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Not found post",
-        error: "Not found post with id: " + postId,
+        message: "Không tìm thấy bài viết",
+        error: "Không tìm thấy bài viết có ID: " + postId,
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -212,7 +212,7 @@ export const handleGetDetailPostService = async ({
     } else {
       const dataResponse: SuccessResponse = {
         success: true,
-        message: "Get post successfully",
+        message: "Lấy thông tin bài viết thành công",
         data: post,
         statusCode: 200,
         type: SUCCESS,
@@ -223,8 +223,8 @@ export const handleGetDetailPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to get post",
-      error: "Failed to get post: " + error.message,
+      message: "Xảy ra lỗi khi tải bài viết",
+      error: "Xảy ra lỗi khi tải bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -252,8 +252,8 @@ export const handleAddCommentService = async ({
     if (!userInfo || !postInfo) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Not found user or post",
-        error: "Not found user or post",
+        message: "Không tìm thấy người dùng hoặc bài viết",
+        error: "Không tìm thấy người dùng hoặc bài viết",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -301,11 +301,11 @@ export const handleAddCommentService = async ({
         const notification = new Notification({
           receiver: postInfo.poster._id,
           status: "unseen",
-          title: "New activity",
-          subtitle: `${user.username} commented in your post`,
+          title: "Bình luận mới",
+          subtitle: `${user.username} đã bình luận trong bài viết của bạn`,
           moreInfo: `/post/${postId}`,
         });
-        
+
         await notification.save();
 
         // Pusher: Send the notification
@@ -319,7 +319,7 @@ export const handleAddCommentService = async ({
       /** Return */
       const dataResponse: SuccessResponse = {
         success: true,
-        message: "Add comment successfully",
+        message: "Tạo bình luận thành công",
         data: newComment,
         statusCode: 200,
         type: SUCCESS,
@@ -330,8 +330,8 @@ export const handleAddCommentService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed when add comment",
-      error: "Failed when add comment: " + error.message,
+      message: "Xảy ra lỗi khi thêm bình luận",
+      error: "Xảy ra lỗi khi thêm bình luận: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

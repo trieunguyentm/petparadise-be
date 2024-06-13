@@ -55,7 +55,7 @@ export const handleCreatePaymentLinkService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get pet adoption post successfully",
+      message: "Tạo link thanh toán thành công",
       data: paymentLink.checkoutUrl,
       statusCode: 200,
       type: SUCCESS,
@@ -65,8 +65,8 @@ export const handleCreatePaymentLinkService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to create payment link",
-      error: "Failed to create payment link: " + error.message,
+      message: "Xảy ra lỗi khi tạo link thanh toán",
+      error: "Xảy ra lỗi khi tạo link thanh toán: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

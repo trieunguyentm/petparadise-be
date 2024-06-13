@@ -32,8 +32,8 @@ export const handleCreateRefundRequestService = async ({
     if (!order) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Order not found",
-        error: "Order not found",
+        message: "Không tìm thấy đơn hàng",
+        error: "Không tìm thấy đơn hàng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -43,8 +43,8 @@ export const handleCreateRefundRequestService = async ({
     if (order.buyer._id.toString() !== user.id) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "You are not authorized to request a refund for this order",
-        error: "Unauthorized",
+        message: "Không thể thực hiện",
+        error: "Không thể thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -54,8 +54,8 @@ export const handleCreateRefundRequestService = async ({
     if (order.status !== "cancelled") {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Only cancelled orders can be refunded",
-        error: "Unauthorized",
+        message: "Chỉ khi đơn hàng bị từ chối mới có thể được hoàn tiền",
+        error: "Chỉ khi đơn hàng bị từ chối mới có thể được hoàn tiền",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -69,7 +69,7 @@ export const handleCreateRefundRequestService = async ({
       let dataResponse: ErrorResponse = {
         success: false,
         message: "Bạn đã tạo yêu cầu hoàn tiền trước đó rồi",
-        error: "Refund request already exists",
+        error: "Bạn đã tạo yêu cầu hoàn tiền trước đó rồi",
         statusCode: 400,
         type: ERROR_CLIENT,
       };
@@ -80,8 +80,8 @@ export const handleCreateRefundRequestService = async ({
     if (remainingRefundAmount <= 0) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "The order has already been fully refunded",
-        error: "No remaining refund amount",
+        message: "Đơn hàng này đã được hoàn tiền",
+        error: "Đơn hàng này đã được hoàn tiền",
         statusCode: 400,
         type: ERROR_CLIENT,
       };
@@ -112,8 +112,8 @@ export const handleCreateRefundRequestService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to create adoption request",
-      error: "Failed to create adoption request: " + error.message,
+      message: "Xảy ra lỗi khi tạo yêu cầu nhận thú cưng",
+      error: "Xảy ra lỗi khi tạo yêu cầu nhận thú cưng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -144,8 +144,8 @@ export const handleGetRefundRequestByOrderService = async ({
     if (!order) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message: "Order not found",
-        error: "Order not found",
+        message: "Không tìm thấy đơn hàng",
+        error: "Không tìm thấy đơn hàng",
         statusCode: 404,
         type: ERROR_CLIENT,
       };
@@ -157,8 +157,8 @@ export const handleGetRefundRequestByOrderService = async ({
       let dataResponse: ErrorResponse = {
         success: false,
         message:
-          "You are not authorized to view the refund request for this order",
-        error: "Unauthorized",
+          "Không thể thực hiện",
+        error: "Không thể thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,
       };
@@ -183,8 +183,8 @@ export const handleGetRefundRequestByOrderService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to create adoption request",
-      error: "Failed to create adoption request: " + error.message,
+      message: "Xảy ra lỗi khi lấy yêu cầu hoàn tiền",
+      error: "Xảy ra lỗi khi lấy yêu cầu hoàn tiền: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

@@ -1,30 +1,30 @@
 import { body, param } from "express-validator";
 
 export const createAdoptionRequest = [
-  body("petAdoptionPost").notEmpty().withMessage("petAdoptionPost is required"),
+  body("petAdoptionPost").notEmpty().withMessage("Chưa cung cấp petAdoptionPost"),
   body("type")
     .isIn(["reclaim-pet", "adopt-pet"])
-    .withMessage("Type Adoption Request must be one of the specified values"),
+    .withMessage("Kiểu bài đăng không hợp lệ"),
   body("descriptionForPet")
     .optional()
     .isString()
-    .withMessage("Description for pet must be a string"),
+    .withMessage("Mô tả về thú cưng không hợp lệ"),
   body("descriptionForUser")
     .optional()
     .isString()
-    .withMessage("Description for user must be a string"),
+    .withMessage("Mô tả về người dùng không hợp lệ"),
   body("contactInfo")
     .isString()
-    .withMessage("Contact information must be a string"),
+    .withMessage("Chưa cung cấp thông tin liên hệ "),
 ];
 
 export const handleGetAdoptionRequestValidator = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("Cần cung cấp ID bài viết"),
 ];
 
 export const handleSetAdoptionRequestValidator = [
   body("status")
     .isIn(["approved", "rejected"])
-    .withMessage("Status of request must be one of the specified value"),
-  param("requestId").notEmpty().withMessage("requestId must be a ID"),
+    .withMessage("Trạng thái yêu cầu không hợp lệ"),
+  param("requestId").notEmpty().withMessage("Id của yêu cầu không hợp lệ"),
 ];

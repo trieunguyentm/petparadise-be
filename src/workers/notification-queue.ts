@@ -61,9 +61,9 @@ const handlePetAdoptionNotification = async (data: {
     const notifications = relatedUsers.map((relatedUser) => ({
       receiver: relatedUser._id,
       status: "unseen",
-      title: "New Pet Adoption Post",
-      subtitle: `A new ${typePet} adoption post has been created in your area.`,
-      content: `Check out the new adoption post by ${user.username}.`,
+      title: "Bài đăng nhận nuôi thú cưng mới",
+      subtitle: `Một bài đăng nhận nuôi thú cưng mới đã được tạo trong khu vực của bạn.`,
+      content: `Một bài đăng nhận nuôi thú cưng mới đã được tạo trong khu vực của bạn.`,
       moreInfo: `/pet-adoption/${newPetAdoptionPost._id}`,
     }));
 
@@ -100,9 +100,9 @@ const handleFindPetNotification = async (data: {
     const notifications = relatedUsers.map((relatedUser) => ({
       receiver: relatedUser._id,
       status: "unseen",
-      title: "New Lost Pet Post",
-      subtitle: `A new lost pet post has been created in your area.`,
-      content: `Check out the new lost pet post by ${user.username}.`,
+      title: "Bài đăng tìm kiếm thú cưng mới",
+      subtitle: `Một bài đăng về thú cưng bị thất lạc mới đã được tạo trong khu vực của bạn.`,
+      content: `Một bài đăng về thú cưng bị thất lạc mới đã được tạo trong khu vực của bạn.`,
       moreInfo: `/find-pet/${newFindPetPost._id}`,
     }));
 
@@ -132,9 +132,9 @@ const handleOrderProcessedNotification = async (data: {
     const buyerNotification = {
       receiver: buyer._id.toString(),
       status: "unseen",
-      title: "Order Processed",
-      subtitle: `Your order #${order.orderCode} has been processed.`,
-      content: `Your order has been successfully processed and is now being prepared for shipment.`,
+      title: "Đơn hàng đã được thanh toán",
+      subtitle: `Đơn hàng #${order.orderCode} đã được thanh toán.`,
+      content: `Đơn hàng của bạn đã được xử lý thành công và hiện đang được chuẩn bị để vận chuyển.`,
       moreInfo: `/store/purchased-order`,
     };
 
@@ -142,9 +142,9 @@ const handleOrderProcessedNotification = async (data: {
     const sellerNotification = {
       receiver: seller._id.toString(),
       status: "unseen",
-      title: "New Order",
-      subtitle: `You have received a new order #${order.orderCode}.`,
-      content: `A new order has been placed. Please check the details and prepare the items for shipment.`,
+      title: "Đơn hàng mới",
+      subtitle: `Bạn đã nhận được đơn đặt hàng mới #${order.orderCode}.`,
+      content: `Một đơn đặt hàng mới đã được đặt. Vui lòng kiểm tra chi tiết và chuẩn bị hàng hóa để vận chuyển.`,
       moreInfo: `/store/manage-order`,
     };
 
@@ -178,7 +178,7 @@ const handleOrderProcessedNotification = async (data: {
       order.totalAmount
     );
 
-    const subject = "New Order Notification";
+    const subject = "Thông báo đơn hàng mới";
     await sendEmail(seller.email, subject, emailBody);
   } catch (error: any) {
     console.error("Error in handleOrderProcessedNotification:", error);

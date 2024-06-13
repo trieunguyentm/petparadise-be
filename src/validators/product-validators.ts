@@ -71,29 +71,35 @@ export const getProductValidator = [
       "other",
     ])
     .withMessage("Loại sản phẩm không hợp lệ"),
-  query("minPrice").optional().isNumeric().withMessage("minPrice phải là số"),
-  query("maxPrice").optional().isNumeric().withMessage("maxPrice phải là số"),
-  query("name").optional().isString().withMessage("name phải là chuỗi"),
+  query("minPrice")
+    .optional()
+    .isNumeric()
+    .withMessage("Giá thấp nhất phải là số"),
+  query("maxPrice")
+    .optional()
+    .isNumeric()
+    .withMessage("Giá lớn nhất phải là số"),
+  query("name").optional().isString().withMessage("Tên sản phẩm phải là chuỗi"),
   query("seller")
     .optional()
     .isMongoId()
-    .withMessage("seller phải là một ID hợp lệ"),
+    .withMessage("ID người bán phải là một ID hợp lệ"),
 ];
 
 export const getProductByIdValidator = [
-  param("productId").notEmpty().withMessage("productId must be a ID"),
+  param("productId").notEmpty().withMessage("ID của sản phẩm không hợp lệ"),
 ];
 
 export const addToCartValidator = [
-  body("productId").notEmpty().withMessage("productId must be a ID"),
+  body("productId").notEmpty().withMessage("ID của sản phẩm không hợp lệ"),
 ];
 
 export const deleteCartValidator = [
-  body("productId").notEmpty().withMessage("productId must be a ID"),
+  body("productId").notEmpty().withMessage("ID của sản phẩm không hợp lệ"),
 ];
 
 export const editProductValidator = [
-  param("productId").notEmpty().withMessage("productId must be a ID"),
+  param("productId").notEmpty().withMessage("ID của sản phẩm không hợp lệ"),
   body("name")
     .notEmpty()
     .withMessage("Tên sản phẩm là bắt buộc")

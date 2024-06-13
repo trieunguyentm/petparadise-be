@@ -19,8 +19,8 @@ export const authenticate = async (
     if (!tokenId) {
       let response: ErrorResponse = {
         success: false,
-        message: "Not provided a token id",
-        error: "Not found token id",
+        message: "Chưa cung cấp ID Session",
+        error: "Chưa cung cấp ID Session",
         statusCode: 403,
         type: SESSION_EXPIRED,
       };
@@ -32,8 +32,8 @@ export const authenticate = async (
     if (!token) {
       let response: ErrorResponse = {
         success: false,
-        message: "Not found token",
-        error: "Not exist token in DB",
+        message: "Không tìm thấy ID Session",
+        error: "Không tìm thấy ID Session",
         statusCode: 403,
         type: SESSION_EXPIRED,
       };
@@ -47,8 +47,8 @@ export const authenticate = async (
     } else {
       let response: ErrorResponse = {
         success: false,
-        message: "Error when verify authenticate",
-        error: "Error when verify authenticate",
+        message: "Xảy ra lỗi khi xác thực",
+        error: "Xảy ra lỗi khi xác thực",
         statusCode: 403,
         type: SESSION_EXPIRED,
       };
@@ -58,8 +58,8 @@ export const authenticate = async (
   } catch (error) {
     let response: ErrorResponse = {
       success: false,
-      message: "Error when verify authenticate",
-      error: "Error when verify authenticate",
+      message: "Xảy ra lỗi khi xác thực",
+      error: "Xảy ra lỗi khi xác thực",
       statusCode: 403,
       type: SESSION_EXPIRED,
     };

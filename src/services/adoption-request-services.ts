@@ -21,7 +21,7 @@ const uploadImage = async (file: Express.Multer.File): Promise<string> => {
         if (error) {
           reject(error);
         } else if (!result) {
-          reject(new Error("Upload failed without a specific error."));
+          reject(new Error("Tải ảnh không thành công"));
         } else {
           resolve(result.url); // Khi upload thành công, trả về URL của ảnh
         }
@@ -65,8 +65,8 @@ export const handleCreateAdoptionRequestService = async ({
     if (!postInfo) {
       return {
         success: false,
-        message: "Pet adoption post not found",
-        error: "Pet adoption post not found",
+        message: "Không tìm thấy bài viết nhận thú cưng",
+        error: "Không tìm thấy bài viết nhận thú cưng",
         statusCode: 404,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -75,8 +75,8 @@ export const handleCreateAdoptionRequestService = async ({
     if (user.id === postInfo.poster._id.toString()) {
       return {
         success: false,
-        message: "Cannot request for post because you is poster",
-        error: "Cannot request",
+        message: "Không thể yêu cầu bởi vì bạn chính là người đăng",
+        error: "Không thể yêu cầu bởi vì bạn chính là người đăng",
         statusCode: 403,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -92,8 +92,8 @@ export const handleCreateAdoptionRequestService = async ({
     if (existingRequest) {
       return {
         success: false,
-        message: "You have already sent an adoption request for this pet",
-        error: "You have already sent an adoption request for this pet",
+        message: "Bạn đã gửi yêu cầu nhận thú cưng này rồi",
+        error: "Bạn đã gửi yêu cầu nhận thú cưng này rồi",
         statusCode: 400,
         type: ERROR_SERVER,
       } as ErrorResponse;
@@ -120,8 +120,8 @@ export const handleCreateAdoptionRequestService = async ({
     const notification = new Notification({
       receiver: postInfo.poster._id.toString(),
       status: "unseen",
-      title: "New request for adopt pet",
-      subtitle: `${user.username} has requested adopt pet`,
+      title: "Yêu cầu mới về việc nhận thú cưng",
+      subtitle: `${user.username} đã yêu cầu nhận thú cưng`,
       moreInfo: `/pet-adoption/request/${petAdoptionPost}`,
     });
 
@@ -137,7 +137,7 @@ export const handleCreateAdoptionRequestService = async ({
     // Return
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Adoption request created successfully",
+      message: "Tạo yêu cầu nhận thú cưng thành công",
       data: newRequest,
       statusCode: 200,
       type: SUCCESS,
@@ -147,8 +147,8 @@ export const handleCreateAdoptionRequestService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to create adoption request",
-      error: "Failed to create adoption request: " + error.message,
+      message: "Xảy ra lỗi khi tạo yêu cầu nhận thú cưng",
+      error: "Xảy ra lỗi khi tạo yêu cầu nhận thú cưng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -179,8 +179,8 @@ export const handleGetAdoptionRequestByPostService = async ({
     if (!post) {
       return {
         success: false,
-        message: "Pet adoption post not found",
-        error: "Pet adoption post not found",
+        message: "Không tìm thấy bài viết nhận thú cưng",
+        error: "Không tìm thấy bài viết nhận thú cưng",
         statusCode: 404,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -189,8 +189,8 @@ export const handleGetAdoptionRequestByPostService = async ({
     if (post.poster._id.toString() !== user.id) {
       return {
         success: false,
-        message: "Unauthorized access",
-        error: "You are not authorized to access these adoption requests",
+        message: "Không có quyền truy cập",
+        error: "Không có quyền truy cập",
         statusCode: 403,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -217,7 +217,7 @@ export const handleGetAdoptionRequestByPostService = async ({
     // Trả về danh sách adoption requests của bài đăng với thông tin phân trang
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Adoption requests retrieved successfully",
+      message: "Lấy các yêu cầu nhận thú cưng thành công",
       data: {
         adoptionRequests,
         totalRequests,
@@ -229,8 +229,9 @@ export const handleGetAdoptionRequestByPostService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Failed to retrieve adoption requests",
-      error: "Failed to retrieve adoption requests: " + error.message,
+      message: "Xảy ra lỗi khi lấy danh sách yêu cầu nhận thú cưng",
+      error:
+        "Xảy ra lỗi khi lấy danh sách yêu cầu nhận thú cưng: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
@@ -266,8 +267,8 @@ export const handleSetAdoptionRequestService = async ({
     if (!request) {
       return {
         success: false,
-        message: "Adoption request not found",
-        error: "Adoption request not found",
+        message: "Không tìm thấy yêu cầu này",
+        error: "Không tìm thấy yêu cầu này",
         statusCode: 404,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -279,8 +280,8 @@ export const handleSetAdoptionRequestService = async ({
     if (petAdoptionPost.poster.toString() !== user.id) {
       return {
         success: false,
-        message: "Unauthorized access",
-        error: "You are not authorized to handle this adoption request",
+        message: "Không có quyền truy cập",
+        error: "Không có quyền truy cập",
         statusCode: 403,
         type: ERROR_CLIENT,
       } as ErrorResponse;
@@ -350,8 +351,10 @@ export const handleSetAdoptionRequestService = async ({
     const notification = new Notification({
       receiver: request.requester._id,
       status: "unseen",
-      title: "Response about adopt pet",
-      subtitle: `${user.username} has ${status} your request`,
+      title: "Phản hồi về việc nhận thú cưng",
+      subtitle: `${user.username} đã ${
+        status === "approved" ? "chấp nhận" : "từ chối"
+      } yêu cầu của bạn`,
       moreInfo: `/pet-adoption/request/${petAdoptionPost._id.toString()}`,
     });
 
@@ -390,7 +393,9 @@ export const handleSetAdoptionRequestService = async ({
 
     const dataResponse: SuccessResponse = {
       success: true,
-      message: `Adoption request ${status} successfully`,
+      message: `${
+        status === "approved" ? "Chấp nhận" : "Từ chối"
+      } yêu cầu nhận thú cưng thành công`,
       data: request,
       statusCode: 200,
       type: SUCCESS,
@@ -399,8 +404,13 @@ export const handleSetAdoptionRequestService = async ({
   } catch (error: any) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: `Failed to ${status} adoption request`,
-      error: `Failed to ${status} adoption request: ` + error.message,
+      message: `Lỗi xảy ra khi ${
+        status === "approved" ? "chấp nhận" : "từ chối"
+      } yêu cầu nhận thú cưng`,
+      error:
+        `Lỗi xảy ra khi ${
+          status === "approved" ? "chấp nhận" : "từ chối"
+        } yêu cầu nhận thú cưng: ` + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

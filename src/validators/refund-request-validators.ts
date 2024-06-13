@@ -1,7 +1,7 @@
 import { body, param } from "express-validator";
 
 export const createRefundRequest = [
-  body("orderId").notEmpty().withMessage("Chưa cung cấp orderId"),
+  body("orderId").notEmpty().withMessage("Chưa cung cấp ID của đơn hàng"),
   body("bankCode")
     .notEmpty()
     .withMessage("Chưa cấp cung codeName của ngân hàng"),
@@ -9,5 +9,5 @@ export const createRefundRequest = [
 ];
 
 export const getRefundRequest = [
-  param("orderId").notEmpty().withMessage("Chưa cung cấp orderId"),
+  param("orderId").notEmpty().withMessage("Chưa cung cấp ID của đơn hàng"),
 ];

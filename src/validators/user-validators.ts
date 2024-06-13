@@ -3,33 +3,35 @@ import { body, param, query } from "express-validator";
 export const changePasswordValidator = [
   body("currentPassword")
     .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long")
+    .withMessage("Mật khẩu hiện tại không hợp lệ")
     .notEmpty()
-    .withMessage("Password is required"),
+    .withMessage("Chưa cung cấp mật khẩu hiện tại"),
   body("newPassword")
     .isLength({ min: 6 })
-    .withMessage("New password must be at least 6 characters long")
+    .withMessage("Mật khẩu mới không hợp lệ")
     .notEmpty()
-    .withMessage("New password is required"),
+    .withMessage("Chưa cung cấp mật khẩu mới"),
 ];
 
 export const updateUserValidator = [
   body("location")
     .optional() // Make location optional
     .isString()
-    .withMessage("Location must be a string")
+    .withMessage("Chưa cung cấp vị trí")
     .custom((value) => {
       // Check if the value matches the pattern "city-district-ward"
       const locationPattern = /^[^\s].*-[^\s].*-[^\s].*$/;
       if (!locationPattern.test(value)) {
-        throw new Error("Location must be formatted as 'city-district-ward'");
+        throw new Error(
+          "Vị trí người dùng cần có định dạng 'city-district-ward'"
+        );
       }
       return true;
     }),
   body("typePet")
     .optional() // Make typePet optional
     .isArray()
-    .withMessage("TypePet must be an array")
+    .withMessage("Loại thú cưng yêu thích cần có dạng mảng")
     .custom((value) => {
       const allowedValues = [
         "dog",
@@ -43,32 +45,32 @@ export const updateUserValidator = [
       ];
       const isValid = value.every((pet: string) => allowedValues.includes(pet));
       if (!isValid) {
-        throw new Error("TypePet array contains invalid values");
+        throw new Error("Loại thú cưng cần là một mảng với các giá trị hợp lệ");
       }
       return true;
     }),
 ];
 
 export const seenNotificationValidator = [
-  param("notificationId").notEmpty().withMessage("notificationId must be a ID"),
+  param("notificationId").notEmpty().withMessage("ID thông báo không hợp lệ"),
 ];
 
 export const likePostValidator = [
-  body("postID").notEmpty().withMessage("Post ID is required"),
+  body("postID").notEmpty().withMessage("ID của bài viết không hợp lệ"),
 ];
 
 export const savePostValidator = [
-  body("postID").notEmpty().withMessage("Post ID is required"),
+  body("postID").notEmpty().withMessage("ID của bài viết không hợp lệ"),
 ];
 
 export const followValidator = [
-  body("peopleID").notEmpty().withMessage("People ID is required"),
+  body("peopleID").notEmpty().withMessage("ID người dùng không hợp lệ"),
 ];
 
 export const searchValidator = [
-  query("query").notEmpty().withMessage("Query is required"),
+  query("query").notEmpty().withMessage("Truy vấn tìm kiếm không hợp lệ"),
 ];
 
 export const addFavoriteProductValidator = [
-  param("productId").notEmpty().withMessage("productId must be a ID"),
+  param("productId").notEmpty().withMessage("ID của sản phẩm không hợp lệ"),
 ];

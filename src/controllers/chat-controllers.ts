@@ -17,7 +17,7 @@ export const handleCreateChat = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -28,8 +28,8 @@ export const handleCreateChat = async (req: RequestCustom, res: Response) => {
   if (!user) {
     return res.status(400).json({
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     });
@@ -40,8 +40,8 @@ export const handleCreateChat = async (req: RequestCustom, res: Response) => {
   if (members.includes(user.id)) {
     const response: ErrorResponse = {
       success: false,
-      message: `Members cannot contain the user's id`,
-      error: `Members cannot contain the user's id`,
+      message: `Mảng danh sách thành viên không hợp lệ`,
+      error: `Mảng danh sách thành viên không hợp lệ`,
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -66,8 +66,8 @@ export const handleGetChat = async (req: RequestCustom, res: Response) => {
   if (!user) {
     return res.status(400).json({
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     });
@@ -89,8 +89,8 @@ export const handleGetDetailChat = async (
   if (!user) {
     return res.status(400).json({
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     });
@@ -99,8 +99,8 @@ export const handleGetDetailChat = async (
   if (!chatId) {
     return res.status(400).json({
       success: false,
-      message: "Not provide chatId",
-      error: "Not provide chatId",
+      message: "Chưa cung cấp ID cuộc trò chuyện",
+      error: "Chưa cung cấp ID cuộc trò chuyện",
       statusCode: 400,
       type: ERROR_CLIENT,
     });
@@ -110,15 +110,15 @@ export const handleGetDetailChat = async (
   if (!check.inChat || check.chat === null) {
     return res.status(400).json({
       success: false,
-      message: "No access to conversations",
-      error: "No access to conversations",
+      message: "Không có quyền truy cập cuộc trò chuyện",
+      error: "Không có quyền truy cập cuộc trò chuyện",
       statusCode: 403,
       type: ERROR_CLIENT,
     });
   } else {
     const dataResponse: SuccessResponse = {
       success: true,
-      message: "Get Detail Chat successfully",
+      message: "Lấy thông tin cuộc trò chuyện thành công",
       data: check.chat,
       statusCode: 200,
       type: SUCCESS,
@@ -132,8 +132,8 @@ export const handleSeen = async (req: RequestCustom, res: Response) => {
   if (!user) {
     return res.status(400).json({
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     });
@@ -142,8 +142,8 @@ export const handleSeen = async (req: RequestCustom, res: Response) => {
   if (!chatId) {
     return res.status(400).json({
       success: false,
-      message: "Not provide chatId",
-      error: "Not provide chatId",
+      message: "Chưa cung cấp ID cuộc trò chuyện",
+      error: "Chưa cung cấp ID cuộc trò chuyện",
       statusCode: 400,
       type: ERROR_CLIENT,
     });
@@ -153,8 +153,8 @@ export const handleSeen = async (req: RequestCustom, res: Response) => {
   if (!check.inChat || check.chat === null) {
     return res.status(400).json({
       success: false,
-      message: "No access to conversations",
-      error: "No access to conversations",
+      message: "Không có quyền truy cập cuộc trò chuyện",
+      error: "Không có quyền truy cập cuộc trò chuyện",
       statusCode: 403,
       type: ERROR_CLIENT,
     });
@@ -178,8 +178,8 @@ export const handleGetMessageChat = async (
   if (!user) {
     return res.status(400).json({
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     });

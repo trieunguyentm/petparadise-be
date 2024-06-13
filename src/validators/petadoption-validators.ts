@@ -12,50 +12,50 @@ export const createPetAdoptioPostValidator = [
       "reptile",
       "other",
     ])
-    .withMessage("typePet is required and must be one of the specified values"),
+    .withMessage("Kiểu thú cưng không hợp lệ"),
   body("reason")
     .isIn(["lost-pet", "your-pet"])
     .withMessage(
-      "Reason create post is required and must be one of the specified values"
+      "Lý do tạo bài đăng là bắt buộc và phải là một trong các giá trị được chỉ định"
     ),
   body("sizePet")
     .optional()
     .isIn(["small", "medium", "big"])
     .withMessage(
-      "Size pet is required and must be one of the specified values"
+      "Kích thước thú cưng là bắt buộc và phải là một trong các giá trị được chỉ định"
     ),
   body("genderPet")
     .optional()
     .isIn(["male", "female"])
-    .withMessage("genderPet, if provided, must be either 'male' or 'female'"),
+    .withMessage("Giới tính thú cưng không hợp lệ"),
   body("location")
     .notEmpty()
-    .withMessage("Location is required")
+    .withMessage("Vị trí không hợp lệ")
     .isString()
-    .withMessage("Location must be a string")
+    .withMessage("Vị trí không hợp lệ")
     .custom((value) => {
       // Check if the value matches the pattern "city-district-ward"
       const locationPattern = /^[^\s].*-[^\s].*-[^\s].*$/;
       if (!locationPattern.test(value)) {
-        throw new Error("Location must be formatted as 'city-district-ward'");
+        throw new Error("Vị trí phải được định dạng là 'city-district-ward'");
       }
       return true;
     }),
   body("description")
     .notEmpty()
-    .withMessage("description is required")
+    .withMessage("Chưa cung cấp mô tả")
     .isString()
-    .withMessage("description must be a string"),
+    .withMessage("Mô tả bài viết không hợp lệ"),
   body("healthInfo")
     .notEmpty()
-    .withMessage("Health info is required")
+    .withMessage("Chưa cung cấp thông tin sức khỏe thú cưng")
     .isString()
-    .withMessage("Health info must be a string"),
+    .withMessage("Thông tin sức khỏe thú cưng không hợp lệ"),
   body("contactInfo")
     .notEmpty()
-    .withMessage("contactInfo is required")
+    .withMessage("Chưa cung cấp thông tin liên hệ")
     .isString()
-    .withMessage("contactInfo must be a string"),
+    .withMessage("Thông tin liên hệ không hợp lệ"),
 ];
 
 export const getPetAdoptionPostBySearchValidator = [
@@ -72,67 +72,67 @@ export const getPetAdoptionPostBySearchValidator = [
       "reptile",
       "other",
     ])
-    .withMessage(
-      "petType must be one of 'all', 'dog', 'cat', 'bird', 'rabbit', 'fish', 'rodents', 'reptile', 'other'"
-    ),
+    .withMessage("Kiểu thú cưng không hợp lệ"),
   query("gender")
     .optional()
     .isIn(["all", "male", "female"])
-    .withMessage("gender must be one of 'all', 'male', or 'female'"),
+    .withMessage("Giới tính tìm kiếm không hợp lệ"),
   query("size")
     .optional()
     .isIn(["all", "small", "medium", "big"])
-    .withMessage("size must be one of 'all', 'small', 'medium', or 'big'"),
+    .withMessage("Kích thước tìm kiếm không hợp lệ"),
   query("location")
     .optional()
     .isString()
-    .withMessage("Location must be a string")
+    .withMessage("Vị trí tìm kiếm không hợp lệ")
     .custom((value) => {
       const locationPattern = /^[^\s]+-[^\s]+-[^\s]+$/;
       if (!locationPattern.test(value)) {
-        throw new Error("Location must be formatted as 'city-district-ward'");
+        throw new Error(
+          "Vị trí tìm kiếm phải có định dạng 'city-district-ward'"
+        );
       }
       return true;
     }),
   query("status")
     .optional()
     .isIn(["all", "available", "adopted"])
-    .withMessage("Status must be one of 'all', 'available', 'adopted'"),
+    .withMessage("Trạng thái bài viết tìm kiếm không hợp lệ"),
   query("reason")
     .optional()
     .isIn(["all", "lost-pet", "your-pet"])
-    .withMessage("Status must be one of 'all', 'lost-pet', 'your-pet'"),
+    .withMessage("Lý do của bài viết tìm kiếm không hợp lệ"),
 ];
 
 export const getPetAdoptionPostByIdValidator = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("ID bài viết không hợp lệ"),
 ];
 
 export const deletePetAdoptionPostByIdValidator = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("ID bài viết không hợp lệ"),
 ];
 
 export const postComment = [
-  body("content").notEmpty().withMessage("Content is required"),
-  body("postId").notEmpty().withMessage("Post Id is required"),
+  body("content").notEmpty().withMessage("Nội dung bình luận không hợp lệ"),
+  body("postId").notEmpty().withMessage("Cần cung cấp ID bài viết"),
 ];
 
 export const getComment = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("ID bài viết không hợp lệ"),
 ];
 
 export const getAdoptedPetOwner = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("ID bài viết không hợp lệ"),
 ];
 
 export const getConfirmByPostValidator = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("ID bài viết không hợp lệ"),
 ];
 
 export const confirmAdoptPet = [
-  param("postId").notEmpty().withMessage("postId must be a ID"),
+  param("postId").notEmpty().withMessage("ID bài viết không hợp lệ"),
   body("confirmed")
     .notEmpty()
     .isBoolean()
-    .withMessage("confirmed must be a boolean"),
+    .withMessage("Xác nhận có kiểu không hợp lệ"),
 ];

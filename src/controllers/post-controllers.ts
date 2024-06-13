@@ -17,7 +17,7 @@ export const handleCreatePost = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -28,8 +28,8 @@ export const handleCreatePost = async (req: RequestCustom, res: Response) => {
   if (!user) {
     return res.status(400).json({
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     });
@@ -72,7 +72,7 @@ export const handleSearchPost = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -84,8 +84,8 @@ export const handleSearchPost = async (req: RequestCustom, res: Response) => {
   if (typeof query !== "string") {
     const response: ErrorResponse = {
       success: false,
-      message: "Query must be a string.",
-      error: "Invalid query parameter",
+      message: "Truy vấn không hợp lệ",
+      error: "Truy vấn không hợp lệ",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -109,7 +109,7 @@ export const handleGetDetailPost = async (
     const response: ErrorResponse = {
       success: false,
       message: `Invalid post id`,
-      error: "Not provide post id",
+      error: "Chưa cung cấp ID bài viết",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -132,7 +132,7 @@ export const handleAddComment = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -143,8 +143,8 @@ export const handleAddComment = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };

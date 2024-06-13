@@ -25,7 +25,7 @@ export const handleCreateProduct = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -36,8 +36,8 @@ export const handleCreateProduct = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -47,8 +47,8 @@ export const handleCreateProduct = async (
   if (files.length === 0 || !files) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide image of product",
-      error: "Not provide image of product",
+      message: "Chưa cung cấp hình ảnh của sản phẩm",
+      error: "Chưa cung cấp hình ảnh của sản phẩm",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -73,8 +73,8 @@ export const handleCreateProduct = async (
   ) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide promotion information",
-      error: "Not provide promotion information",
+      message: "Chưa cung cấp đầy đủ thông tin giảm giá của sản phẩm",
+      error: "Chưa cung cấp đầy đủ thông tin giảm giá của sản phẩm",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -109,7 +109,7 @@ export const handleGetProduct = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -120,8 +120,8 @@ export const handleGetProduct = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -167,7 +167,7 @@ export const handleGetProductById = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -178,8 +178,8 @@ export const handleGetProductById = async (
   if (!productId) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide product Id",
-      error: "Not provide product Id",
+      message: "Chưa cung cấp ID của sản phẩm",
+      error: "Chưa cung cấp ID của sản phẩm",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -203,7 +203,7 @@ export const handleAddToCart = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -214,8 +214,8 @@ export const handleAddToCart = async (req: RequestCustom, res: Response) => {
   if (!productId) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide product Id",
-      error: "Not provide product Id",
+      message: "Chưa cung cấp ID của sản phẩm",
+      error: "Chưa cung cấp ID của sản phẩm",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -226,8 +226,8 @@ export const handleAddToCart = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -251,7 +251,7 @@ export const handleDeleteCart = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -262,8 +262,8 @@ export const handleDeleteCart = async (req: RequestCustom, res: Response) => {
   if (!productId) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide product Id",
-      error: "Not provide product Id",
+      message: "Chưa cung cấp ID của sản phẩm",
+      error: "Chưa cung cấp ID của sản phẩm",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -274,8 +274,8 @@ export const handleDeleteCart = async (req: RequestCustom, res: Response) => {
   if (!user) {
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -298,7 +298,7 @@ export const handleEditProduct = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -310,8 +310,8 @@ export const handleEditProduct = async (req: RequestCustom, res: Response) => {
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -321,8 +321,8 @@ export const handleEditProduct = async (req: RequestCustom, res: Response) => {
   if (files.length === 0 || !files) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide image of product",
-      error: "Not provide image of product",
+      message: "Chưa cung cấp hình ảnh của sản phẩm",
+      error: "Chưa cung cấp hình ảnh của sản phẩm",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -347,8 +347,8 @@ export const handleEditProduct = async (req: RequestCustom, res: Response) => {
   ) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide promotion information",
-      error: "Not provide promotion information",
+      message: "Chưa cung cấp đầy đủ thông tin giảm giá của sản phẩm",
+      error: "Chưa cung cấp đầy đủ thông tin giảm giá của sản phẩm",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -388,7 +388,7 @@ export const handleDeleteProduct = async (
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -400,8 +400,8 @@ export const handleDeleteProduct = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -428,8 +428,8 @@ export const handleGetPurchasedOrder = async (
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -450,8 +450,8 @@ export const handleGetMyOrder = async (req: RequestCustom, res: Response) => {
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -473,7 +473,7 @@ export const handleSetOrder = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -485,8 +485,8 @@ export const handleSetOrder = async (req: RequestCustom, res: Response) => {
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
@@ -512,7 +512,7 @@ export const handleConfirmOrder = async (req: RequestCustom, res: Response) => {
   if (!errors.isEmpty()) {
     const response: ErrorResponse = {
       success: false,
-      message: `Invalid data: ${errors.array()[0].msg}`,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
       error: errors.array()[0].msg,
       statusCode: 400,
       type: ERROR_CLIENT,
@@ -524,8 +524,8 @@ export const handleConfirmOrder = async (req: RequestCustom, res: Response) => {
   if (!user) {
     const response: ErrorResponse = {
       success: false,
-      message: "Not provide user",
-      error: "Not provide user",
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
       statusCode: 400,
       type: ERROR_CLIENT,
     };
