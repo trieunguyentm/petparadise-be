@@ -172,7 +172,7 @@ export const handleUpdateService = async ({
   user: { id: string; username: string; email: string };
   file: Express.Multer.File | undefined;
   location: string | undefined;
-  typePet: TypePet[];
+  typePet: TypePet[] | undefined;
 }) => {
   try {
     await connectMongoDB();
@@ -190,7 +190,7 @@ export const handleUpdateService = async ({
       }
     }
     // Handle pet type update
-    if (typePet.length > 0) {
+    if (typePet && typePet.length > 0) {
       updates.petTypeFavorites = typePet;
     }
     // Perform update if there are any changes
