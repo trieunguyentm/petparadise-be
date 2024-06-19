@@ -18,6 +18,7 @@ export interface IProductDocument extends mongoose.Document {
     | "accessories"
     | "housing"
     | "training"
+    | "service"
     | "other";
   stock: number; // Số lượng sản phẩm
   createdAt: Date;
@@ -45,6 +46,7 @@ const productSchema = new Schema<IProductDocument>(
         "accessories",
         "housing",
         "training",
+        "service",
         "other",
       ],
     },

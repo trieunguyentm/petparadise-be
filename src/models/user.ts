@@ -4,6 +4,7 @@ import { ILostPetPostDocument } from "./lost-pet-post";
 import { IPetAdoptionPostDocument } from "./pet-adoption-post";
 import { TypePet } from "../types";
 import { IProductDocument } from "./product";
+import { IWithdrawalHistory } from "./withdrawal-history";
 
 export interface ICartItem {
   product: IProductDocument;
@@ -30,6 +31,7 @@ export interface IUserDocument extends mongoose.Document {
   favoriteProducts: IProductDocument[];
   role: "user" | "admin";
   accountBalance: number;
+  withdrawalHistory: IWithdrawalHistory[];
   updatedAt: Date;
   createdAt: Date;
 }
@@ -93,6 +95,13 @@ const userSchema = new mongoose.Schema<IUserDocument>(
     ],
     role: { type: String, enum: ["user", "admin"], default: "user" },
     accountBalance: { type: Number, default: 0 },
+    withdrawalHistory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "WithdrawalHistory",
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,

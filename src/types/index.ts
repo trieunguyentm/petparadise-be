@@ -56,4 +56,5 @@ export type ProductType =
   | "accessories"
   | "housing"
   | "training"
+  | "service"
   | "other";

@@ -21,6 +21,7 @@ export const createProductValidator = [
       "accessories",
       "housing",
       "training",
+      "service",
       "other",
     ])
     .withMessage("Loại sản phẩm không hợp lệ"),
@@ -68,6 +69,7 @@ export const getProductValidator = [
       "accessories",
       "housing",
       "training",
+      "service",
       "other",
     ])
     .withMessage("Loại sản phẩm không hợp lệ"),
@@ -120,6 +122,7 @@ export const editProductValidator = [
       "accessories",
       "housing",
       "training",
+      "service",
       "other",
     ])
     .withMessage("Loại sản phẩm không hợp lệ"),
