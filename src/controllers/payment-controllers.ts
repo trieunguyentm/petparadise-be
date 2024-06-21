@@ -44,7 +44,7 @@ export const handleCreatePaymentLink = async (
   /** Lấy các thông tin như sellerId, products, buyerNote, checkoutData để tạo Payment Link */
   const sellerId = req.body.sellerId as string;
   const products = req.body.listItem.products as {
-    product: IProductDocument[];
+    product: IProductDocument;
     quantity: number;
   }[];
   const buyerNote = req.body.buyerNote as string | undefined;
@@ -91,13 +91,35 @@ export const handleReceiveHook = async (req: RequestCustom, res: Response) => {
           .populate({
             path: "products.product",
             model: Product,
-            select: "name price",
+            select: "name price stock",
           })
           .exec();
 
         if (!order) {
           return res.json();
         }
+
+        /** Cập nhật số lượng sản phẩm trong kho */
+        const productUpdatePromises = order.products.map(
+          async (orderProduct) => {
+            const product = orderProduct.product;
+            const quantity = orderProduct.quantity;
+
+            // Trừ đi số lượng sản phẩm
+            product.stock -= quantity;
+
+            // Kiểm tra nếu số lượng sản phẩm còn lại là âm
+            if (product.stock < 0) {
+              product.stock = 0; // Đảm bảo số lượng sản phẩm không âm
+            }
+
+            // Lưu lại sản phẩm đã cập nhật
+            await product.save();
+          }
+        );
+
+        // Chờ tất cả các sản phẩm được cập nhật
+        await Promise.all(productUpdatePromises);
 
         /** Cập nhật order */
         order.status = "processed";
@@ -112,7 +134,7 @@ export const handleReceiveHook = async (req: RequestCustom, res: Response) => {
           },
         });
         /** Return */
-        return res.status(200).json({ message: "Đơn hàng đã được cập nhập" });
+        return res.status(200).json({ message: "Đơn hàng đã được cập nhật" });
       } catch (error: any) {
         console.log("Error when update order:", error.message);
         return res.json();

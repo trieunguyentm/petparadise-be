@@ -1,6 +1,6 @@
 import { CheckoutRequestType, WebhookDataType } from "@payos/node/lib/type";
 import { ErrorResponse, RequestCustom, SuccessResponse } from "../types";
-import { ERROR_SERVER, SUCCESS } from "../constants";
+import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import dotenv from "dotenv";
 import PayOS from "@payos/node";
 import { IProductDocument } from "../models/product";
@@ -24,11 +24,24 @@ export const handleCreatePaymentLinkService = async ({
 }: {
   user: { id: string; username: string; email: string };
   sellerId: string;
-  products: { product: IProductDocument[]; quantity: number }[];
+  products: { product: IProductDocument; quantity: number }[];
   buyerNote: string | undefined;
   checkoutData: CheckoutRequestType;
 }) => {
   try {
+    /** Kiểm tra số lượng sản phẩm */
+    for (let i = 0; i < products.length; i++) {
+      if (products[i].quantity > products[i].product.stock) {
+        const dataResponse: ErrorResponse = {
+          success: false,
+          message: `Sản phẩm ${products[i].product.name} chỉ còn ${products[i].product.stock} sản phẩm.`,
+          error: `Sản phẩm ${products[i].product.name} chỉ còn ${products[i].product.stock} sản phẩm.`,
+          statusCode: 404,
+          type: ERROR_CLIENT,
+        };
+        return dataResponse;
+      }
+    }
     /** Tạo Link thanh toán */
     const paymentLink = await payos.createPaymentLink(checkoutData);
 
