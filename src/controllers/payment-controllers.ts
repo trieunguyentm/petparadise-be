@@ -5,6 +5,7 @@ import { ERROR_CLIENT } from "../constants";
 import { CheckoutRequestType, WebhookDataType } from "@payos/node/lib/type";
 import {
   handleCreatePaymentLinkService,
+  handleDirectPaymentService,
   handleVerifyPaymentWebhook,
 } from "../services/payment-services";
 import Product, { IProductDocument } from "../models/product";
@@ -121,7 +122,7 @@ export const handleReceiveHook = async (req: RequestCustom, res: Response) => {
         // Chờ tất cả các sản phẩm được cập nhật
         await Promise.all(productUpdatePromises);
 
-        /** Cập nhật order */
+        /** Cập nhật order thành trạng thái đã thanh toán */
         order.status = "processed";
         await order.save();
         /** Thêm nhiệm vụ gửi thông báo vào hàng đợi */
@@ -145,5 +146,57 @@ export const handleReceiveHook = async (req: RequestCustom, res: Response) => {
   } catch (error: any) {
     console.log("Error Receive Hook:", error.message);
     return res.json();
+  }
+};
+
+export const handleDirectPayment = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  // Kiểm tra kết quả validation
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
+      error: errors.array()[0].msg,
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  // Kiểm tra người dùng
+  const { user } = req;
+  if (!user) {
+    const response: ErrorResponse = {
+      success: false,
+      message: "Chưa cung cấp người dùng",
+      error: "Chưa cung cấp người dùng",
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  /** Lấy các thông tin như sellerId, products, buyerNote, checkoutData để tạo Payment Link */
+  const sellerId = req.body.sellerId as string;
+  const products = req.body.listItem.products as {
+    product: IProductDocument;
+    quantity: number;
+  }[];
+  const buyerNote = req.body.buyerNote as string | undefined;
+  const checkoutData = req.body.checkoutData as CheckoutRequestType;
+  const result = await handleDirectPaymentService({
+    user,
+    sellerId,
+    products,
+    buyerNote,
+    checkoutData,
+  });
+
+  // Check the result and respond accordingly
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
   }
 };

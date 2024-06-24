@@ -1,6 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { IUserDocument } from "./user";
 import { IAdoptionRequestDocument } from "./adoption-request";
+import { IPetAdoptionCommentDocument } from "./pet-adoption-comment";
 
 export interface IPetAdoptionPostDocument extends mongoose.Document {
   poster: IUserDocument; // Người đăng bài
@@ -21,7 +22,7 @@ export interface IPetAdoptionPostDocument extends mongoose.Document {
   healthInfo: string; // Thông tin sức khỏe thú cưng
   description: string; // Mô tả chi tiết thú cưng và lí do tìm chủ mới
   likes: IUserDocument[];
-  comments: mongoose.Schema.Types.ObjectId[];
+  comments: IPetAdoptionCommentDocument[];
   location: string; // Vị trí hiện tại của thú cưng
   images: string[]; // Các hình ảnh của thú cưng
   contactInfo: string; // Thông tin liên lạc để liên hệ

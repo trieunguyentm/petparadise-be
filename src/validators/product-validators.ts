@@ -169,7 +169,7 @@ export const setOrderValidator = [
   body("status")
     .notEmpty()
     .withMessage("Trạng thái đơn hàng là bắt buộc")
-    .isIn(["processed", "shipped", "delivered", "cancelled"])
+    .isIn(["processed", "offline", "shipped", "delivered", "cancelled"])
     .withMessage("Trạng thái đơn hàng không hợp lệ"),
 ];
 

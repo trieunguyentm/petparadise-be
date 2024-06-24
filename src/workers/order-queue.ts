@@ -59,14 +59,17 @@ const handleUpdateStatusOrder = async (data: { orderId: string }) => {
     if (order.status === "delivered" && daysDiff >= 7) {
       order.status = "success";
       await order.save();
+      // Nếu kiểu thanh toán là "online" thì cộng số dư
+      if (order.typePayment === "online") {
+        // Update the seller's account balance
+        const seller = (await User.findById(order.seller._id)) as IUserDocument;
 
-      // Update the seller's account balance
-      const seller = (await User.findById(order.seller._id)) as IUserDocument;
+        // Cập nhật số dư tài khoản của người bán
+        seller.accountBalance =
+          (seller.accountBalance || 0) + order.totalAmount;
 
-      // Cập nhật số dư tài khoản của người bán
-      seller.accountBalance = (seller.accountBalance || 0) + order.totalAmount;
-
-      await seller.save();
+        await seller.save();
+      }
 
       // Gửi email thông báo đơn hàng thành công
       const emailBody = generateOrderSuccessMail(

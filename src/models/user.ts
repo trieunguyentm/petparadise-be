@@ -5,6 +5,7 @@ import { IPetAdoptionPostDocument } from "./pet-adoption-post";
 import { TypePet } from "../types";
 import { IProductDocument } from "./product";
 import { IWithdrawalHistory } from "./withdrawal-history";
+import { IChatDocument } from "./chat";
 
 export interface ICartItem {
   product: IProductDocument;
@@ -26,7 +27,7 @@ export interface IUserDocument extends mongoose.Document {
   likedPosts: IPostDocument[];
   followers: IUserDocument[];
   following: IUserDocument[];
-  chats: mongoose.Schema.Types.ObjectId[];
+  chats: IChatDocument[];
   cart: ICartItem[];
   favoriteProducts: IProductDocument[];
   role: "user" | "admin";

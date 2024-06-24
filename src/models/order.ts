@@ -17,8 +17,10 @@ export interface IOrderDocument extends mongoose.Document {
   buyerPhone?: string;
   buyerAddress?: string;
   buyerNote?: string;
+  typePayment: "offline" | "online";
   status:
     | "pending"
+    | "offline"
     | "processed"
     | "shipped"
     | "delivered"
@@ -58,10 +60,16 @@ const orderSchema = new Schema<IOrderDocument>(
     buyerPhone: { type: String, default: "" },
     buyerAddress: { type: String, default: "" },
     buyerNote: { type: String, default: "" },
+    typePayment: {
+      type: String,
+      enum: ["offline", "online"],
+      required: true,
+    },
     status: {
       type: String,
       enum: [
         "pending",
+        "offline",
         "processed",
         "shipped",
         "delivered",

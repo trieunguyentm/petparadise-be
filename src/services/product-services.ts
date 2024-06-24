@@ -652,7 +652,7 @@ export const handleSetOrderService = async ({
 }: {
   user: { username: string; email: string; id: string };
   orderId: string;
-  status: "processed" | "shipped" | "delivered" | "cancelled";
+  status: "processed" | "offline" | "shipped" | "delivered" | "cancelled";
 }) => {
   try {
     await connectMongoDB();
@@ -695,7 +695,7 @@ export const handleSetOrderService = async ({
       };
       return dataResponse;
     }
-    /** Kiểm tra tình trạng đơn hàng xem đã thành công hoặc từ chối thì không được đổi */
+    /** Kiểm tra tình trạng đơn hàng đang pending thì không thể thay đổi */
     if (order.status === "pending") {
       let dataResponse: ErrorResponse = {
         success: false,
@@ -706,6 +706,7 @@ export const handleSetOrderService = async ({
       };
       return dataResponse;
     }
+    /** Kiểm tra tình trạng đơn hàng xem đã thành công hoặc từ chối thì không được đổi */
     if (order.status === "cancelled" || order.status === "success") {
       let dataResponse: ErrorResponse = {
         success: false,
@@ -716,6 +717,24 @@ export const handleSetOrderService = async ({
       };
       return dataResponse;
     }
+    /** Nếu đơn hàng là offline thì chỉ chấp nhận việc hủy hoặc đã giao hàng */
+    if (
+      order.typePayment === "offline" &&
+      status !== "cancelled" &&
+      status !== "delivered"
+    ) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message:
+          "Không thể cập nhật trạng thái đơn hàng offline thành trạng thái này",
+        error:
+          "Không thể cập nhật trạng thái đơn hàng offline thành trạng thái này",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
     /** Lưu trạng thái đơn hàng */
     order.status = status;
     await order.save();
@@ -726,7 +745,8 @@ export const handleSetOrderService = async ({
     }
 
     const converStatusToText = {
-      cancelled: "bị hủy",
+      cancelled: "đã bị hủy",
+      offline: "sẽ được thanh toán trực tiếp",
       processed: "đã được thanh toán",
       shipped: "đang được giao",
       delivered: "đã được giao tới",
@@ -866,22 +886,26 @@ export const handleConfirmOrderService = async ({
       order.status = "success";
       await order.save();
 
-      // Update the seller's account balance
-      const seller = await User.findById(order.seller._id);
-      if (!seller) {
-        let dataResponse: ErrorResponse = {
-          success: false,
-          message: "Không tìm thấy người bán",
-          error: "Không tìm thấy người bán",
-          statusCode: 404,
-          type: ERROR_CLIENT,
-        };
-        return dataResponse;
-      }
-      // Cập nhật số dư tài khoản của người bán
-      seller.accountBalance = (seller.accountBalance || 0) + order.totalAmount;
+      // Nếu là thanh toán online thì cập nhật số dư
+      if (order.typePayment === "online") {
+        // Update the seller's account balance
+        const seller = await User.findById(order.seller._id);
+        if (!seller) {
+          let dataResponse: ErrorResponse = {
+            success: false,
+            message: "Không tìm thấy người bán",
+            error: "Không tìm thấy người bán",
+            statusCode: 404,
+            type: ERROR_CLIENT,
+          };
+          return dataResponse;
+        }
+        // Cập nhật số dư tài khoản của người bán
+        seller.accountBalance =
+          (seller.accountBalance || 0) + order.totalAmount;
 
-      await seller.save();
+        await seller.save();
+      }
 
       // Gửi email thông báo đơn hàng thành công
       emailBody = generateOrderSuccessMail(
@@ -895,7 +919,12 @@ export const handleConfirmOrderService = async ({
       );
       await sendEmail(order.buyer.email, "Đơn hàng thành công", emailBody);
     } else if (typeConfirm === "cancel") {
-      order.status = "processed";
+      if (order.typePayment === "online") {
+        order.status = "processed";
+      } else {
+        order.status = "offline";
+      }
+
       await order.save();
 
       // Gửi email thông báo cho người bán kiểm tra đơn hàng

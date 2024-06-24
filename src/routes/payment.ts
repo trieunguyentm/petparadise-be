@@ -15,4 +15,10 @@ paymentRoute.post(
   paymentControllers.handleCreatePaymentLink
 );
 
+paymentRoute.post(
+  "/direct-payment",
+  validators.directPaymentValidator,
+  paymentControllers.handleDirectPayment
+);
+
 export default paymentRoute;
