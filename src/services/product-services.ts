@@ -756,7 +756,7 @@ export const handleSetOrderService = async ({
     const buyerNotification = new Notification({
       receiver: order.buyer._id.toString(),
       status: "unseen",
-      title: `Đơn hàng ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+      title: `Đơn hàng ${converStatusToText[status]}`,
       subtitle: `Đơn hàng của bạn #${order.orderCode} ${converStatusToText[status]}.`,
       content: `Đơn hàng của bạn #${order.orderCode} ${converStatusToText[status]}.`,
       moreInfo: `/store/purchased-order`,
