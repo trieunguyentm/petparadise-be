@@ -88,8 +88,7 @@ export const handleRegister = async (req: Request, res: Response) => {
     res.cookie("verify-otp", result.data?.id, {
       maxAge: 300 * 1000,
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
     });
     return res.status(result.statusCode).json(result);
   }
@@ -115,8 +114,7 @@ export const handleResendVerifyOTP = async (req: Request, res: Response) => {
     res.cookie("verify-otp", result.data?.newKey, {
       maxAge: 300 * 1000,
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
     });
     return res.status(result.statusCode).json(result);
   }
@@ -186,8 +184,7 @@ export const handleRecoveryPassword = async (req: Request, res: Response) => {
     res.cookie("verify-otp-recovery", result.data?.id, {
       maxAge: 300 * 1000,
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
     });
     return res.status(result.statusCode).json(result);
   }
@@ -218,8 +215,7 @@ export const handleResendVerifyOTPRecovery = async (
     res.cookie("verify-otp-recovery", result.data?.newKey, {
       maxAge: 300 * 1000,
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
     });
     return res.status(result.statusCode).json(result);
   }
@@ -269,8 +265,7 @@ export const handleVerifyOTPRecovery = async (req: Request, res: Response) => {
     res.cookie("confirm-password", result.data?.id, {
       maxAge: 300 * 1000,
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
     });
     return res.status(result.statusCode).json(result);
   }
@@ -338,8 +333,7 @@ export const handleLogin = async (req: Request, res: Response) => {
     res.cookie("t", result.data.jti, {
       maxAge: jwtHelper.getExpiryDurationToken(result.data.token) * 1000,
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
     });
     // Delete Key refreshToken and accessToken Before Return
     if (result.data.token) {
