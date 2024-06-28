@@ -114,7 +114,7 @@ export const handleResendVerifyOTP = async (req: Request, res: Response) => {
     res.cookie("verify-otp", result.data?.newKey, {
       maxAge: 300 * 1000,
       httpOnly: true,
-      secure: true,
+      secure: false,
     });
     return res.status(result.statusCode).json(result);
   }
@@ -215,7 +215,7 @@ export const handleResendVerifyOTPRecovery = async (
     res.cookie("verify-otp-recovery", result.data?.newKey, {
       maxAge: 300 * 1000,
       httpOnly: true,
-      secure: true,
+      secure: false,
     });
     return res.status(result.statusCode).json(result);
   }
