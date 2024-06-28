@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/index.js",
     "dev": "concurrently \"nodemon src/index.ts\" \"nodemon --exec ts-node src/workers/notification-queue.ts\" \"nodemon --exec ts-node src/workers/order-queue.ts\""
