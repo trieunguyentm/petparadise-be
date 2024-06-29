@@ -72,4 +72,10 @@ userRoute.post(
 
 userRoute.get("/favorite-product", userControllers.handleGetFavoriteProduct);
 
+userRoute.get(
+  "/detail-info/:username",
+  validators.getDetailInfoValidator,
+  userControllers.handleGetDetailInfoPeople
+);
+
 export default userRoute;

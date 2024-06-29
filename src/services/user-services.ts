@@ -973,3 +973,56 @@ export const handleGetFavoriteProductService = async ({
     return dataResponse;
   }
 };
+
+export const handleGetDetailInfoPeopleService = async ({
+  username,
+}: {
+  username: string;
+}) => {
+  try {
+    await connectMongoDB();
+    const peopleInfo = await User.findOne({ username: username })
+      .populate({
+        path: "posts",
+        model: Post,
+        populate: {
+          path: "poster",
+          model: User,
+          select: "username email profileImage",
+        },
+      })
+      .select(
+        "posts username profileImage petTypeFavorites address followers following"
+      )
+      .exec();
+
+    if (!peopleInfo) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Không tìm thấy người dùng",
+        error: "Không tìm thấy người dùng",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Lấy thông tin người dùng thành công",
+      data: peopleInfo,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi lấy thông tin người dùng",
+      error: "Xảy ra lỗi khi lấy thông tin người dùng: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};

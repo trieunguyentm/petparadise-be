@@ -74,3 +74,7 @@ export const searchValidator = [
 export const addFavoriteProductValidator = [
   param("productId").notEmpty().withMessage("ID của sản phẩm không hợp lệ"),
 ];
+
+export const getDetailInfoValidator = [
+  param("username").notEmpty().withMessage("Tên người dùng không hợp lệ"),
+];
