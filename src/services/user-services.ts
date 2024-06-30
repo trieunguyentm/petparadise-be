@@ -13,6 +13,7 @@ import { pusherServer } from "../utils/pusher";
 import { Stream } from "stream";
 import Product from "../models/product";
 import Report from "../models/report";
+import WithdrawalHistory from "../models/withdrawal-history";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -1080,6 +1081,82 @@ export const handleCreateReportService = async ({
       success: false,
       message: "Xảy ra lỗi khi tạo báo cáo vi phạm",
       error: "Xảy ra lỗi khi tạo báo cáo vi phạm: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleCreateRequestDrawMoneyService = async ({
+  user,
+  amount,
+  bankCode,
+  accountNumber,
+  accountName,
+}: {
+  user: { username: string; email: string; id: string };
+  amount: number;
+  bankCode: string;
+  accountNumber: string;
+  accountName: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Kiểm tra số tiền muốn rút
+    const userDocument = await User.findById(user.id);
+    if (!userDocument) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Người dùng không tồn tại",
+        error: "Người dùng không tồn tại",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    if (amount <= 0 || amount !== userDocument.accountBalance) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Số tiền rút không hợp lệ",
+        error: "Số tiền rút không hợp lệ",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Tạo yêu cầu rút tiền
+    const newWithdrawalRequest = new WithdrawalHistory({
+      user: userDocument._id,
+      amount,
+      bankCode,
+      accountNumber,
+      accountName,
+      status: "pending",
+    });
+
+    await newWithdrawalRequest.save();
+
+    // Trừ số tiền khỏi tài khoản của người dùng
+    userDocument.accountBalance -= amount;
+    await userDocument.save();
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Yêu cầu rút tiền đã được tạo thành công",
+      data: newWithdrawalRequest,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi tạo yêu cầu hoàn tiền:",
+      error: "Xảy ra lỗi khi tạo yêu cầu nhận tiền: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

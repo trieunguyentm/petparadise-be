@@ -5,6 +5,9 @@ export interface IWithdrawalHistory extends mongoose.Document {
   user: IUserDocument;
   amount: number;
   status: "pending" | "completed" | "failed";
+  bankCode: string;
+  accountNumber: string;
+  accountName?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,6 +21,9 @@ const withdrawalHistorySchema = new mongoose.Schema<IWithdrawalHistory>(
       enum: ["pending", "completed", "failed"],
       default: "pending",
     },
+    bankCode: { type: String, required: true },
+    accountNumber: { type: String, required: true },
+    accountName: { type: String, default: "" },
   },
   { timestamps: true }
 );

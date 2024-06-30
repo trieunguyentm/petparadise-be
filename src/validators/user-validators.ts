@@ -85,3 +85,12 @@ export const createReportValidator = [
     .notEmpty()
     .withMessage("Chưa cung cấp đường dẫn nội dung vi phạm"),
 ];
+
+export const createRequestDrawMoneyValidator = [
+  body("amount").isNumeric().withMessage("Số tiền không hợp lệ"),
+  body("bankCode")
+    .notEmpty()
+    .withMessage("Chưa cấp cung codeName của ngân hàng"),
+  body("accountNumber").notEmpty().withMessage("Chưa cấp cấp số tài khoản"),
+  body("accountName").notEmpty().withMessage("Chưa cung cấp tên chủ tài khoản"),
+];

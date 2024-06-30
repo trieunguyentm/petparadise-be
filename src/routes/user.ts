@@ -84,4 +84,10 @@ userRoute.post(
   userControllers.handleCreateReport
 );
 
+userRoute.post(
+  "/create-request-draw-money",
+  validators.createRequestDrawMoneyValidator,
+  userControllers.handleCreateRequestDrawMoney
+);
+
 export default userRoute;
