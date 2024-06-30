@@ -78,3 +78,10 @@ export const addFavoriteProductValidator = [
 export const getDetailInfoValidator = [
   param("username").notEmpty().withMessage("Tên người dùng không hợp lệ"),
 ];
+
+export const createReportValidator = [
+  body("description").notEmpty().withMessage("Chưa cung cấp mô tả vi phạm"),
+  body("link")
+    .notEmpty()
+    .withMessage("Chưa cung cấp đường dẫn nội dung vi phạm"),
+];

@@ -12,6 +12,7 @@ import Notification from "../models/notification";
 import { pusherServer } from "../utils/pusher";
 import { Stream } from "stream";
 import Product from "../models/product";
+import Report from "../models/report";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -1020,6 +1021,65 @@ export const handleGetDetailInfoPeopleService = async ({
       success: false,
       message: "Xảy ra lỗi khi lấy thông tin người dùng",
       error: "Xảy ra lỗi khi lấy thông tin người dùng: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleCreateReportService = async ({
+  user,
+  description,
+  link,
+}: {
+  user: { username: string; email: string; id: string };
+  description: string;
+  link: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Kiểm tra xem đã tồn tại báo cáo với cùng reporter và link chưa
+    const existingReport = await Report.findOne({
+      reporter: user.id,
+      link,
+    });
+
+    if (existingReport) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Bạn đã báo cáo rồi",
+        error: "Báo đã báo cáo rồi",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Tạo báo cáo mới
+    const newReport = new Report({
+      reporter: user.id,
+      description,
+      link,
+      status: "pending",
+    });
+
+    await newReport.save();
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Báo cáo vi phạm đã được tạo thành công",
+      data: newReport,
+      statusCode: 201,
+      type: "SUCCESS",
+    };
+    return dataResponse;
+  } catch (error: any) {
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi tạo báo cáo vi phạm",
+      error: "Xảy ra lỗi khi tạo báo cáo vi phạm: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

@@ -78,4 +78,10 @@ userRoute.get(
   userControllers.handleGetDetailInfoPeople
 );
 
+userRoute.post(
+  "/create-report",
+  validators.createReportValidator,
+  userControllers.handleCreateReport
+);
+
 export default userRoute;
