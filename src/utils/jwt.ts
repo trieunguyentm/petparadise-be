@@ -8,16 +8,19 @@ export const generateToken = ({
   username,
   email,
   id,
+  role,
 }: {
-  username?: string;
-  email?: string;
-  id?: string;
+  username: string;
+  email: string;
+  id: string;
+  role: string;
 }) => {
   // Payload
   const tokenPayload = {
     id,
     username,
     email,
+    role,
   };
   // Id cho token
   const jti = v4();

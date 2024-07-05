@@ -676,6 +676,7 @@ export const handleLoginService = async ({
       username: user.username,
       email: user.email,
       id: user._id.toString(),
+      role: user.role,
     });
     // Connect Redis
     const client = await connectRedis();

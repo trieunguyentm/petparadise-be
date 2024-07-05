@@ -987,11 +987,22 @@ export const handleGetDetailInfoPeopleService = async ({
       .populate({
         path: "posts",
         model: Post,
-        populate: {
-          path: "poster",
-          model: User,
-          select: "username email profileImage",
-        },
+        populate: [
+          {
+            path: "poster",
+            model: User,
+            select: "username email profileImage",
+          },
+          {
+            path: "comments",
+            model: CommentModel,
+            populate: {
+              path: "poster",
+              model: User,
+              select: "username email profileImage",
+            },
+          },
+        ],
       })
       .select(
         "posts username profileImage petTypeFavorites address followers following"
