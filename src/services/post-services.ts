@@ -223,8 +223,8 @@ export const handleGetDetailPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Xảy ra lỗi khi tải bài viết",
-      error: "Xảy ra lỗi khi tải bài viết: " + error.message,
+      message: "Xảy ra lỗi khi tạo bài viết",
+      error: "Xảy ra lỗi khi tạo bài viết",
       statusCode: 500,
       type: ERROR_SERVER,
     };

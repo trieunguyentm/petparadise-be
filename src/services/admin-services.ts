@@ -1,6 +1,7 @@
-import { ERROR_SERVER } from "../constants";
+import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
 import { connectRedis } from "../db/redis";
+import Post from "../models/post";
 import User from "../models/user";
 import { ErrorResponse, SuccessResponse } from "../types";
 import { sendEmail } from "../utils/mailer";
@@ -69,6 +70,62 @@ export const handleBanUserService = async ({
       success: false,
       message: "Xảy ra lỗi khi khóa tài khoản người dùng",
       error: "Xảy ra lỗi khi khóa tài khoản người dùng: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleDeletePostService = async ({
+  user,
+  postId,
+}: {
+  user: { username: string; id: string; email: string };
+  postId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Tìm bài viết dựa trên postId
+    const post = await Post.findById(postId).populate("poster");
+
+    // Kiểm tra xem bài viết có tồn tại không
+    if (!post) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Bài viết không tồn tại",
+        error: "Bài viết không tồn tại",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Xóa bài viết
+    await Post.findByIdAndDelete(postId);
+
+    // Xóa postId khỏi mảng posts của người đăng bài (poster)
+    const poster = await User.findById(post.poster._id);
+    if (poster) {
+      poster.posts = poster.posts.filter((id) => id.toString() !== postId);
+      await poster.save();
+    }
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Xóa bài viết thành công",
+      data: "Xóa bài viết thành công",
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi xóa bài viết",
+      error: "Xảy ra lỗi khi xóa bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

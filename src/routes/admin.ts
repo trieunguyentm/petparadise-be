@@ -13,4 +13,10 @@ adminRoute.post(
   adminControllers.handleBanUser
 );
 
+adminRoute.delete(
+  "/delete-post/:postId",
+  validators.deletePostValidator,
+  adminControllers.handleDeletePost
+);
+
 export default adminRoute;
