@@ -15,8 +15,16 @@ adminRoute.post(
 
 adminRoute.delete(
   "/delete-post/:postId",
-  validators.deletePostValidator,
+  validators.deleteReportValidator,
   adminControllers.handleDeletePost
+);
+
+adminRoute.get("/get-report", adminControllers.handleGetReport);
+
+adminRoute.put(
+  "/update-report",
+  validators.updateReportValidator,
+  adminControllers.handleUpdateReport
 );
 
 export default adminRoute;

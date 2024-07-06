@@ -125,8 +125,8 @@ export const handleGetPostService = async ({
     console.log(error);
     let dataResponse: ErrorResponse = {
       success: false,
-      message: "Xảy ra lỗi khi tạo bài viết",
-      error: "Xảy ra lỗi khi tạo bài viết: " + error.message,
+      message: "Xảy ra lỗi khi lấy bài viết",
+      error: "Xảy ra lỗi khi lấy bài viết: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

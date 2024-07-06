@@ -2,6 +2,7 @@ import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
 import { connectRedis } from "../db/redis";
 import Post from "../models/post";
+import Report from "../models/report";
 import User from "../models/user";
 import { ErrorResponse, SuccessResponse } from "../types";
 import { sendEmail } from "../utils/mailer";
@@ -126,6 +127,114 @@ export const handleDeletePostService = async ({
       success: false,
       message: "Xảy ra lỗi khi xóa bài viết",
       error: "Xảy ra lỗi khi xóa bài viết: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetReportService = async ({
+  limit,
+  offset,
+}: {
+  limit: number;
+  offset: number;
+}) => {
+  try {
+    await connectMongoDB();
+
+    const reports = await Report.find()
+      .skip(offset)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "reporter",
+        model: User,
+        select: "username email profileImage",
+      })
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Lấy thông tin báo cáo thành công",
+      data: reports,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi lấy báo cáo",
+      error: "Xảy ra lỗi khi lấy báo cáo: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleUpdateReportService = async ({
+  newStatus,
+  reportId,
+}: {
+  newStatus: "pending" | "reviewing" | "resolved";
+  reportId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Tìm báo cáo dựa trên reportId
+    const report = await Report.findById(reportId)
+      .populate({
+        path: "reporter",
+        model: Report,
+        select: "username email profileImage",
+      })
+      .exec();
+
+    // Kiểm tra xem báo cáo có tồn tại hay không
+    if (!report) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Báo cáo này không tồn tại",
+        error: "Báo cáo này không tồn tại",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    if (newStatus === report.status) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Trạng thái mới phải khác trạng thái ban đầu",
+        error: "Trạng thái mới phải khác trạng thái ban đầu",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    report.status = newStatus;
+    await report.save();
+
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Cập nhật trạng thái báo cáo thành công",
+      data: report,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi cập nhật báo cáo",
+      error: "Xảy ra lỗi khi cập nhật báo cáo: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

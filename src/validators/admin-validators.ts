@@ -9,6 +9,13 @@ export const banUserValidator = [
     .withMessage("Số giờ khóa tài khoản phải lớn hơn 0"),
 ];
 
-export const deletePostValidator = [
+export const deleteReportValidator = [
   param("postId").notEmpty().withMessage("Chưa cung cấp ID bài viết"),
+];
+
+export const updateReportValidator = [
+  body("newStatus")
+    .isIn(["pending", "reviewing", "resolved"])
+    .withMessage("Trạng thái cập nhật không hợp lệ"),
+  body("reportId").notEmpty().withMessage("ID của báo cáo không hợp lệ"),
 ];
