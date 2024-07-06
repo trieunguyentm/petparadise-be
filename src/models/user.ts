@@ -33,6 +33,8 @@ export interface IUserDocument extends mongoose.Document {
   role: "user" | "admin";
   accountBalance: number;
   withdrawalHistory: IWithdrawalHistory[];
+  isBanned: boolean;
+  banExpiration?: Date;
   updatedAt: Date;
   createdAt: Date;
 }
@@ -103,6 +105,8 @@ const userSchema = new mongoose.Schema<IUserDocument>(
         default: [],
       },
     ],
+    isBanned: { type: Boolean, default: false },
+    banExpiration: { type: Date },
   },
   {
     timestamps: true,

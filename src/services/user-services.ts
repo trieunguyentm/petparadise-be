@@ -411,7 +411,7 @@ export const handleGetOtherUserService = async ({
       .skip(offset)
       .limit(limit)
       .sort({ createdAt: -1 })
-      .select("-password -chats -email -savedPosts -likedPosts") // Loại bỏ các trường nhạy cảm
+      .select("-password -chats -savedPosts -likedPosts") // Loại bỏ các trường nhạy cảm
       .exec();
     // Return
     let dataResponse: SuccessResponse = {

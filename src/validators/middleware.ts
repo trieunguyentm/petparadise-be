@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { ErrorResponse, RequestCustom, UserPayLoad } from "../types";
-import { SESSION_EXPIRED } from "../constants";
+import { ERROR_CLIENT, SESSION_EXPIRED } from "../constants";
 import { connectRedis } from "../db/redis";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
@@ -43,6 +43,76 @@ export const authenticate = async (
     const payload = jwt.verify(token, process.env.JWT_KEY as string);
     if (payload) {
       req.user = payload as UserPayLoad;
+      next();
+    } else {
+      let response: ErrorResponse = {
+        success: false,
+        message: "Xảy ra lỗi khi xác thực",
+        error: "Xảy ra lỗi khi xác thực",
+        statusCode: 403,
+        type: SESSION_EXPIRED,
+      };
+      res.status(403).json(response);
+      return;
+    }
+  } catch (error) {
+    let response: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi xác thực",
+      error: "Xảy ra lỗi khi xác thực",
+      statusCode: 403,
+      type: SESSION_EXPIRED,
+    };
+    res.status(403).json(response);
+    return;
+  }
+};
+
+export const adminAuthentiation = async (
+  req: RequestCustom,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const tokenId = req.cookies["t"];
+    if (!tokenId) {
+      let response: ErrorResponse = {
+        success: false,
+        message: "Chưa cung cấp ID Session",
+        error: "Chưa cung cấp ID Session",
+        statusCode: 403,
+        type: SESSION_EXPIRED,
+      };
+      res.status(403).json(response);
+      return;
+    }
+    const client = await connectRedis();
+    const token = await client.get(tokenId);
+    if (!token) {
+      let response: ErrorResponse = {
+        success: false,
+        message: "Không tìm thấy ID Session",
+        error: "Không tìm thấy ID Session",
+        statusCode: 403,
+        type: SESSION_EXPIRED,
+      };
+      res.status(403).json(response);
+      return;
+    }
+    const payload = jwt.verify(token, process.env.JWT_KEY as string);
+    if (payload) {
+      req.user = payload as UserPayLoad;
+      if (req.user.role !== "admin") {
+        let response: ErrorResponse = {
+          success: false,
+          message: "Không có quyền admin",
+          error: "Không có quyền admin",
+          statusCode: 403,
+          type: ERROR_CLIENT,
+        };
+        res.status(403).json(response);
+        return;
+      }
       next();
     } else {
       let response: ErrorResponse = {

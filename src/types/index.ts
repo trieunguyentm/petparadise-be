@@ -21,7 +21,7 @@ export interface UserPayLoad extends JwtPayload {
   username: string;
   email: string;
   id: string;
-  role: string;
+  role: "admin" | "user";
 }
 
 export interface RequestCustom extends Request {
@@ -29,6 +29,7 @@ export interface RequestCustom extends Request {
     id: string;
     username: string;
     email: string;
+    role: "admin" | "user";
   };
 }
 

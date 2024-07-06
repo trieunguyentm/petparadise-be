@@ -274,3 +274,20 @@ export const generateNotificationCancelOrderMail = (
   const emailBody = mailGenerator.generate(email);
   return emailBody;
 };
+
+export const generateBanNotificationMail = (
+  to: string,
+  banDuration: number
+) => {
+  const email = {
+    body: {
+      name: to,
+      intro: `Tài khoản của bạn trên hệ thống Pet Paradise đã bị khóa. Thời gian khóa tài khoản là ${banDuration} giờ.`,
+      outro: "Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi.",
+    },
+  };
+  const emailBody = mailGenerator.generate(email);
+
+  /** Return HTML email */
+  return emailBody;
+};

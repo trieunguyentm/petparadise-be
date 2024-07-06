@@ -10,6 +10,7 @@ import adoptionRequestRoute from "./adoption-request";
 import productRoute from "./product";
 import paymentRoute from "./payment";
 import refundRequestRoute from "./refund-request";
+import adminRoute from "./admin";
 
 const router = Router();
 router.use("/auth", authRoute);
@@ -23,5 +24,6 @@ router.use("/adoption-request", adoptionRequestRoute);
 router.use("/product", productRoute);
 router.use("/payment", paymentRoute);
 router.use("/refund-request", refundRequestRoute);
+router.use("/admin", adminRoute);
 
 export default router;

@@ -16,6 +16,7 @@ import User from "../models/user";
 import { ErrorResponse, SuccessResponse } from "../types";
 import bcrypt, { hash } from "bcryptjs";
 import * as jwtHelper from "../utils/jwt";
+import moment from "moment";
 
 export const handleRegisterService = async ({
   username,
@@ -654,6 +655,28 @@ export const handleLoginService = async ({
         type: ERROR_CLIENT,
       };
       return dataResponse;
+    }
+
+    // Kiểm tra trạng thái khóa tài khoản
+    if (user.isBanned) {
+      if (user.banExpiration && new Date() > user.banExpiration) {
+        // Thời gian khóa đã hết, cập nhật lại trạng thái tài khoản
+        user.isBanned = false;
+        user.banExpiration = undefined;
+        await user.save();
+      } else {
+        // Tài khoản vẫn đang bị khóa
+        let dataResponse: ErrorResponse = {
+          success: false,
+          message: `Tài khoản của bạn đã bị khóa đến thời điểm: ${moment(
+            user.banExpiration
+          ).format("DD/MM/YYYY HH:mm")}`,
+          error: "Tài khoản bị khóa",
+          statusCode: 403,
+          type: ERROR_CLIENT,
+        };
+        return dataResponse;
+      }
     }
     // So sánh mật khẩu đã nhập với mật khẩu đã băm
     const isMatch = await bcrypt.compare(inputPassword, user.password);
