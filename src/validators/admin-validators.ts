@@ -28,3 +28,7 @@ export const updateDrawMoneyHistoryValidator = [
     .notEmpty()
     .withMessage("ID của yêu cầu nhận tiền không hợp lệ"),
 ];
+
+export const deleteProductvalidator = [
+  param("productId").notEmpty().withMessage("ID sản phẩm không hợp lệ"),
+];

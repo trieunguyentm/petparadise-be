@@ -2,6 +2,7 @@ import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
 import { connectRedis } from "../db/redis";
 import Post from "../models/post";
+import Product from "../models/product";
 import Report from "../models/report";
 import User from "../models/user";
 import WithdrawalHistory from "../models/withdrawal-history";
@@ -359,6 +360,53 @@ export const handleUpdateDrawMoneyHistoryService = async ({
       error:
         "Xảy ra lỗi khi cập nhật trạng thái yêu cầu nhận tiền: " +
         error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleDeleteProductByAdminService = async ({
+  productId,
+}: {
+  productId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Tìm kiếm sản phẩm theo productId
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Không tìm thấy sản phẩm",
+        error: "Không tìm thấy sản phẩm",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+
+    // Xóa sản phẩm
+    await Product.findByIdAndDelete(productId);
+
+    // Trả về phản hồi thành công
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Xóa sản phẩm thành công",
+      data: null,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi xóa sản phẩm",
+      error: "Xảy ra lỗi khi xóa sản phẩm: " + error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

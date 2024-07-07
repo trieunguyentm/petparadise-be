@@ -38,4 +38,10 @@ adminRoute.put(
   adminControllers.handleUpdateDrawMoneyHistory
 );
 
+adminRoute.delete(
+  "/delete-product/:productId",
+  validators.deleteProductvalidator,
+  adminControllers.handleDeleteProductByAdmin
+);
+
 export default adminRoute;

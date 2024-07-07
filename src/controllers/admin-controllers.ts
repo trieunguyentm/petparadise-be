@@ -4,6 +4,7 @@ import { ERROR_CLIENT } from "../constants";
 import {
   handleBanUserService,
   handleDeletePostService,
+  handleDeleteProductByAdminService,
   handleDrawMoneyHistoriesService,
   handleGetReportService,
   handleUpdateDrawMoneyHistoryService,
@@ -163,6 +164,35 @@ export const handleUpdateDrawMoneyHistory = async (
     drawMoneyHistoryId,
   });
 
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleDeleteProductByAdmin = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  // Kiểm tra kết quả validation
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
+      error: errors.array()[0].msg,
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+
+  const { productId } = req.params;
+
+  const result = await handleDeleteProductByAdminService({ productId });
+
+  // Kiểm tra kết quả và phản hồi tương ứng
   if (!result.success) {
     return res.status(result.statusCode).json(result);
   } else {
