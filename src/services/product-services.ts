@@ -717,9 +717,10 @@ export const handleSetOrderService = async ({
       };
       return dataResponse;
     }
-    /** Nếu đơn hàng là offline thì chỉ chấp nhận việc hủy hoặc đã giao hàng */
+    /** Nếu đơn hàng là offline thì chỉ chấp nhận việc hủy hoặc đã giao hàng hoặc đang giao hàng */
     if (
       order.typePayment === "offline" &&
+      status !== "shipped" &&
       status !== "cancelled" &&
       status !== "delivered"
     ) {

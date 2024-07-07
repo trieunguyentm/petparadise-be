@@ -39,6 +39,17 @@ export const handleCreateRefundRequestService = async ({
       };
       return dataResponse;
     }
+    // Nếu đơn hàng là đơn hàng nhận trực tiếp rồi thanh toán hoặc giá đơn hàng <= 0
+    if (order.typePayment === "offline" || order.totalAmount <= 0) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Yêu cầu hoàn tiền không hợp lệ",
+        error: "Yêu cầu hoàn tiền không hợp lệ",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
     // Check if the requester is the buyer of the order
     if (order.buyer._id.toString() !== user.id) {
       let dataResponse: ErrorResponse = {
@@ -156,8 +167,7 @@ export const handleGetRefundRequestByOrderService = async ({
     if (order.buyer._id.toString() !== user.id) {
       let dataResponse: ErrorResponse = {
         success: false,
-        message:
-          "Không thể thực hiện",
+        message: "Không thể thực hiện",
         error: "Không thể thực hiện",
         statusCode: 403,
         type: ERROR_CLIENT,

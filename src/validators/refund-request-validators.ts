@@ -5,6 +5,7 @@ export const createRefundRequest = [
   body("bankCode")
     .notEmpty()
     .withMessage("Chưa cấp cung codeName của ngân hàng"),
+  body("bankName").notEmpty().withMessage("Chưa cấp cung tên tài khoản"),
   body("bankNumber").notEmpty().withMessage("Chưa cấp cấp số tài khoản"),
 ];
 
