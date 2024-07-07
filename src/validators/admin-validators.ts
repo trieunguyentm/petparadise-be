@@ -19,3 +19,12 @@ export const updateReportValidator = [
     .withMessage("Trạng thái cập nhật không hợp lệ"),
   body("reportId").notEmpty().withMessage("ID của báo cáo không hợp lệ"),
 ];
+
+export const updateDrawMoneyHistoryValidator = [
+  body("newStatus")
+    .isIn(["pending", "completed", "failed"])
+    .withMessage("Trạng thái cập nhật không hợp lệ"),
+  body("drawMoneyHistoryId")
+    .notEmpty()
+    .withMessage("ID của yêu cầu nhận tiền không hợp lệ"),
+];

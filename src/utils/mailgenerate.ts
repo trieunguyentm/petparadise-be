@@ -291,3 +291,20 @@ export const generateBanNotificationMail = (
   /** Return HTML email */
   return emailBody;
 };
+
+export const generateWithdrawalCompletedMail = (
+  username: string,
+  amount: number
+) => {
+  const email = {
+    body: {
+      name: username,
+      intro: `Yêu cầu nhận tiền của bạn với số tiền ${amount} đã được xử lý thành công.`,
+      outro: "Trân trọng, Đội ngũ hỗ trợ Pet Paradise",
+    },
+  };
+  const emailBody = mailGenerator.generate(email);
+
+  /** Return HTML email */
+  return emailBody;
+};

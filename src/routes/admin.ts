@@ -27,4 +27,15 @@ adminRoute.put(
   adminControllers.handleUpdateReport
 );
 
+adminRoute.get(
+  "/get-draw-money-histories",
+  adminControllers.handleDrawMoneyHistories
+);
+
+adminRoute.put(
+  "/update-draw-money-history",
+  validators.updateDrawMoneyHistoryValidator,
+  adminControllers.handleUpdateDrawMoneyHistory
+);
+
 export default adminRoute;

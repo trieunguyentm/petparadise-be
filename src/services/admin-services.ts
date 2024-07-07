@@ -4,9 +4,13 @@ import { connectRedis } from "../db/redis";
 import Post from "../models/post";
 import Report from "../models/report";
 import User from "../models/user";
+import WithdrawalHistory from "../models/withdrawal-history";
 import { ErrorResponse, SuccessResponse } from "../types";
 import { sendEmail } from "../utils/mailer";
-import { generateBanNotificationMail } from "../utils/mailgenerate";
+import {
+  generateBanNotificationMail,
+  generateWithdrawalCompletedMail,
+} from "../utils/mailgenerate";
 
 export const handleBanUserService = async ({
   user,
@@ -235,6 +239,126 @@ export const handleUpdateReportService = async ({
       success: false,
       message: "Xảy ra lỗi khi cập nhật báo cáo",
       error: "Xảy ra lỗi khi cập nhật báo cáo: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleDrawMoneyHistoriesService = async ({
+  limit,
+  offset,
+}: {
+  limit: number;
+  offset: number;
+}) => {
+  try {
+    await connectMongoDB();
+
+    const drawMoneyHistories = await WithdrawalHistory.find()
+      .skip(offset)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        model: User,
+        select: "username email profileImage",
+      })
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Lấy thông tin thành công",
+      data: drawMoneyHistories,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi lấy danh sách yêu cầu nhận tiền",
+      error: "Xảy ra lỗi khi lấy danh sách yêu cầu nhận tiền: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleUpdateDrawMoneyHistoryService = async ({
+  newStatus,
+  drawMoneyHistoryId,
+}: {
+  newStatus: "pending" | "completed" | "failed";
+  drawMoneyHistoryId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Tìm yêu cầu nhận tiền
+    const drawMoneyHistory = await WithdrawalHistory.findById(
+      drawMoneyHistoryId
+    )
+      .populate({
+        path: "user",
+        model: User,
+        select: "username email profileImage",
+      })
+      .exec();
+    // Kiểm tra xem yêu cầu có tồn tại
+    if (!drawMoneyHistory) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Yêu cầu nhận tiền này không tồn tại",
+        error: "Yêu cầu nhận tiền này không tồn tại",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Nếu yêu cầu đã hoàn thành trước đó
+    if (drawMoneyHistory.status === "completed") {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Yêu cầu nhận tiền này đã được xử lý",
+        error: "Yêu cầu nhận tiền này đã được xử lý",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Lưu trạng thái mới
+    drawMoneyHistory.status = newStatus;
+    await drawMoneyHistory.save();
+    // Nếu trạng thái mới là "completed", gửi email thông báo
+    if (newStatus === "completed") {
+      const emailBody = generateWithdrawalCompletedMail(
+        drawMoneyHistory.user.username,
+        drawMoneyHistory.amount
+      );
+      const subject = "Yêu cầu nhận tiền đã được xử lý thành công";
+      await sendEmail(drawMoneyHistory.user.email, subject, emailBody);
+    }
+    // Return
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Cập nhật trạng thái yêu cầu nhận tiền thành công",
+      data: drawMoneyHistory,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi cập nhật trạng thái yêu cầu nhận tiền",
+      error:
+        "Xảy ra lỗi khi cập nhật trạng thái yêu cầu nhận tiền: " +
+        error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };
