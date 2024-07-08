@@ -6,8 +6,10 @@ import {
   handleDeletePostService,
   handleDeleteProductByAdminService,
   handleDrawMoneyHistoriesService,
+  handleGetRefundRequestService,
   handleGetReportService,
   handleUpdateDrawMoneyHistoryService,
+  handleUpdateRefundRequestService,
   handleUpdateReportService,
 } from "../services/admin-services";
 import { validationResult } from "express-validator";
@@ -193,6 +195,55 @@ export const handleDeleteProductByAdmin = async (
   const result = await handleDeleteProductByAdminService({ productId });
 
   // Kiểm tra kết quả và phản hồi tương ứng
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleGetRefundRequest = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  // Parse the query parameters and provide default values if necessary
+  const limit = parseInt(req.query.limit as string) || 20;
+  const offset = parseInt(req.query.offset as string) || 0;
+
+  const result = await handleGetRefundRequestService({ limit, offset });
+
+  // Kiểm tra kết quả và phản hồi tương ứng
+  if (!result.success) {
+    return res.status(result.statusCode).json(result);
+  } else {
+    return res.status(200).json(result);
+  }
+};
+
+export const handleUpdateRefundRequest = async (
+  req: RequestCustom,
+  res: Response
+) => {
+  // Kiểm tra kết quả validation
+  const errors = validationResult(req);
+  // Nếu có lỗi validation, gửi lại lỗi cho client
+  if (!errors.isEmpty()) {
+    const response: ErrorResponse = {
+      success: false,
+      message: `Thông tin không hợp lệ: ${errors.array()[0].msg}`,
+      error: errors.array()[0].msg,
+      statusCode: 400,
+      type: ERROR_CLIENT,
+    };
+    return res.status(400).json(response);
+  }
+  const { newStatus, refundRequestId } = req.body;
+
+  const result = await handleUpdateRefundRequestService({
+    newStatus,
+    refundRequestId,
+  });
+
   if (!result.success) {
     return res.status(result.statusCode).json(result);
   } else {

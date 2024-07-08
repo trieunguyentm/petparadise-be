@@ -32,3 +32,12 @@ export const updateDrawMoneyHistoryValidator = [
 export const deleteProductvalidator = [
   param("productId").notEmpty().withMessage("ID sản phẩm không hợp lệ"),
 ];
+
+export const updateRefundRequestValidator = [
+  body("newStatus")
+    .isIn(["pending", "approved"])
+    .withMessage("Trạng thái cập nhật không hợp lệ"),
+  body("refundRequestId")
+    .notEmpty()
+    .withMessage("ID của yêu cầu hoàn tiền mua hàng không hợp lệ"),
+];

@@ -1,8 +1,10 @@
 import { ERROR_CLIENT, ERROR_SERVER, SUCCESS } from "../constants";
 import { connectMongoDB } from "../db/mongodb";
 import { connectRedis } from "../db/redis";
+import Order from "../models/order";
 import Post from "../models/post";
 import Product from "../models/product";
+import RefundRequest from "../models/refund-request";
 import Report from "../models/report";
 import User from "../models/user";
 import WithdrawalHistory from "../models/withdrawal-history";
@@ -10,6 +12,7 @@ import { ErrorResponse, SuccessResponse } from "../types";
 import { sendEmail } from "../utils/mailer";
 import {
   generateBanNotificationMail,
+  generateRefundSuccessMail,
   generateWithdrawalCompletedMail,
 } from "../utils/mailgenerate";
 
@@ -407,6 +410,156 @@ export const handleDeleteProductByAdminService = async ({
       success: false,
       message: "Xảy ra lỗi khi xóa sản phẩm",
       error: "Xảy ra lỗi khi xóa sản phẩm: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleGetRefundRequestService = async ({
+  limit,
+  offset,
+}: {
+  limit: number;
+  offset: number;
+}) => {
+  try {
+    await connectMongoDB();
+
+    const refundRequests = await RefundRequest.find()
+      .skip(offset)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "order",
+        model: Order,
+        populate: [
+          {
+            path: "products.product",
+            model: Product,
+          },
+          {
+            path: "buyer",
+            model: User,
+            select: "username email profileImage",
+          },
+          {
+            path: "seller",
+            model: User,
+            select: "username email profileImage",
+          },
+        ],
+      })
+      .exec();
+
+    const dataResponse: SuccessResponse = {
+      success: true,
+      message: "Lấy danh sách yêu cầu hoàn tiền thành công",
+      data: refundRequests,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi lấy yêu cầu hoàn tiền",
+      error: "Xảy ra lỗi khi lấy yêu cầu hoàn tiền: " + error.message,
+      statusCode: 500,
+      type: ERROR_SERVER,
+    };
+    return dataResponse;
+  }
+};
+
+export const handleUpdateRefundRequestService = async ({
+  newStatus,
+  refundRequestId,
+}: {
+  newStatus: "pending" | "approved";
+  refundRequestId: string;
+}) => {
+  try {
+    await connectMongoDB();
+
+    // Tìm yêu cầu hoàn tiền
+    const refundRequest = await RefundRequest.findById(refundRequestId)
+      .populate({
+        path: "buyer",
+        model: User,
+        select: "username email profileImage",
+      })
+      .populate({
+        path: "order",
+        model: Order,
+        select: "orderCode",
+      })
+      .exec();
+    // Kiểm tra xem yêu cầu có tồn tại
+    if (!refundRequest) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Yêu cầu hoàn tiền này không tồn tại",
+        error: "Yêu cầu hoàn tiền này không tồn tại",
+        statusCode: 404,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Nếu yêu cầu đã hoàn thành trước đó
+    if (refundRequest.status === "approved") {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Yêu cầu hoàn tiền này đã được xử lý",
+        error: "Yêu cầu hoàn tiền này đã được xử lý",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Kiểm tra trạng thái mới
+    if (newStatus === refundRequest.status) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Cần cập nhật trạng thái khác",
+        error: "Cần cập nhật trạng thái khác",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
+    // Lưu trạng thái mới
+    refundRequest.status = newStatus;
+    await refundRequest.save();
+    // Gửi email thông báo
+    if (newStatus === "approved") {
+      const emailBody = generateRefundSuccessMail(
+        refundRequest.buyer.username,
+        refundRequest.amount,
+        refundRequest.order.orderCode
+      );
+      const subject = `Yêu cầu hoàn tiền cho đơn hàng ${refundRequest.order.orderCode} đã thành công`;
+      await sendEmail(refundRequest.buyer.email, subject, emailBody);
+    }
+    // Return
+    let dataResponse: SuccessResponse = {
+      success: true,
+      message: "Cập nhật trạng thái yêu cầu hoàn tiền thành công",
+      data: refundRequest,
+      statusCode: 200,
+      type: SUCCESS,
+    };
+    return dataResponse;
+  } catch (error: any) {
+    console.log(error);
+    let dataResponse: ErrorResponse = {
+      success: false,
+      message: "Xảy ra lỗi khi cập nhật trạng thái yêu cầu hoàn tiền",
+      error:
+        "Xảy ra lỗi khi cập nhật trạng thái yêu cầu hoàn tiền: " +
+        error.message,
       statusCode: 500,
       type: ERROR_SERVER,
     };

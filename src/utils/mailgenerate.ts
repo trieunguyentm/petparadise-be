@@ -1,10 +1,13 @@
 import Mailgen from "mailgen";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const mailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: "Pet Paradise",
-    link: "http://localhost:3000/",
+    link: process.env.FE_URL as string,
   },
 });
 
@@ -76,7 +79,7 @@ export const generateAdoptionResponseMail = (
         button: {
           color: "#22BC66",
           text: "Xác nhận đồng ý nuôi",
-          link: `http://localhost:3001/pet-adoption/confirm/${id}`,
+          link: `${process.env.FE_URL}/pet-adoption/confirm/${id}`,
         },
       },
       outro:
@@ -127,7 +130,7 @@ export const generateOrderNotificationMail = (
         button: {
           color: "#22BC66",
           text: "Xem Đơn Hàng",
-          link: `http://localhost:3001/store/manage-order`,
+          link: `${process.env.FE_URL}/store/manage-order`,
         },
       },
       outro: `Tổng số tiền: ${totalAmount
@@ -189,7 +192,7 @@ export const generateOrderDeliveredMail = (
         button: {
           color: "#22BC66",
           text: "Xác Nhận Đã Nhận Hàng",
-          link: `http://localhost:3000/store/purchased-order`,
+          link: `${process.env.FE_URL}/store/purchased-order`,
         },
       },
       outro: "Cảm ơn bạn đã mua sắm tại Pet Paradise!",
@@ -233,7 +236,7 @@ export const generateOrderSuccessMail = (
         button: {
           color: "#22BC66", // Màu tùy chọn của nút hành động
           text: "Xem Đơn Hàng",
-          link: `http://localhost:3000/store/purchased-order/${orderCode}`,
+          link: `${process.env.FE_URL}/store/purchased-order/${orderCode}`,
         },
       },
       outro:
@@ -303,6 +306,35 @@ export const generateWithdrawalCompletedMail = (
       outro: "Trân trọng, Đội ngũ hỗ trợ Pet Paradise",
     },
   };
+  const emailBody = mailGenerator.generate(email);
+
+  /** Return HTML email */
+  return emailBody;
+};
+
+export const generateRefundSuccessMail = (
+  username: string,
+  amount: number,
+  orderCode: number
+) => {
+  const email = {
+    body: {
+      name: username,
+      intro: `Chúng tôi rất vui thông báo rằng yêu cầu hoàn lại số tiền ${amount} VND cho đơn hàng có mã số ${orderCode} của bạn đã được xử lý thành công.`,
+      table: {
+        data: [
+          {
+            "Mã đơn hàng": orderCode,
+            "Số tiền hoàn lại": `${amount} VND`,
+          },
+        ],
+      },
+      outro:
+        "Cảm ơn bạn đã sử dụng Pet Paradise. Chúng tôi mong muốn mang đến cho bạn dịch vụ tốt nhất.",
+    },
+  };
+
+  // Generate the email body
   const emailBody = mailGenerator.generate(email);
 
   /** Return HTML email */

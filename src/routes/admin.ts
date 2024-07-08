@@ -44,4 +44,12 @@ adminRoute.delete(
   adminControllers.handleDeleteProductByAdmin
 );
 
+adminRoute.get("/get-refund-request", adminControllers.handleGetRefundRequest);
+
+adminRoute.put(
+  "/update-refund-request",
+  validators.updateRefundRequestValidator,
+  adminControllers.handleUpdateRefundRequest
+);
+
 export default adminRoute;
