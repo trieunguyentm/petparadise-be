@@ -409,6 +409,8 @@ export const handleGetPetAdoptionPostBySearchService = async ({
   location,
   status,
   reason,
+  limit,
+  offset,
 }: {
   petType: "all" | TypePet;
   gender: "all" | GenderPet;
@@ -416,34 +418,39 @@ export const handleGetPetAdoptionPostBySearchService = async ({
   location: string;
   status: "all" | StatusPetAdoption;
   reason: "all" | ReasonFindOwner;
+  limit: number;
+  offset: number;
 }) => {
   let query: any = {};
 
   if (petType !== "all") query.petType = petType;
   if (gender !== "all") query.gender = gender;
   if (size !== "all") query.sizePet = size;
-
   const [cityName, districtName, wardName] = location.split("-");
+  
   if (cityName) {
-    query.lastSeenLocation = new RegExp("^" + escapeRegex(cityName), "i");
+    query.location = new RegExp("^" + escapeRegex(cityName), "i");
     if (districtName) {
-      query.lastSeenLocation = new RegExp(
+      query.location = new RegExp(
         "^" + escapeRegex(`${cityName}-${districtName}`),
         "i"
       );
       if (wardName) {
-        query.lastSeenLocation = new RegExp(
+        query.location = new RegExp(
           "^" + escapeRegex(`${cityName}-${districtName}-${wardName}`),
           "i"
         );
       }
     }
   }
+
   if (status !== "all") query.status = status;
   if (reason !== "all") query.reason = reason;
   try {
     await connectMongoDB();
     const posts = await PetAdoptionPost.find(query)
+      .skip(offset)
+      .limit(limit)
       .populate("poster", "username profileImage")
       .sort({ createdAt: -1 })
       .exec();

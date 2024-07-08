@@ -167,12 +167,16 @@ export const handleGetFindPetPostBySearchService = async ({
   size,
   lastSeenLocation,
   lastSeenDate,
+  limit,
+  offset,
 }: {
   petType: "all" | TypePet;
   gender: "all" | GenderPet;
   size: "all" | SizePet;
   lastSeenLocation: string;
   lastSeenDate: Date | undefined;
+  limit: number;
+  offset: number;
 }) => {
   let query: any = {};
 
@@ -204,6 +208,8 @@ export const handleGetFindPetPostBySearchService = async ({
   try {
     await connectMongoDB();
     const posts = await LostPetPost.find(query)
+      .skip(offset)
+      .limit(limit)
       .populate("poster", "username profileImage")
       .sort({ createdAt: -1 }) // Sorting by creation time, latest first
       .exec();

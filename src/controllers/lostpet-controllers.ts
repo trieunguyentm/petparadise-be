@@ -118,6 +118,10 @@ export const handleGetFindPetPostBySearch = async (
     lastSeenDate = "",
   } = req.query;
 
+  // Parse the query parameters and provide default values if necessary
+  const limit = parseInt(req.query.limit as string) || 20;
+  const offset = parseInt(req.query.offset as string) || 0;
+
   // Cast the parameters to their respective types
   const searchParams = {
     petType: petType as "all" | TypePet,
@@ -125,6 +129,8 @@ export const handleGetFindPetPostBySearch = async (
     size: size as "all" | SizePet,
     lastSeenLocation: lastSeenLocation as string,
     lastSeenDate: lastSeenDate ? new Date(lastSeenDate as string) : undefined,
+    limit,
+    offset,
   };
 
   const result = await handleGetFindPetPostBySearchService(searchParams);

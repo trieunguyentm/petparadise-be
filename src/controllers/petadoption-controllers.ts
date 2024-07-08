@@ -254,6 +254,10 @@ export const handleGetPetAdoptionPostBySearch = async (
     reason = "all",
   } = req.query;
 
+  // Parse the query parameters and provide default values if necessary
+  const limit = parseInt(req.query.limit as string) || 20;
+  const offset = parseInt(req.query.offset as string) || 0;
+
   // Cast the parameters to their respective types
   const searchParams = {
     petType: petType as "all" | TypePet,
@@ -262,6 +266,8 @@ export const handleGetPetAdoptionPostBySearch = async (
     location: location as string,
     status: status as "all" | StatusPetAdoption,
     reason: reason as "all" | ReasonFindOwner,
+    limit,
+    offset,
   };
 
   const result = await handleGetPetAdoptionPostBySearchService(searchParams);
