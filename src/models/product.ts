@@ -37,7 +37,7 @@ const productSchema = new Schema<IProductDocument>(
   {
     seller: { type: Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },
-    normalizedName: { type: String, required: true }, // Lưu tên đã chuẩn hóa
+    normalizedName: { type: String }, // Lưu tên đã chuẩn hóa
     description: { type: String, required: true },
     price: { type: Number, required: true },
     discountRate: { type: Number, default: 0 },
