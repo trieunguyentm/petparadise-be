@@ -4,6 +4,7 @@ import { IUserDocument } from "./user";
 export interface IProductDocument extends mongoose.Document {
   seller: IUserDocument;
   name: string;
+  normalizedName: string; // Tên sản phẩm đã chuẩn hóa
   description: string;
   price: number;
   discountRate?: number; // Tỷ lệ giảm giá (%)
@@ -25,10 +26,18 @@ export interface IProductDocument extends mongoose.Document {
   updatedAt: Date;
 }
 
+const normalizeString = (str: string) => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+};
+
 const productSchema = new Schema<IProductDocument>(
   {
     seller: { type: Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },
+    normalizedName: { type: String, required: true }, // Lưu tên đã chuẩn hóa
     description: { type: String, required: true },
     price: { type: Number, required: true },
     discountRate: { type: Number, default: 0 },
@@ -72,6 +81,12 @@ productSchema.index({ productType: 1 }); // Index for searching by productType
 productSchema.index({ seller: 1 }); // Index for searching by seller
 productSchema.index({ name: 1 }); // Index for full-text search on name
 productSchema.index({ price: 1 }); // Index for sorting by price
+
+// Middleware để chuẩn hóa tên sản phẩm trước khi lưu
+productSchema.pre("save", function (next) {
+  this.normalizedName = normalizeString(this.name);
+  next();
+});
 
 const Product: Model<IProductDocument> =
   mongoose.models?.Product ||

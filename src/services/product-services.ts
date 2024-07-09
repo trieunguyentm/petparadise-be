@@ -147,12 +147,7 @@ export const handleGetProductService = async ({
     if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) };
     if (name) {
       const normalizedSearch = normalizeString(name as string);
-      filter.$expr = {
-        $regexMatch: {
-          input: { $toLower: "$name" },
-          regex: new RegExp(normalizedSearch, "i"),
-        },
-      };
+      filter.normalizedName = { $regex: new RegExp(normalizedSearch, "i") };
     }
     if (seller) filter.seller = seller;
     await connectMongoDB();
