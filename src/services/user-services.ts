@@ -949,6 +949,11 @@ export const handleGetFavoriteProductService = async ({
       .populate({
         path: "favoriteProducts",
         model: Product,
+        populate: {
+          path: "seller",
+          model: User,
+          select: "username email profileImage",
+        },
       })
       .exec();
 
