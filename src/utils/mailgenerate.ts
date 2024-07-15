@@ -340,3 +340,26 @@ export const generateRefundSuccessMail = (
   /** Return HTML email */
   return emailBody;
 };
+
+export const generateAdoptionReminderMail = (
+  username: string,
+  petAdoptionPostId: string
+) => {
+  const email = {
+    body: {
+      name: username,
+      intro: `Đã 3 tháng kể từ khi thú cưng được nhận nuôi qua PetParadise!`,
+      action: {
+        instructions:
+          "Hãy chia sẻ hình ảnh và cập nhật về thú cưng sau khi thú cưng được nhận nuôi nhé.",
+        button: {
+          color: "#22BC66",
+          text: "Xem chi tiết",
+          link: `${process.env.FE_URL}/pet-adoption/${petAdoptionPostId}`,
+        },
+      },
+      outro: "Cảm ơn bạn đã tin tưởng Pet Paradise!",
+    },
+  };
+  return mailGenerator.generate(email);
+};

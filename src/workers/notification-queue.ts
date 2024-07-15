@@ -2,13 +2,19 @@ import Bull from "bull";
 import User, { IUserDocument } from "../models/user";
 import Notification from "../models/notification";
 import { TypePet } from "../types";
-import { IPetAdoptionPostDocument } from "../models/pet-adoption-post";
+import PetAdoptionPost, {
+  IPetAdoptionPostDocument,
+} from "../models/pet-adoption-post";
 import { ILostPetPostDocument } from "../models/lost-pet-post";
 import { pusherServer } from "../utils/pusher";
 import { connectMongoDB } from "../db/mongodb";
 import { IOrderDocument } from "../models/order";
 import { sendEmail } from "../utils/mailer";
-import { generateOrderNotificationMail } from "../utils/mailgenerate";
+import {
+  generateAdoptionReminderMail,
+  generateOrderNotificationMail,
+} from "../utils/mailgenerate";
+import TransferContract from "../models/transfer-contract";
 
 // Kết nối Redis
 const redisOptions = {
@@ -36,6 +42,9 @@ notificationQueue.process(async (job) => {
       break;
     case "ORDER_PROCESSED":
       await handleOrderProcessedNotification(data);
+      break;
+    case "ADOPTION_REMINDER":
+      await handleAdoptionReminder(data);
       break;
     default:
       console.log(`Unknown job type: ${type}`);
@@ -182,6 +191,53 @@ const handleOrderProcessedNotification = async (data: {
     await sendEmail(seller.email, subject, emailBody);
   } catch (error: any) {
     console.error("Error in handleOrderProcessedNotification:", error);
+  }
+};
+
+const handleAdoptionReminder = async (data: { contractId: string }) => {
+  try {
+    const contract = await TransferContract.findById(data.contractId)
+      .populate({
+        path: "petAdoptionPost",
+        model: PetAdoptionPost,
+      })
+      .populate({
+        path: "giver",
+        model: User,
+        select: "username email",
+      })
+      .populate({
+        path: "receiver",
+        model: User,
+        select: "username email",
+      });
+    if (!contract) {
+      throw new Error("Contract not found");
+    }
+
+    // Gửi email cho người nhận nuôi
+    const receiverEmailBody = generateAdoptionReminderMail(
+      contract.receiver.username,
+      contract.petAdoptionPost._id.toString()
+    );
+    await sendEmail(
+      contract.receiver.email,
+      "Nhắc nhở về thú cưng đã nhận nuôi",
+      receiverEmailBody
+    );
+
+    // Gửi email cho người trao thú cưng
+    const giverEmailBody = generateAdoptionReminderMail(
+      contract.giver.username,
+      contract.petAdoptionPost._id.toString()
+    );
+    await sendEmail(
+      contract.giver.email,
+      "Nhắc nhở về thú cưng đã trao",
+      giverEmailBody
+    );
+  } catch (error: any) {
+    console.error("Error in handleAdoptionReminder:", error);
   }
 };
 

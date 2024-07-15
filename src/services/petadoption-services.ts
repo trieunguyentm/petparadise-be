@@ -427,7 +427,7 @@ export const handleGetPetAdoptionPostBySearchService = async ({
   if (gender !== "all") query.gender = gender;
   if (size !== "all") query.sizePet = size;
   const [cityName, districtName, wardName] = location.split("-");
-  
+
   if (cityName) {
     query.location = new RegExp("^" + escapeRegex(cityName), "i");
     if (districtName) {
@@ -758,7 +758,16 @@ export const handleConfirmAdoptPetService = async ({
       contract.status = "confirmed";
       await contract.save();
       // Schedule quarterly reminders
-      // TODO: Implement scheduling logic
+      await notificationQueue.add(
+        {
+          type: "ADOPTION_REMINDER",
+          data: {
+            contractId: contract._id.toString(),
+          },
+        },
+        { delay: 3 * 30 * 24 * 60 * 60 * 1000 } // 3 months delay
+      );
+
       const dataResponse: SuccessResponse = {
         success: true,
         message: "Bạn đã xác nhận việc giao thú cưng",
