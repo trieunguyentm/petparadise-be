@@ -10,6 +10,7 @@ import { normalizeQuery } from "../utils/normalize";
 import CommentModel from "../models/comment";
 import { pusherServer } from "../utils/pusher";
 import Notification from "../models/notification";
+import { checkBadWords } from "../utils/check-bad-word";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -46,6 +47,17 @@ export const handleCreatePostService = async ({
   tags: string;
 }) => {
   try {
+    // Kiểm tra nội dung nhạy cảm
+    if (checkBadWords(content) === false || checkBadWords(tags) === false) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Nội dung hoặc thẻ bài viết có chứa từ ngữ nhạy cảm",
+        error: "Nội dung hoặc thẻ bài viết có chứa từ ngữ nhạy cảm",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
     // Hàm uploadImage để tải ảnh lên Cloudinary và trả về URL
     const imageUrls = await Promise.all(files.map((file) => uploadImage(file)));
 
@@ -244,6 +256,17 @@ export const handleAddCommentService = async ({
   file: Express.Multer.File | undefined;
 }) => {
   try {
+    // Kiểm tra nội dung nhạy cảm
+    if (checkBadWords(content) === false) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Nội dung bình luận có chứa từ ngữ nhạy cảm",
+        error: "Nội dung bình luận có chứa từ ngữ nhạy cảm",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
     await connectMongoDB();
     const [userInfo, postInfo] = await Promise.all([
       User.findById(user.id).select("-password"),

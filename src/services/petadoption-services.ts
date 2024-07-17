@@ -19,6 +19,7 @@ import Notification from "../models/notification";
 import notificationQueue from "../workers/notification-queue";
 import { error } from "console";
 import TransferContract from "../models/transfer-contract";
+import { checkBadWords } from "../utils/check-bad-word";
 
 // Helper function to escape regex characters
 function escapeRegex(text: string) {
@@ -70,6 +71,21 @@ export const handleCreatePetAdoptionPostService = async ({
   contactInfo: string;
 }) => {
   try {
+    // Kiểm tra nội dung nhạy cảm
+    if (
+      checkBadWords(description) === false ||
+      checkBadWords(healthInfo) === false ||
+      checkBadWords(contactInfo) === false
+    ) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Nội dung có chứa từ ngữ nhạy cảm",
+        error: "Nội dung có chứa từ ngữ nhạy cảm",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
     // Hàm uploadImage để tải ảnh lên Cloudinary và trả về URL
     const imageUrls = await Promise.all(files.map((file) => uploadImage(file)));
 

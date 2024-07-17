@@ -11,6 +11,7 @@ import User from "../models/user";
 import { generateAdoptionResponseMail } from "../utils/mailgenerate";
 import { sendEmail } from "../utils/mailer";
 import TransferContract from "../models/transfer-contract";
+import { checkBadWords } from "../utils/check-bad-word";
 
 const uploadImage = async (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -53,6 +54,21 @@ export const handleCreateAdoptionRequestService = async ({
   contactInfo: string;
 }) => {
   try {
+    // Kiểm tra nội dung nhạy cảm
+    if (
+      checkBadWords(descriptionForPet) === false ||
+      checkBadWords(descriptionForUser) === false ||
+      checkBadWords(contactInfo) === false
+    ) {
+      let dataResponse: ErrorResponse = {
+        success: false,
+        message: "Nội dung có chứa từ ngữ nhạy cảm",
+        error: "Nội dung có chứa từ ngữ nhạy cảm",
+        statusCode: 400,
+        type: ERROR_CLIENT,
+      };
+      return dataResponse;
+    }
     /** Upload image */
     let imageUrls: string[] = [];
     if (files && files.length > 0) {
